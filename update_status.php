@@ -7,6 +7,7 @@ $docId = $_POST['document_id'] ?? 0;
 $status = $_POST['status'] ?? '';
 $roleId = $_SESSION['role_id'] ?? 0;
 
+
 if ($roleId != 2) {
   echo json_encode(['success' => false, 'message' => 'ไม่มีสิทธิ์เปลี่ยนสถานะ']);
   exit;

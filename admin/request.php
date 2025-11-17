@@ -11,8 +11,10 @@ if (!isset($_SESSION['user_id'])) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>รายการส่งคำขอ (Officer)</title>
+  <title>รายการส่งคำขอ (admin)</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <style>
   html,
   body {
@@ -58,23 +60,45 @@ if (!isset($_SESSION['user_id'])) {
       </div>
     </div>
     <div class="flex items-center space-x-4">
-      <a href="home.html">
-        <div class="px-4 py-2 rounded-[11px] font-bold transition bg-white text-teal-500 shadow">
+      <a href="home.php">
+        <div class="px-4 py-2 rounded-[11px] font-bold transition  text-white hover:bg-white hover:text-teal-500 ">
           หน้าหลัก
         </div>
       </a>
 
+      <a href="request.php">
+        <div class="px-4 py-2 rounded-[11px] font-bold transition bg-white text-teal-500 shadow">
+          รายการคำขอ
+        </div>
+      </a>
+      <a href="user_Managerment.php" id="tab-users">
+        <div class="px-4 py-2 rounded-[11px] font-bold transition  text-white hover:bg-white hover:text-teal-500">
+          กำหนดสิทธิ์
+        </div>
+      </a>
+      <!-- Dropdown จัดการเทมเพลต -->
       <div class="relative">
-        <!-- ปุ่มโปรไฟล์ -->
+        <button id="templateBtn"
+          class="px-4 py-2 rounded-[11px] font-bold transition text-white hover:bg-white hover:text-teal-500 flex items-center space-x-1">
+          <span>ตั้งค่าระบบเริ่มต้น</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        <!-- เมนูย่อย -->
+        <div id="templateMenu" class="hidden absolute bg-white text-gray-700 mt-1 rounded-lg shadow-lg w-48 z-50">
+          <a href="form_Templates.php" class="block px-4 py-2 hover:bg-teal-100">การจัดการเทมเพลต</a>
+          <a href="department_Managerment.php" class="block px-4 py-2 hover:bg-teal-100">การจัดการภาควิชา</a>
+        </div>
+      </div>
+
+      <div class="relative">
         <button id="profileBtn"
           class="bg-white text-teal-500 px-4 py-2 rounded-[11px] shadow flex items-center space-x-2 hover:bg-gray-100">
           <div class="text-right leading-tight">
-            <div class="font-bold text-[14px]">
-              <?= htmlspecialchars($_SESSION['fullname'] ?? 'Guest') ?>
-            </div>
-            <div class="text-[12px]">
-              <?= htmlspecialchars($_SESSION['role_name'] ?? '') ?>
-            </div>
+            <div class="font-bold text-[14px]"><?= htmlspecialchars($_SESSION['fullname']) ?></div>
+            <div class="text-[12px]"><?= htmlspecialchars($_SESSION['role_name']) ?></div>
           </div>
           <div class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -84,7 +108,6 @@ if (!isset($_SESSION['user_id'])) {
             </svg>
           </div>
         </button>
-
         <!-- เมนู Dropdown -->
         <div id="profileMenu" class="hidden absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-50">
           <a href="../logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">ออกจากระบบ</a>
@@ -94,7 +117,11 @@ if (!isset($_SESSION['user_id'])) {
         </div>
       </div>
     </div>
+    </button>
+    </div>
+    </div>
   </header>
+
 
   <!-- Content -->
   <main class="max-w-7xl w-full px-8 mx-auto bg-white mt-4 mb-12 p-6 rounded shadow min-h-[85vh]">
@@ -207,13 +234,11 @@ if (!isset($_SESSION['user_id'])) {
       new Date(a.date));
     const start = (currentPage - 1) * itemsPerPage;
     const shown = sorted.slice(start, start + itemsPerPage);
+
     requestList.innerHTML = shown.map(req => `
     <div class="bg-gray-50 p-4 rounded-xl shadow flex justify-between items-start">
       <div>
-        <a href="../edit_document.php?id=${req.document_id}" 
-           class="font-semibold text-teal-600 hover:underline">
-           ${req.title}
-        </a>
+        <a href="../edit_document.php?id=${req.document_id}" class="font-semibold text-teal-600 hover:underline">${req.title}</a>
         <div class="text-sm text-gray-500 mt-1 flex items-center space-x-2">
           <span>${req.detail}</span>
           <span> | สถานะ:</span> 

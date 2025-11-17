@@ -103,7 +103,7 @@ function getActiveUsers()
 function db(): PDO
 {
     $dbHost = 'localhost';
-    $dbName = 'government_letter';
+    $dbName = 'pro_letter';
     $dbUser = 'root';
     $dbPass = '';
     return new PDO(
