@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once __DIR__ . '/../functions.php';
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.html");
     exit;
@@ -58,23 +60,25 @@ if (!isset($_SESSION['user_id'])) {
       </div>
     </div>
     <div class="flex items-center space-x-4">
-      <a href="home.html">
+      <a href="home.php">
         <div class="px-4 py-2 rounded-[11px] font-bold transition bg-white text-teal-500 shadow">
           หน้าหลัก
         </div>
       </a>
+
+      <?php 
+                if (isset($_SESSION['permissions']) && in_array(3, $_SESSION['permissions'])) {
+                    renderAdminExtraMenus(); 
+                }
+            ?>
 
       <div class="relative">
         <!-- ปุ่มโปรไฟล์ -->
         <button id="profileBtn"
           class="bg-white text-teal-500 px-4 py-2 rounded-[11px] shadow flex items-center space-x-2 hover:bg-gray-100">
           <div class="text-right leading-tight">
-            <div class="font-bold text-[14px]">
-              <?= htmlspecialchars($_SESSION['fullname'] ?? 'Guest') ?>
-            </div>
-            <div class="text-[12px]">
-              <?= htmlspecialchars($_SESSION['role_name'] ?? '') ?>
-            </div>
+            <div class="font-bold text-[14px]">ดร.พิทย์พิมล ชูรอด</div>
+            <div class="text-[12px]">อาจารย์</div>
           </div>
           <div class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -207,6 +211,7 @@ if (!isset($_SESSION['user_id'])) {
       new Date(a.date));
     const start = (currentPage - 1) * itemsPerPage;
     const shown = sorted.slice(start, start + itemsPerPage);
+
     requestList.innerHTML = shown.map(req => `
     <div class="bg-gray-50 p-4 rounded-xl shadow flex justify-between items-start">
       <div>
@@ -288,30 +293,9 @@ if (!isset($_SESSION['user_id'])) {
   function closeMenu() {
     profileMenu.classList.add("hidden");
   }
-
-  // กดนอกเมนูให้ปิด
   window.addEventListener("click", (e) => {
     if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
       profileMenu.classList.add("hidden");
-    }
-  });
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const params = new URLSearchParams(window.location.search);
-    const errType = params.get("err");
-
-    if (errType === "no_view") {
-      Swal.fire({
-        title: "ไม่มีสิทธิ์ดูเอกสารนี้",
-        text: "คุณไม่มีสิทธิ์ในการเข้าถึงเอกสารนี้",
-        icon: "error",
-        confirmButtonText: "ตกลง",
-        confirmButtonColor: "#3085d6",
-      }).then(() => {
-        const url = new URL(window.location.href);
-        url.searchParams.delete("err");
-        window.history.replaceState({}, "", url.toString());
-      });
     }
   });
   </script>

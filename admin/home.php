@@ -116,7 +116,59 @@ function thai_date($date) {
       <a href="user_Managerment.php" id="tab-users">
         <div class="px-4 py-2 rounded-[11px] font-bold transition text-white hover:bg-white hover:text-teal-500">
           กำหนดสิทธิ์
-        </div>
+          <div class="flex items-center space-x-4">
+            <a href="home.php">
+              <div class="px-4 py-2 rounded-[11px] font-bold transition bg-white text-teal-500 shadow">หน้าหลัก</div>
+            </a>
+            <?php 
+                if (isset($_SESSION['permissions']) && in_array(3, $_SESSION['permissions'])): 
+                renderAdminExtraMenus(); 
+            endif; 
+            ?>
+
+            <!-- เมนู: ตั้งค่าระบบเริ่มต้น -->
+            <div class="relative">
+              <button id="templateBtn" class="px-4 py-2 rounded-[11px] font-bold transition 
+                text-white hover:bg-white hover:text-teal-500 flex items-center space-x-1">
+                <span>ตั้งค่าระบบเริ่มต้น</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              <!-- เมนูย่อย -->
+              <div id="templateMenu" class="hidden absolute bg-white text-gray-700 mt-1 rounded-lg shadow-lg w-48 z-50">
+                <a href="form_Templates.php" class="block px-4 py-2 hover:bg-teal-100">การจัดการเทมเพลต</a>
+                <a href="department_Managerment.php" class="block px-4 py-2 hover:bg-teal-100">การจัดการภาควิชา</a>
+              </div>
+            </div>
+
+            <div class="relative">
+              <button id="profileBtn"
+                class="bg-white text-teal-500 px-4 py-2 rounded-[11px] shadow flex items-center space-x-2 hover:bg-gray-100">
+                <div class="text-right leading-tight">
+                  <div class="font-bold text-[14px]"><?= htmlspecialchars($_SESSION['fullname']) ?></div>
+                  <div class="text-[12px]"><?= htmlspecialchars($_SESSION['role_name']) ?></div>
+                </div>
+                <div
+                  class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M5.121 17.804A13.937 13.937 0 0112 15c2.33 0 4.487.577 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+              </button>
+              <!-- เมนู Dropdown -->
+              <div id="profileMenu" class="hidden absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-50">
+                <a href="../logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">ออกจากระบบ</a>
+                <button onclick="closeMenu()"
+                  class="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">
+                  อยู่ต่อ
+                </button>
+              </div>
+            </div>
+          </div>
       </a>
       <!-- Dropdown จัดการเทมเพลต -->
       <div class="relative">
