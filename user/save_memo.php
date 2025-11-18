@@ -169,7 +169,7 @@ try {
 
     // ----- สำคัญ: ถ้า submit ฟอร์มปกติ -> เด้งไปหน้าแก้ไข พร้อม id -----
     if (!$wantsJson) {
-        header('Location: edit_document.php?id=' . $documentId, true, 302);
+        header('Location: ../edit_document.php?id=' . $documentId, true, 302);
         exit;
     }
 

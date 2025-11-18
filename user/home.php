@@ -17,6 +17,7 @@ if (!isset($_SESSION['user_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>รายการส่งคำขอ</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
     html,
     body {
@@ -245,7 +246,7 @@ if (!isset($_SESSION['user_id'])) {
     <div class="bg-gray-50 p-4 rounded-xl shadow flex justify-between items-start">
       <div>
         <!-- 🟢 ชื่อเอกสารเป็นลิงก์ -->
-        <a href="edit_document.php?id=${req.document_id}" 
+        <a href="../edit_document.php?id=${req.document_id}" 
            class="font-semibold text-teal-600 hover:underline">
            ${req.title}
         </a>
@@ -282,7 +283,8 @@ if (!isset($_SESSION['user_id'])) {
       <button onclick="goToPage(${i})" class="px-3 py-1 rounded border ${i === currentPage ? "bg-teal-500 text-white" : "text-teal-500 border-teal-500"
                     }">${i}</button>
     `).join("");
-    }
+    } <<
+    << << < HEAD
 
 
 
@@ -356,6 +358,29 @@ if (!isset($_SESSION['user_id'])) {
         }
     });
     </script>
+    =======
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const errType = params.get("err");
+
+    if (errType === "no_view") {
+    Swal.fire({
+    title: "ไม่มีสิทธิ์ดูเอกสารนี้",
+    text: "คุณไม่มีสิทธิ์ในการเข้าถึงเอกสารนี้",
+    icon: "error",
+    confirmButtonText: "ตกลง",
+    confirmButtonColor: "#3085d6",
+    }).then(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("err");
+    window.history.replaceState({}, "", url.toString());
+    });
+    }
+    });
+    </script>
+    >>>>>>> 400b2a825c68f3000347a1bbdbf134c585aec8e0
 </body>
 
 </html>

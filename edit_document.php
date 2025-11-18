@@ -7,10 +7,10 @@ if ($DEV_AUTO_LOGIN && empty($_SESSION['user_id'])) {
 require_once __DIR__
   . '/../functions.php';
 if (empty($_SESSION['user_id'])) {
-  http_response_code(401);
-  echo 'Unauthorized';
-  exit;
+    http_response_code(401);
+    exit("Unauthorized");
 }
+
 $userId = (int) $_SESSION['user_id'];
 function h($s)
 {
@@ -45,7 +45,11 @@ function thai_date($ymd)
 }
 
 
+/* --------------------------------------------------
+   รับ document_id
+-------------------------------------------------- */
 $pdo = db();
+$docId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 /** รับ id เอกสาร; ถ้าไม่ส่งมาให้หยิบของล่าสุดของ user */
 $docId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
@@ -74,60 +78,102 @@ if (!$document) {
 $vals = $pdo->prepare("SELECT field_id, value_text FROM document_values WHERE document_id = :id");
 $vals->execute([':id' => $docId]);
 $valueMap = [];
-foreach ($vals->fetchAll(PDO::FETCH_ASSOC) as $r) {
-  $valueMap[(int) $r['field_id']] = (string) $r['value_text'];
+foreach ($q->fetchAll(PDO::FETCH_ASSOC) as $row) {
+    $valueMap[(int)$row['field_id']] = $row['value_text'];
 }
 
-/** map ค่า */
-$docDate = $valueMap[1] ?? ($document['doc_date'] ?? '');
-$ownerName = $valueMap[2] ?? '';
-$position = $valueMap[3] ?? '';
-$joinType = $valueMap[4] ?? ''; // เรื่อง
-$courseName = $valueMap[5] ?? '';
-$joinDates = $valueMap[6] ?? '';
-$location = $valueMap[7] ?? '';
-$amountStr = $valueMap[8] ?? '';
-$vehicle = $valueMap[9] ?? '';
-$faculty = $valueMap[10] ?? '';
-$department = $valueMap[11] ?? '';
+/* --------------------------------------------------
+   ฟังก์ชัน helper
+-------------------------------------------------- */
+function h($s) {
+    return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
+}
 
-// map joinType (ข้อความไทย) -> purpose (รหัสที่ backend ต้องการ)
-$purposeCode = 'training'; // ค่าเริ่มต้น
+function thai_date($ymd) {
+    if (!$ymd || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $ymd)) return "";
+    [$y,$m,$d] = explode("-", $ymd);
+    $months = [
+        1=>"มกราคม",2=>"กุมภาพันธ์",3=>"มีนาคม",4=>"เมษายน",5=>"พฤษภาคม",
+        6=>"มิถุนายน",7=>"กรกฎาคม",8=>"สิงหาคม",9=>"กันยายน",10=>"ตุลาคม",
+        11=>"พฤศจิกายน",12=>"ธันวาคม"
+    ];
+    return intval($d)." ".$months[intval($m)]." ".(intval($y)+543);
+}
+
+/* --------------------------------------------------
+   Mapping ตัวแปรหลักจาก document_values
+-------------------------------------------------- */
+$docDate    = $valueMap[1] ?? $document['doc_date'];
+$ownerName  = $valueMap[2] ?? "";
+$position   = $valueMap[3] ?? "";
+$joinType   = $valueMap[4] ?? "";
+$courseName = $valueMap[5] ?? "";
+$joinDates  = $valueMap[6] ?? "";
+$location   = $valueMap[7] ?? "";
+$amountStr  = $valueMap[8] ?? "";
+$vehicle    = $valueMap[9] ?? "";
+$faculty    = $valueMap[10] ?? "";
+$department = $valueMap[11] ?? "";
+/* --------------------------------------------------
+   Mapping joinType → purposeCode (รหัส)
+-------------------------------------------------- */
+$purposeCode = 'other';
+
 switch (trim($joinType)) {
-  case 'นำเสนอผลงานทางวิชาการ':
-    $purposeCode = 'academic';
-    break;
-  case 'เข้าร่วมประชุมวิชาการในงาน':
-    $purposeCode = 'meeting';
-    break;
-  case 'เข้ารับการฝึกอบรมหลักสูตร':
-    $purposeCode = 'training';
-    break;
-  default:
-    $purposeCode = 'other';
-    break;
+    case 'นำเสนอผลงานทางวิชาการ':
+        $purposeCode = 'academic';
+        break;
+    case 'เข้าร่วมประชุมวิชาการในงาน':
+        $purposeCode = 'meeting';
+        break;
+    case 'เข้ารับการฝึกอบรมหลักสูตร':
+        $purposeCode = 'training';
+        break;
 }
 
+/* --------------------------------------------------
+   ⭐⭐⭐ สำคัญที่สุด — แก้ให้ส่วนหัวขึ้น ⭐⭐⭐
+-------------------------------------------------- */
 
+$header_text = $document["header_text"] ?? "";
+$doc_no      = $document["doc_no"] ?? "";
+$subject     = $document["subject"] ?? "";
+
+/* --------------------------------------------------
+   คำนวณวันที่ไทย, งบประมาณ
+-------------------------------------------------- */
 $thaiDocDate = thai_date($docDate);
-$prettyAmount = $amountStr !== '' ? number_format((float) $amountStr, 2) : '';
+$prettyAmount = $amountStr !== "" ? number_format((float)$amountStr, 2) : "";
 
-/** header ช่วยประกอบบรรทัด */
-$hdr_agency = trim(($faculty ? $faculty : 'คณะ..................................') . ' ' . ($department ?
-  'ภาควิชา' . $department : 'ภาควิชา........................'));
-$hdr_subject = $joinType ?: 'เข้ารับการฝึกอบรมหลักสูตร';
-$hdr_to = 'คณบดี' . ($faculty ? $faculty : 'คณะ..................................');
+/* --------------------------------------------------
+   สร้างข้อความส่วนหัวที่ใช้ในเนื้อหา
+-------------------------------------------------- */
+$hdr_agency = trim(
+    ($faculty ?: "คณะ..................................") . " " .
+    ($department ? "ภาควิชา" . $department : "ภาควิชา........................")
+);
 
-/** ปีงบ/พ.ศ.แบบคร่าว ๆ จากวันที่เอกสาร */
-$thaiYear = '';
+$hdr_subject = $joinType ?: "เข้ารับการฝึกอบรมหลักสูตร";
+$hdr_to = "คณบดี" . ($faculty ?: "คณะ..................................");
+
+/* --------------------------------------------------
+   ปีไทย
+-------------------------------------------------- */
+$thaiYear = "";
 if ($docDate && preg_match('/^\d{4}/', $docDate)) {
-  $thaiYear = ((int) substr($docDate, 0, 4) + 543);
+    $thaiYear = ((int) substr($docDate, 0, 4) + 543);
 }
-$subject = $document['subject'] ?? '';
-$len = mb_strlen($subject, 'UTF-8');  // นับตัวอักษรแบบ UTF-8
+
+/* --------------------------------------------------
+   ความกว้างของช่อง “เรื่อง”
+-------------------------------------------------- */
+$len = mb_strlen($subject, "UTF-8");
 $len = max(20, $len);
 
 ?>
+
+
+
 <!DOCTYPE html>
 <html lang="th">
 
@@ -256,6 +302,25 @@ $len = max(20, $len);
     .content-block.indent-first {
         text-indent: 2.5cm;
         display: block;
+    }
+
+    /* ✅ ปรับขนาด SweetAlert ให้ใหญ่เท่าหน้า home */
+    .swal2-popup {
+        font-size: 1rem !important;
+        /* ขยายทั้งกล่อง */
+        font-family: 'Arial', sans-serif !important;
+        /* ใช้ฟอนต์เดียวกับหน้า Home */
+    }
+
+    /* ถ้าอยากให้ title ใหญ่ขึ้นนิด */
+    .swal2-title {
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+    }
+
+    /* ถ้าอยากให้ข้อความ (text) ใหญ่กว่าปกติหน่อย */
+    .swal2-html-container {
+        font-size: 1rem !important;
     }
 
     .indent-block {
@@ -453,12 +518,21 @@ $len = max(20, $len);
         ⚠️ เกิดข้อผิดพลาดในระบบ กรุณาลองใหม่อีกครั้ง
     </div>
     <?php endif; ?>
+    <!-- <?php
+  echo '<pre style="background:#eee;padding:8px;border:1px solid #ccc;">';
+  print_r($_SESSION);
+  echo '</pre>';
+  ?> -->
 
     <main class="page">
         <form id="updateForm" action="update_memo.php" method="post">
+            <input type="hidden" name="header_text" id="hidden_header_text" value="<?= h($header_text) ?>">
+            <input type="hidden" name="doc_no" id="hidden_doc_no" value="<?= h($doc_no) ?>">
+
             <!-- hidden input ครบทุก field_id -->
             <!-- hidden input ครบทุก field_id + ตั้งค่าเริ่มต้น -->
             <input type="hidden" name="document_id" value="<?= h($document['document_id']) ?>">
+            <input type="hidden" name="template_id" value="<?= h($document['template_id']) ?>">
 
             <!-- สำคัญ: ให้ doc_date เป็นรูปแบบเดิม (YYYY-MM-DD) ที่ดึงมาจาก DB -->
             <input type="hidden" name="doc_date" id="hidden_doc_date" value="<?= h($docDate) ?>">
@@ -497,74 +571,94 @@ $len = max(20, $len);
             <!-- ส่วนหัว -->
             <div class="doc-header" style="margin-top:5px;">
 
-
+                <!-- ส่วนราชการ -->
                 <div class="doc-row">
-                    <div class="doc-label" style="font-size:20pt; font-family:'TH SarabunPSK'; font-weight:bold;">
-                        ส่วนราชการ</div>
+                    <div class="doc-label" style="font-size:20pt;font-weight:bold;">ส่วนราชการ</div>
                     <div class="dot-line">
                         <span class="chip" contenteditable="true" data-target="header_text">
-                            <?= h($document['header_text'] ?? 'คณะ... ภาค... โทร...') ?>
+                            <?= h($header_text ?: 'คณะ... ภาค... โทร...') ?>
                         </span>
                     </div>
-                    <input type="hidden" name="header_text" id="hidden_header_text"
-                        value="<?= h($document['header_text'] ?? '') ?>">
-
                 </div>
+                <input type="hidden" name="header_text" id="hidden_header_text" value="<?= h($header_text) ?>">
 
+                <!-- ที่ -->
                 <div class="doc-row">
-                    <div class="doc-label" style="font-size:20pt; font-family:'TH SarabunPSK'; font-weight:bold;">ที่
-                    </div>
+                    <div class="doc-label" style="font-size:20pt;font-weight:bold;">ที่</div>
                     <div class="dot-line">
                         <span class="chip" contenteditable="true" data-target="doc_no">
-                            <?= h($document['doc_no'] ?: 'ทส. พิเศษ.486/2568') ?>
+                            <?= h($doc_no ?: 'ทส. พิเศษ.486/2568') ?>
                         </span>
                     </div>
-                    <input type="hidden" name="doc_no" id="hidden_doc_no" value="<?= h($document['doc_no'] ?: '') ?>">
+                    <input type="hidden" name="doc_no" id="hidden_doc_no" value="<?= h($doc_no) ?>">
 
-                    <div class="doc-label" style="font-size:20pt; font-family:'TH SarabunPSK'; font-weight:bold;">วันที่
-                    </div>
+                    <!-- วันที่ -->
+                    <div class="doc-label" style="font-size:20pt;font-weight:bold;">วันที่</div>
                     <div class="dot-line">
                         <span class="chip" contenteditable="true" data-target="doc_date_display">
                             <?= h($thaiDocDate ?: '') ?>
                         </span>
                     </div>
                     <input type="hidden" name="doc_date_display" id="hidden_doc_date_display"
-                        value="<?= h($thaiDocDate ?: '') ?>">
+                        value="<?= h($thaiDocDate) ?>">
                 </div>
 
-
+                <!-- เรื่อง -->
                 <div class="doc-row">
-                    <div class="doc-label" style="font-size:20pt; font-family:'TH SarabunPSK'; font-weight:bold;">เรื่อง
-                    </div>
+                    <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
                     <div class="dot-line">
-                        <input type="text" class="dot-input box"
-                            style="font-size:16pt; font-family:'TH SarabunPSK'; width: <?= $len ?>ch;"
-                            value="  <?= h($subject) ?>" />
+                        <input type="text" class="dot-input box" name="subject" id="subject_input"
+                            style="font-size:16pt;width:<?= $len ?>ch;" value="<?= h($subject) ?>">
                     </div>
                 </div>
             </div>
 
-            <?php
-                switch ($purposeCode) {
-                  case 'academic':
-                      include __DIR__ . '/form_academic_presentation.php';
-                      break;
 
-                  case 'meeting':
-                      include __DIR__ . '/form_meeting.php';
-                      break;
+            <!-- เนื้อหา -->
+            <div class="content-block single">
+                เรียน คณบดีคณะเทคโนโลยีและการจัดการอุตสาหกรรม
+            </div>
 
-                  case 'training':
-                      include __DIR__ . '/form_training.php';
-                      break;
+            <div class="content-block paragraph">
+                ตามที่ สมาคมสหกิจศึกษาไทย กำหนดจัดอบรมหลักสูตร
+                <span class="chip" contenteditable="true"
+                    data-target="courseName"><?= h($courseName ?: 'ชื่อหลักสูตร') ?></span>
+                ระหว่างวันที่ <span class="chip" contenteditable="true"
+                    data-target="joinDates"><?= h($joinDates ?: '...') ?></span>
+                ณ <span class="chip" contenteditable="true" data-target="location"><?= h($location ?: '...') ?></span>
+                นั้น
+                ซึ่งหลักสูตรดังกล่าวเป็นประโยชน์ต่อการพัฒนาทั้งกระบวนการจัดการเรียนการสอนในรูปแบบสหกิจศึกษา
+            </div>
 
-                  default:
-                      include __DIR__ . '/form_other.php';
-                      break;
-                }
-              ?>
+            <div class="content-block paragraph">
+                การนี้ ข้าพเจ้า
+                <span class="chip" contenteditable="true"
+                    data-target="ownerName"><?= h($ownerName ?: 'ชื่อ-นามสกุล') ?></span>
+                <span class="chip" contenteditable="true" data-target="position"><?= h($position ?: '') ?></span>
+                สังกัดภาควิชา <span class="chip" contenteditable="true"
+                    data-target="department"><?= h($department ?: '...') ?></span>
+                คณะ <span class="chip" contenteditable="true" data-target="faculty"><?= h($faculty ?: '...') ?></span>
+                มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ วิทยาเขตปราจีนบุรี
+                จึงมีความประสงค์ที่จะขออนุมัติ เข้ารับการอบรมหลักสูตร
+                <span class="chip" contenteditable="true"
+                    data-target="courseName"><?= h($courseName ?: 'ชื่อหลักสูตร') ?></span>
+                ระหว่างวันที่ <span class="chip" contenteditable="true"
+                    data-target="joinDates"><?= h($joinDates ?: '') ?></span>
+                ณ <span class="chip" contenteditable="true" data-target="location"><?= h($location ?: '') ?></span>
+                วงเงินทั้งสิ้น <span class="chip" contenteditable="true"
+                    data-target="amountStr"><?= h($prettyAmount ?: '') ?></span> บาท
+                โดยขอใช้แหล่งเงินจัดสรรให้หน่วยงาน ประจำปีงบประมาณ
+                <span class="chip" contenteditable="true" data-target="fiscal_year_display">
+                    <?= h($thaiYear ? 'พ.ศ. ' . $thaiYear : 'พ.ศ. ....') ?>
+                </span>
 
-            <!-- ลายเซ็นผู้ขอ (ต้องอยู่ท้ายสุดเสมอ) -->
+                แผนงานจัดการศึกษาระดับอุดมศึกษา กองทุนพัฒนาบุคลากร หมวดค่าใช้สอย (รายละเอียดตามเอกสารแนบ)
+            </div>
+
+            <div class="content-block paragraph">
+                จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ
+            </div>
+
             <div class="signature-wrapper">
                 <div class="signature-block" id="signatureBlock">
                     <div class="sig-name">(<?= h($ownerName ?: '') ?>)</div>
@@ -572,40 +666,10 @@ $len = max(20, $len);
                 </div>
             </div>
 
-            <!-- ⭐ เรียน (ชิดซ้ายปกติ) ⭐ -->
-            <div style="
-    font-family:'TH SarabunPSK';
-    font-size:16pt;
-    line-height:1.2;
-    margin-top:18px;
-">
-                เรียน <?= h($hdr_to) ?>
-            </div>
-
-            <!-- ⭐ เพื่อโปรดพิจารณาอนุมัติ (แท็บเข้า) ⭐ -->
-            <div style="
-    font-family:'TH SarabunPSK';
-    font-size:16pt;
-    line-height:1.2;
-    margin-top:6px;
-    margin-left:40px;  /* ⬅ แท็บให้เข้า */
-">
-                เพื่อโปรดพิจารณาอนุมัติ
-            </div>
-
-            <!-- ⭐ ลายเซ็นหัวหน้าภาค (แท็บเท่าบรรทัดบน) ⭐ -->
-            <div style="
-    font-family:'TH SarabunPSK';
-    font-size:16pt;
-    line-height:1.2;
-    margin-top:40px;
-    margin-left:40px;  /* ⬅ ตรงกับ “เพื่อโปรดพิจารณาอนุมัติ” */
-">
-                (ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา นามี)<br />
-                หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ
-            </div>
-
-
+            <div style="font-family:'TH SarabunPSK'; font-size:16pt; line-height:1.2;"> เรียน <?= h($hdr_to) ?> </div>
+            <div class="content-block single align-to-dean"> เพื่อโปรดพิจารณาอนุมัติ </div>
+            <div class="content-block single align-to-dean" style="margin-top:50px;;"> (ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา
+                นามี)<br /> หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ </div>
             <div class="footer-actions">
                 <button type="button" onclick="window.print()"
                     class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md text-xl font-bold">
@@ -620,6 +684,22 @@ $len = max(20, $len);
             </div>
         </form>
     </main>
+    <?php if ($readonly && !($isAdmin || $isOfficer)): ?>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("[contenteditable]").forEach(e => {
+            e.setAttribute("contenteditable", "false");
+            e.style.background = "#f0f0f0";
+        });
+        document.querySelectorAll("input, textarea, select").forEach(e => {
+            e.disabled = true;
+            e.style.background = "#f0f0f0";
+        });
+        const submitBtn = document.querySelector("button[type=submit]");
+        if (submitBtn) submitBtn.style.display = "none";
+    });
+    </script>
+    <?php endif; ?>
 
     <script>
     const alertBox = document.getElementById('alertBox');
@@ -675,10 +755,71 @@ $len = max(20, $len);
         });
     });
 
+    function updateStatus(status) {
+        const docId = <?= (int) $document['document_id'] ?>;
+
+        fetch('update_status.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `document_id=${docId}&status=${status}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'อัปเดตสถานะสำเร็จ',
+                        text: 'สถานะเอกสารถูกเปลี่ยนเป็น ' + data.status_text,
+                        confirmButtonColor: '#3085d6'
+                    }).then(() => window.location.href = 'home.php');
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'ผิดพลาด',
+                        text: data.message
+                    });
+                }
+            })
+            .catch(() => Swal.fire({
+                icon: 'error',
+                title: 'ผิดพลาด',
+                text: 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้'
+            }));
+    }
+
     function getQuery(name) {
         const url = new URL(window.location.href);
         return url.searchParams.get(name);
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const errType = getQuery("err");
+
+        if (errType === "no_permission") {
+            Swal.fire({
+                title: "ไม่มีสิทธิ์แก้ไขเอกสารนี้",
+                html: `
+        <div style="font-size: 1.15rem; line-height: 1.6;">
+          คุณไม่มีสิทธิ์ในการแก้ไขเอกสารนี้<br>
+          ต้องการกลับหน้าหลักหรืออยู่ต่อ?
+        </div>
+      `,
+                icon: "error",
+                showCancelButton: true,
+                confirmButtonText: "กลับหน้าหลัก",
+                cancelButtonText: "อยู่หน้านี้ต่อ",
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#aaa",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "<?= $homePath ?>";
+                }
+            });
+        }
+    });
+
 
     document.addEventListener("DOMContentLoaded", () => {
         if (getQuery("saved") === "1" && getQuery("from") === "update") {
@@ -693,7 +834,8 @@ $len = max(20, $len);
                 cancelButtonColor: "#aaa",
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = "./home.php";
+                    window.location.href = "<?= $homePath ?>";
+
                 }
             });
         }
@@ -717,6 +859,44 @@ $len = max(20, $len);
         // กำหนดความกว้างกล่อง = ความกว้างบรรทัดชื่อ -> ตำแหน่งจะกึ่งกลางใต้ชื่อพอดี
         box.style.width = nameEl.offsetWidth + 'px';
     })();
+    // ✅ ตรวจสิทธิ์ Officer ก่อนอนุมัติ / ไม่ผ่าน
+    document.addEventListener("DOMContentLoaded", () => {
+        const permId = <?= (int) ($_SESSION['perm_id'] ?? 0) ?>;
+        const btnApprove = document.getElementById('btnApprove');
+        const btnReject = document.getElementById('btnReject');
+
+        function showNoPermissionAlert() {
+            Swal.fire({
+                icon: 'error',
+                title: 'ไม่มีสิทธิ์ในการแก้ไขเอกสาร',
+                html: 'คุณไม่มีสิทธิ์ในการอนุมัติหรือไม่ผ่านเอกสารนี้<br><b>กรุณาติดต่อผู้ดูแลระบบ (Admin)</b>',
+                confirmButtonText: 'ตกลง',
+                confirmButtonColor: '#d33'
+            });
+        }
+
+        if (btnApprove) {
+            btnApprove.addEventListener('click', (e) => {
+                if (permId !== 1) {
+                    e.preventDefault();
+                    showNoPermissionAlert();
+                }
+            });
+        }
+
+        if (btnReject) {
+            btnReject.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (permId !== 1) {
+                    showNoPermissionAlert();
+                    return;
+                }
+                // ✅ มีสิทธิ์ถึงจะอัปเดตสถานะ
+                updateStatus('rejected');
+            });
+        }
+
+    });
     </script>
 </body>
 
