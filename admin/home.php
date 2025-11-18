@@ -1,18 +1,18 @@
 <?php
 session_start();
 if (!isset($_SESSION['role_id']) || $_SESSION['role_id'] != 1) {
-    header('Location: ../login.html');
-    exit;
+  header('Location: ../login.html');
+  exit;
 }
 
-require_once __DIR__ . '/../functions.php'; 
+require_once __DIR__ . '/../functions.php';
 $pdo = getPDO();
 $users = getActiveUsers();
 
 // 📌 รับค่าจาก query string
 $activeTab = $_GET['tab'] ?? 'all';
-$dateFrom  = $_GET['date_from'] ?? '';
-$dateTo    = $_GET['date_to'] ?? '';
+$dateFrom = $_GET['date_from'] ?? '';
+$dateTo = $_GET['date_to'] ?? '';
 
 // 📌 สร้าง SQL
 $sql = "SELECT d.document_id, d.doc_no, d.doc_date, d.status, d.remark, 
@@ -24,27 +24,27 @@ $params = [];
 
 // ✅ ฟิกข้อมูลตัวอย่างเอกสาร
 $documents = [
-    [
-        "fullname" => "ดร.พิทย์พิมล ชูรอด",
-        "title"    => "โครงการวิจัยด้านการศึกษา",
-        "date"     => "2025-09-28",
-        "status"   => "pending",
-        "action"   => "เปิดเอกสาร"
-    ],
-    [
-        "fullname" => "ดร.พิทย์พิมล ชูรอด",
-        "title"    => "บันทึกขออนุมัติใช้งบประมาณ",
-        "date"     => "2025-09-27",
-        "status"   => "approved",
-        "action"   => "แจ้งทางเมล"
-    ],
-    [
-        "fullname" => "ดร.พิทย์พิมล ชูรอด",
-        "title"    => "รายงานผลการดำเนินงาน",
-        "date"     => "2025-09-25",
-        "status"   => "rejected",
-        "action"   => "แจ้งทางเมล"
-    ],
+  [
+    "fullname" => "ดร.พิทย์พิมล ชูรอด",
+    "title" => "โครงการวิจัยด้านการศึกษา",
+    "date" => "2025-09-28",
+    "status" => "pending",
+    "action" => "เปิดเอกสาร"
+  ],
+  [
+    "fullname" => "ดร.พิทย์พิมล ชูรอด",
+    "title" => "บันทึกขออนุมัติใช้งบประมาณ",
+    "date" => "2025-09-27",
+    "status" => "approved",
+    "action" => "แจ้งทางเมล"
+  ],
+  [
+    "fullname" => "ดร.พิทย์พิมล ชูรอด",
+    "title" => "รายงานผลการดำเนินงาน",
+    "date" => "2025-09-25",
+    "status" => "rejected",
+    "action" => "แจ้งทางเมล"
+  ],
 ];
 
 // ✅ อ่านสถานะที่เลือกจาก query string (ค่าเริ่มต้น = all)
@@ -52,28 +52,29 @@ $activeTab = $_GET['tab'] ?? 'all';
 
 // ✅ ฟิลเตอร์ข้อมูลตาม tab
 $filteredDocs = ($activeTab === 'all')
-    ? $documents
-    : array_filter($documents, fn($d) => $d['status'] === $activeTab);
+  ? $documents
+  : array_filter($documents, fn($d) => $d['status'] === $activeTab);
 
 // ✅ ฟิลเตอร์เพิ่มตามวันที่ (date_from)
 if (!empty($dateFrom)) {
-    $filteredDocs = array_filter($filteredDocs, function($d) use ($dateFrom) {
-        return date('Y-m-d', strtotime($d['date'])) === $dateFrom;
-    });
+  $filteredDocs = array_filter($filteredDocs, function ($d) use ($dateFrom) {
+    return date('Y-m-d', strtotime($d['date'])) === $dateFrom;
+  });
 }
 
 
-$totalDocs     = count($documents);
-$approvedDocs  = count(array_filter($documents, fn($d) => $d['status'] === 'approved'));
-$pendingDocs   = count(array_filter($documents, fn($d) => $d['status'] === 'pending'));
-$rejectedDocs  = count(array_filter($documents, fn($d) => $d['status'] === 'rejected'));   
+$totalDocs = count($documents);
+$approvedDocs = count(array_filter($documents, fn($d) => $d['status'] === 'approved'));
+$pendingDocs = count(array_filter($documents, fn($d) => $d['status'] === 'pending'));
+$rejectedDocs = count(array_filter($documents, fn($d) => $d['status'] === 'rejected'));
 
-function thai_date($date) {
-    $time = strtotime($date);
-    $d = date("d", $time);
-    $m = date("m", $time);
-    $y = date("Y", $time) + 543;
-    return "$d/$m/$y";
+function thai_date($date)
+{
+  $time = strtotime($date);
+  $d = date("d", $time);
+  $m = date("m", $time);
+  $y = date("Y", $time) + 543;
+  return "$d/$m/$y";
 }
 ?>
 
@@ -105,111 +106,64 @@ function thai_date($date) {
       </div>
     </div>
     <div class="flex items-center space-x-4">
-      <a href="home.php">
-        <div class="px-4 py-2 rounded-[11px] font-bold transition bg-white text-teal-500 shadow">หน้าหลัก</div>
-      </a>
-      <a href="request.php">
-        <div class="px-4 py-2 rounded-[11px] font-bold transition text-white hover:bg-white hover:text-teal-500">
-          รายการคำขอ
-        </div>
-      </a>
-      <a href="user_Managerment.php" id="tab-users">
-        <div class="px-4 py-2 rounded-[11px] font-bold transition text-white hover:bg-white hover:text-teal-500">
-          กำหนดสิทธิ์
-          <div class="flex items-center space-x-4">
-            <a href="home.php">
-              <div class="px-4 py-2 rounded-[11px] font-bold transition bg-white text-teal-500 shadow">หน้าหลัก</div>
-            </a>
-            <?php 
-                if (isset($_SESSION['permissions']) && in_array(3, $_SESSION['permissions'])): 
-                renderAdminExtraMenus(); 
-            endif; 
-            ?>
+      <div class="flex items-center space-x-4">
+        <a href="home.php">
+          <div class="px-4 py-2 rounded-[11px] font-bold transition bg-white text-teal-500 shadow">หน้าหลัก</div>
+        </a>
+        <a href="request.php">
+          <div class="px-4 py-2 rounded-[11px] font-bold transition text-white hover:bg-white hover:text-teal-500">
+            รายการคำขอ
+          </div>
+        </a>
+        <?php
+        if (isset($_SESSION['permissions']) && in_array(3, $_SESSION['permissions'])):
+          renderAdminExtraMenus();
+        endif;
+        ?>
 
-            <!-- เมนู: ตั้งค่าระบบเริ่มต้น -->
-            <div class="relative">
-              <button id="templateBtn" class="px-4 py-2 rounded-[11px] font-bold transition 
+        <!-- เมนู: ตั้งค่าระบบเริ่มต้น -->
+        <div class="relative">
+          <button id="templateBtn" class="px-4 py-2 rounded-[11px] font-bold transition 
                 text-white hover:bg-white hover:text-teal-500 flex items-center space-x-1">
-                <span>ตั้งค่าระบบเริ่มต้น</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              <!-- เมนูย่อย -->
-              <div id="templateMenu" class="hidden absolute bg-white text-gray-700 mt-1 rounded-lg shadow-lg w-48 z-50">
-                <a href="form_Templates.php" class="block px-4 py-2 hover:bg-teal-100">การจัดการเทมเพลต</a>
-                <a href="department_Managerment.php" class="block px-4 py-2 hover:bg-teal-100">การจัดการภาควิชา</a>
-              </div>
-            </div>
-
-            <div class="relative">
-              <button id="profileBtn"
-                class="bg-white text-teal-500 px-4 py-2 rounded-[11px] shadow flex items-center space-x-2 hover:bg-gray-100">
-                <div class="text-right leading-tight">
-                  <div class="font-bold text-[14px]"><?= htmlspecialchars($_SESSION['fullname']) ?></div>
-                  <div class="text-[12px]"><?= htmlspecialchars($_SESSION['role_name']) ?></div>
-                </div>
-                <div
-                  class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M5.121 17.804A13.937 13.937 0 0112 15c2.33 0 4.487.577 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-              </button>
-              <!-- เมนู Dropdown -->
-              <div id="profileMenu" class="hidden absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-50">
-                <a href="../logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">ออกจากระบบ</a>
-                <button onclick="closeMenu()"
-                  class="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">
-                  อยู่ต่อ
-                </button>
-              </div>
-            </div>
-          </div>
-      </a>
-      <!-- Dropdown จัดการเทมเพลต -->
-      <div class="relative">
-        <button id="templateBtn"
-          class="px-4 py-2 rounded-[11px] font-bold transition text-white hover:bg-white hover:text-teal-500 flex items-center space-x-1">
-          <span>ตั้งค่าระบบเริ่มต้น</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-
-        <!-- เมนูย่อย -->
-        <div id="templateMenu" class="hidden absolute bg-white text-gray-700 mt-1 rounded-lg shadow-lg w-48 z-50">
-          <a href="form_Templates.php" class="block px-4 py-2 hover:bg-teal-100">การจัดการเทมเพลต</a>
-          <a href="department_Managerment.php" class="block px-4 py-2 hover:bg-teal-100">การจัดการภาควิชา</a>
-        </div>
-      </div>
-
-      <div class="relative">
-        <button id="profileBtn"
-          class="bg-white text-teal-500 px-4 py-2 rounded-[11px] shadow flex items-center space-x-2 hover:bg-gray-100">
-          <div class="text-right leading-tight">
-            <div class="font-bold text-[14px]"><?= htmlspecialchars($_SESSION['fullname']) ?></div>
-            <div class="text-[12px]"><?= htmlspecialchars($_SESSION['role_name']) ?></div>
-          </div>
-          <div class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M5.121 17.804A13.937 13.937 0 0112 15c2.33 0 4.487.577 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
+            <span>ตั้งค่าระบบเริ่มต้น</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
-          </div>
-        </button>
-        <!-- เมนู Dropdown -->
-        <div id="profileMenu" class="hidden absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-50">
-          <a href="../logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">ออกจากระบบ</a>
-          <button onclick="closeMenu()" class="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">
-            อยู่ต่อ
           </button>
+
+          <!-- เมนูย่อย -->
+          <div id="templateMenu" class="hidden absolute bg-white text-gray-700 mt-1 rounded-lg shadow-lg w-48 z-50">
+            <a href="form_Templates.php" class="block px-4 py-2 hover:bg-teal-100">การจัดการเทมเพลต</a>
+            <a href="department_Managerment.php" class="block px-4 py-2 hover:bg-teal-100">การจัดการภาควิชา</a>
+          </div>
+        </div>
+
+        <div class="relative">
+          <button id="profileBtn"
+            class="bg-white text-teal-500 px-4 py-2 rounded-[11px] shadow flex items-center space-x-2 hover:bg-gray-100">
+            <div class="text-right leading-tight">
+              <div class="font-bold text-[14px]"><?= htmlspecialchars($_SESSION['fullname']) ?></div>
+              <div class="text-[12px]"><?= htmlspecialchars($_SESSION['role_name']) ?></div>
+            </div>
+            <div class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M5.121 17.804A13.937 13.937 0 0112 15c2.33 0 4.487.577 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+          </button>
+          <!-- เมนู Dropdown -->
+          <div id="profileMenu" class="hidden absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-50">
+            <a href="../logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">ออกจากระบบ</a>
+            <button onclick="closeMenu()" class="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">
+              อยู่ต่อ
+            </button>
+          </div>
         </div>
       </div>
+      </a>
+
     </div>
   </header>
 
@@ -244,19 +198,19 @@ function thai_date($date) {
       <!-- Tabs -->
       <div class="flex space-x-6">
         <a href="?tab=all"
-          class="px-4 py-2 rounded-t-md font-semibold <?= $activeTab==='all' ? 'bg-teal-500 text-white' : 'text-gray-500' ?>">
+          class="px-4 py-2 rounded-t-md font-semibold <?= $activeTab === 'all' ? 'bg-teal-500 text-white' : 'text-gray-500' ?>">
           เอกสารทั้งหมด
         </a>
         <a href="?tab=pending"
-          class="px-4 py-2 rounded-t-md font-semibold <?= $activeTab==='pending' ? 'bg-teal-500 text-white' : 'text-gray-500' ?>">
+          class="px-4 py-2 rounded-t-md font-semibold <?= $activeTab === 'pending' ? 'bg-teal-500 text-white' : 'text-gray-500' ?>">
           รอตรวจสอบ
         </a>
         <a href="?tab=approved"
-          class="px-4 py-2 rounded-t-md font-semibold <?= $activeTab==='approved' ? 'bg-teal-500 text-white' : 'text-gray-500' ?>">
+          class="px-4 py-2 rounded-t-md font-semibold <?= $activeTab === 'approved' ? 'bg-teal-500 text-white' : 'text-gray-500' ?>">
           อนุมัติแล้ว
         </a>
         <a href="?tab=rejected"
-          class="px-4 py-2 rounded-t-md font-semibold <?= $activeTab==='rejected' ? 'bg-teal-500 text-white' : 'text-gray-500' ?>">
+          class="px-4 py-2 rounded-t-md font-semibold <?= $activeTab === 'rejected' ? 'bg-teal-500 text-white' : 'text-gray-500' ?>">
           ถูกตีกลับ
         </a>
       </div>
@@ -289,7 +243,7 @@ function thai_date($date) {
             <!-- Fullname -->
             <td class="px-4 py-3 flex items-center space-x-3">
               <div class="w-8 h-8 rounded-full bg-teal-400 flex items-center justify-center font-bold text-white">
-                <?= mb_substr($doc['fullname'],0,1) ?>
+                <?= mb_substr($doc['fullname'], 0, 1) ?>
               </div>
               <span class="font-medium text-gray-800"><?= htmlspecialchars($doc['fullname']) ?></span>
             </td>
@@ -299,7 +253,7 @@ function thai_date($date) {
             </td>
             <!-- Date -->
             <td class="px-4 py-3 text-gray-600">
-              <?=date("d/m/Y", strtotime($doc['date']))?>
+              <?= date("d/m/Y", strtotime($doc['date'])) ?>
             </td>
             <!-- Status -->
             <td class="px-4 py-3">
