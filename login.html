@@ -1,30 +1,58 @@
 <!DOCTYPE html>
 <html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login | Smart Government</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <title>Login | Smart Government</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-
-<body class="bg-white font-sans">
-
-  <!-- Header -->
-  <header class="bg-teal-500 text-white p-4 flex justify-between items-center shadow-md">
-    <!-- Logo -->
-    <div class="flex items-center space-x-3">
-      <div class="w-[56px] h-[56px] flex items-center justify-center relative overflow-visible">
-        <svg xmlns="http://www.w3.org/2000/svg" class="absolute scale-[1.4] text-white"
-          style="width: 60px; height: 60px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m0 0a2 2 0 00-2-2H5a2 2 0 00-2 2m18 0v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8" />
-        </svg>
+  <body class="bg-white font-sans">
+    <!-- Header -->
+    <header
+      class="bg-teal-500 text-white p-4 flex justify-between items-center shadow-md">
+      <!-- Logo -->
+      <div class="flex items-center space-x-3">
+        <div
+          class="w-[56px] h-[56px] flex items-center justify-center relative overflow-visible">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="absolute scale-[1.4] text-white"
+            style="width: 60px; height: 60px"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1"
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m0 0a2 2 0 00-2-2H5a2 2 0 00-2 2m18 0v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8" />
+          </svg>
+        </div>
+        <div class="leading-tight">
+          <div class="text-[16px] font-bold">Smart</div>
+          <div class="text-[16px] font-bold -mt-[2px]">Government</div>
+          <div class="text-[13px] mt-[0px]">Letter Management System</div>
+        </div>
       </div>
-      <div class="leading-tight">
-        <div class="text-[16px] font-bold">Smart</div>
-        <div class="text-[16px] font-bold -mt-[2px]">Government</div>
-        <div class="text-[13px] mt-[0px]">Letter Management System</div>
-      </div>
+
+      <!-- Login Button -->
+      <a href="login.html" class="inline-block">
+        <button
+          class="bg-white text-teal-500 px-4 py-2 rounded-[11px] shadow hover:bg-gray-100 font-bold">
+          เข้าสู่ระบบ
+        </button>
+      </a>
+    </header>
+
+    <!-- Breadcrumb -->
+    <div class="p-6">
+      <nav class="text-sm text-gray-700 space-x-1">
+        <span class="font-bold text-gray-900">หน้าแรก</span>
+        <span>›</span>
+        <span class="text-gray-500">หน้าแรก</span>
+        <span>›</span>
+        <a class="text-teal-600 font-semibold">เข้าสู่ระบบ</a>
+      </nav>
     </div>
 
     <!-- Login Button -->
@@ -65,83 +93,115 @@
           <small id="error-user" class="text-red-500 text-xs mt-1 hidden"></small>
         </div>
 
-        <div>
-          <label class="block text-sm text-teal-500 mb-1">Password</label>
-          <input type="password" name="password" placeholder="Password" required
-            class="w-full px-4 py-2 border-2 border-teal-400 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500">
-          <small id="error-pass" class="text-red-500 text-xs mt-1 hidden"></small>
-        </div>
+        <!-- Form -->
+        <div
+          id="login-alert"
+          class="hidden bg-red-100 text-red-700 px-4 py-2 rounded mt-4 mb-2"></div>
+        <form
+          action="callfunction.php"
+          method="POST"
+          class="bg-white px-4 pt-6 pb-4 rounded-b-xl space-y-4">
+          <div>
+            <label class="block text-sm text-teal-500 mb-1">ICIT Account</label>
+            <input
+              type="text"
+              name="username"
+              placeholder="ICIT Account"
+              required
+              class="w-full px-4 py-2 border-2 border-teal-400 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500" />
+            <small
+              id="error-user"
+              class="text-red-500 text-xs mt-1 hidden"></small>
+          </div>
 
-        <div class="pt-2">
-          <button type="submit"
-            class="w-full bg-teal-500 text-white font-bold py-2 rounded-full shadow hover:bg-teal-600">
-            Login
-          </button>
-        </div>
-      </form>
+          <div>
+            <label class="block text-sm text-teal-500 mb-1">Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+              class="w-full px-4 py-2 border-2 border-teal-400 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500" />
+            <small
+              id="error-pass"
+              class="text-red-500 text-xs mt-1 hidden"></small>
+          </div>
+
+          <div class="pt-2">
+            <button
+              type="submit"
+              class="w-full bg-teal-500 text-white font-bold py-2 rounded-full shadow hover:bg-teal-600">
+              Login
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
 
-  <!-- Modal: Login Failed -->
-  <div id="failModal" class="fixed inset-0 z-50 hidden">
-    <!-- backdrop -->
-    <div class="absolute inset-0 bg-black/50"></div>
+    <!-- Modal: Login Failed -->
+    <div id="failModal" class="fixed inset-0 z-50 hidden">
+      <!-- backdrop -->
+      <div class="absolute inset-0 bg-black/50"></div>
 
-    <!-- dialog -->
-    <div class="absolute inset-0 flex items-center justify-center p-4">
-      <div class="bg-white rounded-xl shadow-xl w-full max-w-md">
-        <div class="flex flex-col items-center text-center p-6">
-          <!-- วงกลม ! -->
-          <div class="w-16 h-16 rounded-full border-2 border-amber-300 flex items-center justify-center mb-4">
-            <span class="text-3xl text-amber-400">!</span>
+      <!-- dialog -->
+      <div class="absolute inset-0 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md">
+          <div class="flex flex-col items-center text-center p-6">
+            <!-- วงกลม ! -->
+            <div
+              class="w-16 h-16 rounded-full border-2 border-amber-300 flex items-center justify-center mb-4">
+              <span class="text-3xl text-amber-400">!</span>
+            </div>
+            <div
+              id="failText"
+              class="text-gray-700 text-lg font-semibold leading-snug">
+              รหัสผ่านหรือชื่อผู้ใช้ไม่ถูกต้อง
+            </div>
+            <button
+              id="failClose"
+              class="mt-6 px-6 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600 focus:outline-none">
+              ปิด
+            </button>
           </div>
-          <div id="failText" class="text-gray-700 text-lg font-semibold leading-snug">
-            รหัสผ่านหรือชื่อผู้ใช้ไม่ถูกต้อง
-          </div>
-          <button id="failClose"
-            class="mt-6 px-6 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600 focus:outline-none">
-            ปิด
-          </button>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ✅ Script ตรวจสอบ error -->
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const error = params.get("error");
+    <!-- ✅ Script ตรวจสอบ error -->
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const error = params.get("error");
 
-    if (error) {
-      const modal = document.getElementById("failModal");
-      const failText = document.getElementById("failText");
+      if (error) {
+        const modal = document.getElementById("failModal");
+        const failText = document.getElementById("failText");
 
-      switch (error) {
-        case "user":
-          failText.textContent = "ไม่พบบัญชีผู้ใช้นี้";
-          break;
-        case "pass":
-          failText.textContent = "รหัสผ่านไม่ถูกต้อง";
-          break;
-        case "inactive":
-          failText.textContent = "บัญชีนี้ถูกปิดการใช้งาน โปรดติดต่อผู้ดูแลระบบ";
-          break;
-        case "db":
-          failText.textContent = "ไม่สามารถเชื่อมต่อฐานข้อมูลได้";
-          break;
-        default:
-          failText.textContent = "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง";
+        switch (error) {
+          case "user":
+            failText.textContent = "ไม่พบบัญชีผู้ใช้นี้";
+            break;
+          case "pass":
+            failText.textContent = "รหัสผ่านไม่ถูกต้อง";
+            break;
+          case "inactive":
+            failText.textContent =
+              "บัญชีนี้ถูกปิดการใช้งาน โปรดติดต่อผู้ดูแลระบบ";
+            break;
+          case "db":
+            failText.textContent = "ไม่สามารถเชื่อมต่อฐานข้อมูลได้";
+            break;
+          default:
+            failText.textContent = "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง";
+        }
+
+        modal.classList.remove("hidden");
       }
 
-      modal.classList.remove("hidden");
-    }
-
-    document.getElementById("failClose").addEventListener("click", () => {
-      document.getElementById("failModal").classList.add("hidden");
-      // ลบ query string ออก
-      window.history.replaceState({}, document.title, "login.html");
-    });
-  </script>
-
-</body>
+      document.getElementById("failClose").addEventListener("click", () => {
+        document.getElementById("failModal").classList.add("hidden");
+        // ลบ query string ออก
+        window.history.replaceState({}, document.title, "login.html");
+      });
+    </script>
+  </body>
 </html>

@@ -1,5 +1,11 @@
-<?php session_start();
-require_once __DIR__ . '/functions.php'; /* -------------------------------------------------- ตรวจ session -------------------------------------------------- */
+<?php // user/edit_document.php 
+session_start(); /** DEV: auto login ระหว่างพัฒนา */
+$DEV_AUTO_LOGIN = true;
+if ($DEV_AUTO_LOGIN && empty($_SESSION['user_id'])) {
+  $_SESSION['user_id'] = 1;
+}
+require_once __DIR__
+  . '/../functions.php';
 if (empty($_SESSION['user_id'])) {
   http_response_code(401);
   exit("Unauthorized");
@@ -161,14 +167,28 @@ $len = max(20, $len);
     margin-right: 2px;
   }
 
-  /* .dot-line { flex: 1; display: flex; align-items: flex-end; height: 22px; margin: 0; position: relative; } .doc-line { display: flex; align-items: center; } */
-  .doc-spacer {
-    display: inline-block;
-    width: 2.5cm;
-    /* ← ขนาดช่องว่าง ปรับตรงนี้ */
+  /* ✅ เส้นจุดจริง */
+  .dot-line {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    height: 22px;
+    margin: 0;
+    position: relative;
   }
 
-  /* .dot-line::after { content: ""; position: absolute; left: 0; right: 0; bottom: 2px; height: 2px; background-image: radial-gradient(circle, #000 1px, transparent 1px); background-size: 6px 2px; background-repeat: repeat-x; } */
+  .dot-line::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 2px;
+    height: 2px;
+    background-image: radial-gradient(circle, #000 1px, transparent 1px);
+    background-size: 6px 2px;
+    background-repeat: repeat-x;
+  }
+
   .dot-input {
     border: none;
     background: transparent;
@@ -182,6 +202,7 @@ $len = max(20, $len);
     box-sizing: border-box;
     position: relative;
     z-index: 1;
+    /* ให้ข้อความอยู่บนเส้น */
   }
 
   .dot-input.box {
@@ -221,17 +242,21 @@ $len = max(20, $len);
     display: block;
   }
 
-  /* SweetAlert */
+  /* ✅ ปรับขนาด SweetAlert ให้ใหญ่เท่าหน้า home */
   .swal2-popup {
     font-size: 1rem !important;
+    /* ขยายทั้งกล่อง */
     font-family: 'Arial', sans-serif !important;
+    /* ใช้ฟอนต์เดียวกับหน้า Home */
   }
 
+  /* ถ้าอยากให้ title ใหญ่ขึ้นนิด */
   .swal2-title {
     font-size: 1.5rem !important;
     font-weight: 700 !important;
   }
 
+  /* ถ้าอยากให้ข้อความ (text) ใหญ่กว่าปกติหน่อย */
   .swal2-html-container {
     font-size: 1rem !important;
   }
@@ -295,42 +320,6 @@ $len = max(20, $len);
     border-top: 1px solid #e5e7eb;
   }
 
-  .dot-line {
-    flex: 1;
-    position: relative;
-    height: 28px;
-    display: flex;
-    align-items: flex-end !important;
-  }
-
-  .dot-line::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 4px;
-    height: 2px;
-    background-image: radial-gradient(circle, #000 1px, transparent 1px);
-    background-size: 6px 2px;
-    background-repeat: repeat-x;
-  }
-
-  /* ระยะว่างหน้าคำ + หลังคำ ตามรูป */
-  .dot-line .chip {
-    line-height: 0.9 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    margin-left: 14px !important;
-    margin-right: 6px !important;
-    display: inline-flex !important;
-    align-items: flex-end !important;
-    /* ดึงข้อความให้แตะเส้น */
-    position: relative;
-    top: 3px;
-    /* ⭐ กดลงมาอีกนิดเพื่อให้ชิดเส้นมากที่สุด */
-  }
-
-  /* สำหรับ print */
   @media print {
 
     header,
@@ -346,7 +335,8 @@ $len = max(20, $len);
     .page {
       margin: 0;
       box-shadow: none;
-      padding: 0.5cm 1cm 2cm 2.2cm !important;
+      /* กำหนดขอบแต่ละด้าน: บน 2cm, ขวา 2cm, ล่าง 2cm, ซ้าย 2.5cm */
+      padding: 3cm 2cm 3cm 3cm;
       width: 21cm;
       min-height: 29.7cm;
       border: 2px solid #fff !important;
@@ -361,6 +351,8 @@ $len = max(20, $len);
       height: 2px;
       background-image: radial-gradient(circle, #000 0.6px, transparent 0.6px);
       background-size: 4px 2px;
+
+
       background-repeat: repeat-x;
     }
 
@@ -383,6 +375,7 @@ $len = max(20, $len);
       box-shadow: none !important;
     }
   }
+
 
   /* ฟอนต์ Sarabun */
   @font-face {
@@ -407,132 +400,70 @@ $len = max(20, $len);
   body {
     font-family: 'TH SarabunPSK', sans-serif;
   }
-
-  /* ⭐⭐⭐ อันที่คุณย้ำว่าห้ามหาย — ใส่ให้อยู่ท้ายเหมือนเดิม ⭐⭐⭐ */
-  .doc-header .doc-row {
-    margin-bottom: 12px !important;
-    /* เดิม 6px → เพิ่มเป็น 12px */
-    line-height: 0.5 !important;
-    /* เพิ่มความสูงบรรทัด */
-  }
-
-  /* ให้กล่อง (chip) ขยับออกจากคำ โดยเส้นยังติดกับคำ */
-  /* ⭐ ขยับกล่องออกจากคำอีกนิด */
-  .doc-row .dot-line .chip {
-    margin-left: 14px !important;
-    /* เดิม 10px → เพิ่มออกมาอีก */
-    margin-right: 6px !important;
-    /* ขยับปลายด้านหลังให้สวยขึ้น */
-    padding-left: 6px !important;
-    padding-right: 6px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
-    display: inline-flex !important;
-    align-items: flex-end !important;
-  }
-
-  .doc-row .doc-label {
-    line-height: 1.0 !important;
-    height: 32px !important;
-    display: flex;
-    align-items: flex-end;
-  }
-
-  /* ★ สำหรับบรรทัด "ที่ – วันที่" ให้เส้นประต่อกันสนิท */
-  .row-ty-date .ty-left::after {
-    margin-right: -13px !important;
-    /* ดึงเส้นให้ต่อกับคำว่า “วันที่” */
-  }
-
-  .row-ty-date .ty-right::after {
-    margin-left: -6px !important;
-    /* ดึงเส้นให้ต่อจากเส้นฝั่งซ้าย */
-  }
-
-  /* ลดช่องว่างหลังกล่อง เพื่อไม่ให้เกิดรูเล็กๆ */
-  .row-ty-date .chip {
-    margin-right: 0px !important;
-    margin-left: 12px !important;
-    /* เว้นหลังคำว่า “ที่” พอดี */
-  }
-
-  /* เอาช่องว่างเล็กๆ หลังเลขเอกสารออก */
-  .row-ty-date .ty-left .chip {
-    margin-right: 0 !important;
-  }
-
-  /* ⭐ ขยับ "วันที่" ไปทางซ้าย */
-  .row-ty-date .doc-label[style*="margin-left"] {
-    margin-left: 0.2cm !important;
-    /* ← จาก 1cm ลดเหลือ 0.6cm (ขยับซ้าย) */
-  }
-
-  .font-regular {
-    font-family: 'Sarabun', sans-serif !important;
-    font-weight: 20 !important;
-  }
-
-  .content-block,
-  .chip {
-    font-family: "TH SarabunPSK";
-    font-size: 16pt !important;
-    /* ← เทียบเท่า 16pt จริงใน Word */
-    font-weight: 400 !important;
-  }
   </style>
 </head>
 
-<body> <?php if ($readonly): ?>
+<body>
+  <?php if ($readonly): ?>
   <script>
-  document.addEventListener("DOMContentLoaded",
-    () => {
-      // ปิด contenteditable ทั้งหมด 
-      document.querySelectorAll("[contenteditable]").forEach(e => {
-        e.setAttribute("contenteditable", "false");
-        e.style.background = "#f0f0f0";
-        e.style.cursor = "not-allowed";
-      });
-      // ปิด input / select / textarea 
-      document.querySelectorAll("input:not([type=hidden]), textarea, select").forEach(e => {
-        e.disabled = true;
-        e.style.background = "#f0f0f0";
-        e.style.cursor = "not-allowed";
-      });
-      // ซ่อนปุ่ม submit 
-      const submitBtn = document.querySelector("button[type=submit]");
-      if (submitBtn) submitBtn.style.display =
-        "none";
-      // เปลี่ยนข้อความของปุ่มพิมพ์ให้อยู่ในโหมดตัวอย่าง 
-      const printBtn = document.querySelector("button[onclick='window.print()']");
-      if (printBtn) printBtn.innerText = "พิมพ์/ดูตัวอย่าง (โหมดอ่านอย่างเดียว)";
-      // แจ้งเตือนแสดง read-only 
-      Swal.fire({
-        title: "โหมดอ่านอย่างเดียว",
-        text: "คุณไม่มีสิทธิ์แก้ไขเอกสารนี้",
-        icon: "info",
-        confirmButtonText: "ตกลง"
-      });
+  document.addEventListener("DOMContentLoaded", () => {
+
+    // ปิด contenteditable ทั้งหมด
+    document.querySelectorAll("[contenteditable]").forEach(e => {
+      e.setAttribute("contenteditable", "false");
+      e.style.background = "#f0f0f0";
+      e.style.cursor = "not-allowed";
     });
+
+    // ปิด input / select / textarea
+    document.querySelectorAll("input:not([type=hidden]), textarea, select").forEach(e => {
+      e.disabled = true;
+      e.style.background = "#f0f0f0";
+      e.style.cursor = "not-allowed";
+    });
+
+    // ซ่อนปุ่ม submit
+    const submitBtn = document.querySelector("button[type=submit]");
+    if (submitBtn) submitBtn.style.display = "none";
+
+    // เปลี่ยนข้อความของปุ่มพิมพ์ให้อยู่ในโหมดตัวอย่าง
+    const printBtn = document.querySelector("button[onclick='window.print()']");
+    if (printBtn) printBtn.innerText = "พิมพ์/ดูตัวอย่าง (โหมดอ่านอย่างเดียว)";
+
+    // แจ้งเตือนแสดง read-only
+    Swal.fire({
+      title: "โหมดอ่านอย่างเดียว",
+      text: "คุณไม่มีสิทธิ์แก้ไขเอกสารนี้",
+      icon: "info",
+      confirmButtonText: "ตกลง"
+    });
+  });
   </script>
-  <?php endif; ?> <?php if (isset($_GET['saved']) && $_GET['saved'] == '1'): ?>
+  <?php endif; ?>
+
+  <?php if (isset($_GET['saved']) && $_GET['saved'] == '1'): ?>
   <div id="alertBox" class="bg-green-500 text-white px-4 py-2 rounded-md text-center mb-4 shadow-md">
+    ✅ บันทึกสำเร็จ
   </div>
   <?php elseif (isset($_GET['err']) && $_GET['err'] == 'validate'): ?>
-  <div id="alertBox" class="bg-red-500 text-white px-4 py-2 rounded-md text-center mb-4 shadow-md"> ❌
-    กรุณากรอกข้อมูลให้ครบถ้วน </div>
+  <div id="alertBox" class="bg-red-500 text-white px-4 py-2 rounded-md text-center mb-4 shadow-md">
+    ❌ กรุณากรอกข้อมูลให้ครบถ้วน
+  </div>
   <?php elseif (isset($_GET['err']) && $_GET['err'] == 'server'): ?>
-  <div id="alertBox" class="bg-red-600 text-white px-4 py-2 rounded-md text-center mb-4 shadow-md"> ⚠️
-    เกิดข้อผิดพลาดในระบบ
-    กรุณาลองใหม่อีกครั้ง </div> <?php endif; ?>
+  <div id="alertBox" class="bg-red-600 text-white px-4 py-2 rounded-md text-center mb-4 shadow-md">
+    ⚠️ เกิดข้อผิดพลาดในระบบ กรุณาลองใหม่อีกครั้ง
+  </div>
+  <?php endif; ?>
+
   <main class="page">
     <form id="updateForm" action="update_memo.php" method="post">
       <input type="hidden" name="header_text" id="hidden_header_text" value="<?= h($header_text) ?>">
       <input type="hidden" name="doc_no" id="hidden_doc_no" value="<?= h($doc_no) ?>">
 
       <!-- hidden input ครบทุก field_id -->
-      <input type="hidden" name="redirect_back" value="<?= htmlspecialchars($referer) ?>">
-
+      <!-- hidden input ครบทุก field_id + ตั้งค่าเริ่มต้น -->
       <input type="hidden" name="document_id" value="<?= h($document['document_id']) ?>">
+      <input type="hidden" name="template_id" value="<?= h($document['template_id']) ?>">
 
       <!-- สำคัญ: ให้ doc_date เป็นรูปแบบเดิม (YYYY-MM-DD) ที่ดึงมาจาก DB -->
       <input type="hidden" name="doc_date" id="hidden_doc_date" value="<?= h($docDate) ?>">
@@ -624,7 +555,8 @@ $len = max(20, $len);
           data-target="courseName"><?= h($courseName ?: 'ชื่อหลักสูตร') ?></span>
         ระหว่างวันที่ <span class="chip" contenteditable="true"
           data-target="joinDates"><?= h($joinDates ?: '...') ?></span>
-        ณ <span class="chip" contenteditable="true" data-target="location"><?= h($location ?: '...') ?></span> นั้น
+        ณ <span class="chip" contenteditable="true" data-target="location"><?= h($location ?: '...') ?></span>
+        นั้น
         ซึ่งหลักสูตรดังกล่าวเป็นประโยชน์ต่อการพัฒนาทั้งกระบวนการจัดการเรียนการสอนในรูปแบบสหกิจศึกษา
       </div>
 
@@ -668,31 +600,41 @@ $len = max(20, $len);
       <div class="content-block single align-to-dean" style="margin-top:50px;;"> (ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา
         นามี)<br /> หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ </div>
       <div class="footer-actions">
-        <!-- 🔵 ปุ่มแรก: พิมพ์/ดูตัวอย่าง (ทุก role ต้องมี และอยู่ลำดับแรก) -->
-        <button type="button" onclick="window.print()"
-          class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md text-xl font-bold"> พิมพ์/ดูตัวอย่าง
-        </button>
-        <!-- 🟩 USER: ปุ่มยืนยัน -->
-        <?php if ($roleId === 3): ?>
+
+        <?php if ($canEdit): ?>
         <button type="submit" class="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-md text-xl font-bold">
           ยืนยันการแก้ไข
-        </button> <?php endif; ?>
-        <!-- 🟦 OFFICER & ADMIN -->
-        <?php if ($isAdmin || $isOfficer): ?>
-        <!-- ปุ่มอนุมัติ -->
-        <button type="button" onclick="updateStatus('approved')"
-          class="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-md text-xl font-bold"> ยืนยันการแก้ไข
         </button>
-        <!-- ปุ่มไม่ผ่าน -->
-        <button type="button" onclick="updateStatus('rejected')"
-          class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md text-xl font-bold"> ไม่ผ่าน </button>
         <?php endif; ?>
-        <!-- ปุ่มกลับหน้าหลัก (ทุก role มี) -->
+
+        <?php if ($isAdmin || $isOfficer): ?>
+        <button type="button" onclick="updateStatus('approved')"
+          class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-md text-xl font-bold">
+          ✔ อนุมัติ
+        </button>
+
+        <button type="button" onclick="updateStatus('rejected')"
+          class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md text-xl font-bold">
+          ✘ ไม่ผ่าน / ส่งกลับรอแก้ไข
+        </button>
+        <?php endif; ?>
+
+        <button type="button" onclick="window.print()"
+          class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md text-xl font-bold">
+          พิมพ์/ดูตัวอย่าง
+        </button>
+
         <a href="<?= $homePath ?>"
-          class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md text-xl font-bold"> กลับหน้าหลัก </a>
+          class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md text-xl font-bold">
+          กลับหน้าหลัก
+        </a>
+
       </div>
+
+
     </form>
-  </main> <?php if ($readonly && !($isAdmin || $isOfficer)): ?>
+  </main>
+  <?php if ($readonly && !($isAdmin || $isOfficer)): ?>
   <script>
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("[contenteditable]").forEach(e => {
@@ -706,7 +648,9 @@ $len = max(20, $len);
     const submitBtn = document.querySelector("button[type=submit]");
     if (submitBtn) submitBtn.style.display = "none";
   });
-  </script> <?php endif; ?>
+  </script>
+  <?php endif; ?>
+
   <script>
   const alertBox = document.getElementById('alertBox');
   if (alertBox) {
@@ -760,6 +704,40 @@ $len = max(20, $len);
       }
     });
   });
+
+  function updateStatus(status) {
+    const docId = <?= (int) $document['document_id'] ?>;
+
+    fetch('update_status.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `document_id=${docId}&status=${status}`
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'อัปเดตสถานะสำเร็จ',
+            text: 'สถานะเอกสารถูกเปลี่ยนเป็น ' + data.status_text,
+            confirmButtonColor: '#3085d6'
+          }).then(() => window.location.href = 'home.php');
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'ผิดพลาด',
+            text: data.message
+          });
+        }
+      })
+      .catch(() => Swal.fire({
+        icon: 'error',
+        title: 'ผิดพลาด',
+        text: 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้'
+      }));
+  }
 
   function getQuery(name) {
     const url = new URL(window.location.href);
@@ -819,7 +797,8 @@ $len = max(20, $len);
     });
     el.addEventListener('paste', e => {
       e.preventDefault();
-      const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\r?\n/g, ' ');
+      const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\r?\n/g,
+        ' ');
       document.execCommand('insertText', false, text);
     });
   });
@@ -830,6 +809,44 @@ $len = max(20, $len);
     // กำหนดความกว้างกล่อง = ความกว้างบรรทัดชื่อ -> ตำแหน่งจะกึ่งกลางใต้ชื่อพอดี
     box.style.width = nameEl.offsetWidth + 'px';
   })();
+  // ✅ ตรวจสิทธิ์ Officer ก่อนอนุมัติ / ไม่ผ่าน
+  document.addEventListener("DOMContentLoaded", () => {
+    const permId = <?= (int) ($_SESSION['perm_id'] ?? 0) ?>;
+    const btnApprove = document.getElementById('btnApprove');
+    const btnReject = document.getElementById('btnReject');
+
+    function showNoPermissionAlert() {
+      Swal.fire({
+        icon: 'error',
+        title: 'ไม่มีสิทธิ์ในการแก้ไขเอกสาร',
+        html: 'คุณไม่มีสิทธิ์ในการอนุมัติหรือไม่ผ่านเอกสารนี้<br><b>กรุณาติดต่อผู้ดูแลระบบ (Admin)</b>',
+        confirmButtonText: 'ตกลง',
+        confirmButtonColor: '#d33'
+      });
+    }
+
+    if (btnApprove) {
+      btnApprove.addEventListener('click', (e) => {
+        if (permId !== 1) {
+          e.preventDefault();
+          showNoPermissionAlert();
+        }
+      });
+    }
+
+    if (btnReject) {
+      btnReject.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (permId !== 1) {
+          showNoPermissionAlert();
+          return;
+        }
+        // ✅ มีสิทธิ์ถึงจะอัปเดตสถานะ
+        updateStatus('rejected');
+      });
+    }
+
+  });
   </script>
 </body>
 
