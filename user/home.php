@@ -246,10 +246,11 @@ if (!isset($_SESSION['user_id'])) {
     <div class="bg-gray-50 p-4 rounded-xl shadow flex justify-between items-start">
       <div>
         <!-- 🟢 ชื่อเอกสารเป็นลิงก์ -->
-        <a href="../edit_document.php?id=${req.document_id}" 
-           class="font-semibold text-teal-600 hover:underline">
-           ${req.title}
+        <a href="#" onclick="openDocument(${req.document_id})" 
+        class="font-semibold text-teal-600 hover:underline">${req.title}
         </a>
+
+        
         <!-- รายละเอียด + สถานะ -->
         <div class="text-sm text-gray-500 mt-1 flex items-center space-x-2">
             <span>${req.detail ? req.detail : "(ไม่มีรายละเอียด)"}</span>
@@ -284,102 +285,71 @@ if (!isset($_SESSION['user_id'])) {
                     }">${i}</button>
     `).join("");
     }
-
-
-
-
-    function goToPage(page) {
-        currentPage = page;
-        renderList();
-    }
-
-    sortBtn.onclick = () => {
-        sortAsc = !sortAsc;
-        sortIcon.innerHTML = sortAsc ?
-            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />' :
-            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />';
-        renderList();
-    };
-
-    itemsPerPageEl.onchange = () => {
-        itemsPerPage = parseInt(itemsPerPageEl.value);
-        currentPage = 1;
-        renderList();
-    };
-
-    let activeTab = "รอตรวจสอบ";
-
-    tabPending.onclick = () => {
-        activeTab = "รอตรวจสอบ";
-        tabPending.classList.add("bg-teal-500", "text-white");
-        tabDone.classList.remove("bg-teal-500", "text-white");
-        tabEdit.classList.remove("bg-teal-500", "text-white");
-        currentPage = 1;
-        renderList();
-    };
-
-    tabDone.onclick = () => {
-        activeTab = "อนุมัติแล้ว";
-        tabDone.classList.add("bg-teal-500", "text-white");
-        tabPending.classList.remove("bg-teal-500", "text-white");
-        tabEdit.classList.remove("bg-teal-500", "text-white");
-        currentPage = 1;
-        renderList();
-    };
-
-    tabEdit.onclick = () => {
-        activeTab = "รอการแก้ไข";
-        tabEdit.classList.add("bg-teal-500", "text-white");
-        tabDone.classList.remove("bg-teal-500", "text-white");
-        tabPending.classList.remove("bg-teal-500", "text-white");
-        currentPage = 1;
-        renderList();
-    };
-
-
-    renderList();
-
-    const profileBtn = document.getElementById("profileBtn");
-    const profileMenu = document.getElementById("profileMenu");
-
-    profileBtn.addEventListener("click", () => {
-        profileMenu.classList.toggle("hidden");
     });
 
-    function closeMenu() {
-        profileMenu.classList.add("hidden");
-    }
 
-    // กดนอกเมนูให้ปิด
-    window.addEventListener("click", (e) => {
-        if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
-            profileMenu.classList.add("hidden");
-        }
-    });
-    </script>
-    =======
-    });
+
 
     document.addEventListener("DOMContentLoaded", () => {
-    const params = new URLSearchParams(window.location.search);
-    const errType = params.get("err");
+        const params = new URLSearchParams(window.location.search);
+        const errType = params.get("err");
 
-    if (errType === "no_view") {
-    Swal.fire({
-    title: "ไม่มีสิทธิ์ดูเอกสารนี้",
-    text: "คุณไม่มีสิทธิ์ในการเข้าถึงเอกสารนี้",
-    icon: "error",
-    confirmButtonText: "ตกลง",
-    confirmButtonColor: "#3085d6",
-    }).then(() => {
-    const url = new URL(window.location.href);
-    url.searchParams.delete("err");
-    window.history.replaceState({}, "", url.toString());
+        if (errType === "no_view") {
+            Swal.fire({
+                title: "ไม่มีสิทธิ์ดูเอกสารนี้",
+                text: "คุณไม่มีสิทธิ์ในการเข้าถึงเอกสารนี้",
+                icon: "error",
+                confirmButtonText: "ตกลง",
+                confirmButtonColor: "#3085d6",
+            }).then(() => {
+                const url = new URL(window.location.href);
+                url.searchParams.delete("err");
+                window.history.replaceState({}, "", url.toString());
+            });
+        }
     });
+
+    function openDocument(docId) {
+        fetch("../check_view_permission.php?id=" + docId)
+
+            .then(r => r.json())
+            .then(res => {
+                console.log("Returned JSON:", res); // ⭐ Debug
+
+                if (!res || typeof res.allowed === "undefined") {
+                    Swal.fire("Error", "ข้อมูลที่ส่งกลับไม่ถูกต้อง", "error");
+                    return;
+                }
+
+                if (res.allowed === true) {
+                    window.location.href = "../edit_document.php?id=" + docId;
+                    return;
+                }
+
+                if (res.reason === "not_login") {
+                    Swal.fire("กรุณาเข้าสู่ระบบ", "", "warning");
+                    return;
+                }
+
+                if (res.reason === "no_permission") {
+                    Swal.fire({
+                        title: "ไม่มีสิทธิ์เข้าดูเอกสารนี้",
+                        text: "คุณไม่สามารถเข้าถึงเอกสารนี้ได้",
+                        icon: "error",
+                        confirmButtonText: "ตกลง"
+                    });
+                    return;
+                }
+
+                Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถตรวจสอบสิทธิ์ได้", "error");
+            })
+            .catch(err => {
+                console.log("Fetch error:", err); // ⭐ Debug
+                Swal.fire("Error", "ไม่สามารถตรวจสอบสิทธิ์ได้", "error");
+            });
     }
-    });
     </script>
-    >>>>>>> 400b2a825c68f3000347a1bbdbf134c585aec8e0
+
 </body>
 
 </html>

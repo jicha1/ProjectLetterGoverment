@@ -206,9 +206,10 @@ $redirectBack = trim($redirectBack);
 
 /* ถ้ามี referer ที่ส่งมา → กลับไปหน้านั้น */
 if ($redirectBack !== '') {
-    header("Location: {$redirectBack}?saved=1&from=update");
+    header("Location: /Pro_letter/edit_document.php?id={$documentId}&saved=1&from=update");
     exit;
 }
+
 
 /* ถ้าไม่มี referer → fallback ไปหน้าตาม role */
 $role = strtolower($_SESSION['role_name'] ?? '');

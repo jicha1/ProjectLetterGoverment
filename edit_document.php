@@ -1,6 +1,8 @@
 <?php
 session_start();
 require_once __DIR__ . '/functions.php';
+$referer = $_SERVER['HTTP_REFERER'] ?? '';
+$referer = trim(str_replace(["\r","\n"],"", $referer));
 
 /* --------------------------------------------------
    ตรวจ session
@@ -64,6 +66,8 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([':id' => $docId]);
 $document = $stmt->fetch(PDO::FETCH_ASSOC);
+$docStatus = $document['status'];
+
 
 if (!$document)
   exit("ไม่พบเอกสาร");
@@ -230,7 +234,7 @@ $len = max(20, $len);
 
 
   <style>
-  @import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap");
+  @import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@300;700&display=swap");
 
   html,
   body {
@@ -593,7 +597,14 @@ $len = max(20, $len);
     font-family: "TH SarabunPSK";
     font-size: 16pt !important;
     /* ← เทียบเท่า 16pt จริงใน Word */
-    font-weight: 400 !important;
+    font-weight: 300 !important;
+  }
+
+  .chip:focus {
+    outline: none !important;
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
   </style>
 </head>
@@ -623,7 +634,7 @@ $len = max(20, $len);
 
     // เปลี่ยนข้อความของปุ่มพิมพ์ให้อยู่ในโหมดตัวอย่าง
     const printBtn = document.querySelector("button[onclick='window.print()']");
-    if (printBtn) printBtn.innerText = "พิมพ์/ดูตัวอย่าง (โหมดอ่านอย่างเดียว)";
+    if (printBtn) printBtn.innerText = "พิมพ์/ดูตัวอย่าง";
 
     // แจ้งเตือนแสดง read-only
     Swal.fire({
@@ -796,43 +807,44 @@ $len = max(20, $len);
         นามี)<br /> หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ </div>
       <div class="footer-actions">
 
-        <!-- 🔵 ปุ่มแรก: พิมพ์/ดูตัวอย่าง (ทุก role ต้องมี และอยู่ลำดับแรก) -->
+        <!-- ปุ่มแรก: พิมพ์/ดู -->
         <button type="button" onclick="window.print()"
           class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md text-xl font-bold">
           พิมพ์/ดูตัวอย่าง
         </button>
 
-        <!-- 🟩 USER: ปุ่มยืนยัน -->
+        <?php if ($docStatus !== 'approved'): ?>
+
+        <!-- USER -->
         <?php if ($roleId === 3): ?>
         <button type="submit" class="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-md text-xl font-bold">
           ยืนยันการแก้ไข
         </button>
         <?php endif; ?>
 
-        <!-- 🟦 OFFICER & ADMIN -->
+        <!-- ADMIN / OFFICER -->
         <?php if ($isAdmin || $isOfficer): ?>
-
-        <!-- ปุ่มอนุมัติ -->
         <button type="button" onclick="updateStatus('approved')"
           class="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-md text-xl font-bold">
           ยืนยันการแก้ไข
         </button>
 
-        <!-- ปุ่มไม่ผ่าน -->
         <button type="button" onclick="updateStatus('rejected')"
           class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md text-xl font-bold">
           ไม่ผ่าน
         </button>
+        <?php endif; ?>
 
         <?php endif; ?>
 
-        <!-- ปุ่มกลับหน้าหลัก (ทุก role มี) -->
+        <!-- ปุ่มกลับหน้าหลัก -->
         <a href="<?= $homePath ?>"
           class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md text-xl font-bold">
           กลับหน้าหลัก
         </a>
 
       </div>
+
 
 
 
@@ -941,6 +953,65 @@ $len = max(20, $len);
     }
   });
 
+  function updateStatus(status) {
+
+    const docId = document.querySelector("input[name=document_id]").value;
+
+    Swal.fire({
+      title: (status === "approved" ? "ยืนยันการแก้ไข?" : "ไม่ผ่านการตรวจสอบ?"),
+      text: (status === "approved" ?
+        "ต้องการอนุมัติเอกสารนี้หรือไม่?" :
+        "ต้องการส่งกลับให้แก้ไขหรือไม่?"),
+      icon: (status === "approved" ? "success" : "warning"),
+      showCancelButton: true,
+      confirmButtonText: "ยืนยัน",
+      cancelButtonText: "ยกเลิก",
+    }).then((result) => {
+      if (result.isConfirmed) {
+
+        console.log("Sending to update_status.php", {
+          docId,
+          status
+        });
+
+        fetch("/Pro_letter/update_status.php", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+              document_id: docId,
+              status: status
+            })
+          })
+          .then(res => res.json())
+          .then(data => {
+
+            if (!data.success) {
+              Swal.fire("Error", data.message, "error");
+              return;
+            }
+
+            Swal.fire({
+              title: "บันทึกสำเร็จ",
+              text: "คุณต้องการกลับไปหน้าหลักหรือไม่?",
+              icon: "success",
+              showCancelButton: true,
+              confirmButtonText: "กลับหน้าหลัก",
+              cancelButtonText: "อยู่หน้านี้ต่อ",
+            }).then(choice => {
+              if (choice.isConfirmed) {
+                window.location.href = "<?= $homePath ?>";
+              }
+            });
+
+          });
+      }
+    });
+
+  }
+
+
 
   document.addEventListener("DOMContentLoaded", () => {
     if (getQuery("saved") === "1" && getQuery("from") === "update") {
@@ -961,6 +1032,7 @@ $len = max(20, $len);
       });
     }
   });
+
 
   document.querySelectorAll('.editable[contenteditable], .chip[contenteditable]').forEach(el => {
     el.addEventListener('keydown', e => {

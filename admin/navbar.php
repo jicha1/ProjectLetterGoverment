@@ -18,25 +18,28 @@
       </div>
 
       <div class="flex items-center space-x-4">
-        <a href="admin/home.php">
-          <div class="px-4 py-2 rounded-[11px] font-bold transition 
-            <?= $current === 'home.php' 
-                    ? 'bg-white text-teal-500 shadow' 
-                : 'text-white hover:bg-white hover:text-teal-500' ?>">
+
+        <a href="/Pro_letter/admin/home.php">
+          <div
+            class="px-4 py-2 rounded-[11px] font-bold transition 
+        <?= $current === 'home.php' ? 'bg-white text-teal-500 shadow' : 'text-white hover:bg-white hover:text-teal-500' ?>">
             หน้าหลัก
           </div>
         </a>
-        <a href="admin/request.php">
-          <div class="px-4 py-2 rounded-[11px] font-bold transition text-white hover:bg-white hover:text-teal-500">
-            รายการคำขอ
+
+        <a href="/Pro_letter/admin/history_page.php">
+          <div
+            class="px-4 py-2 rounded-[11px] font-bold transition 
+        <?= $current === 'history_page.php' ? 'bg-white text-teal-500 shadow' : 'text-white hover:bg-white hover:text-teal-500' ?>">
+            ประวัติการใช้งานเอกสาร
           </div>
         </a>
-        <?php 
-                if (isset($_SESSION['permissions']) && in_array(3, $_SESSION['permissions'])): 
-                renderAdminExtraMenus(); 
-            endif; 
-            ?>
 
+        <?php 
+      if (isset($_SESSION['permissions']) && in_array(3, $_SESSION['permissions'])): 
+        renderAdminExtraMenus(); 
+      endif; 
+    ?>
         <!-- เมนู: ตั้งค่าระบบเริ่มต้น -->
         <div class="relative">
           <button id="templateBtn" class="px-4 py-2 rounded-[11px] font-bold transition 
@@ -71,11 +74,36 @@
           </button>
           <!-- เมนู Dropdown -->
           <div id="profileMenu" class="hidden absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-50">
-            <a href="logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">ออกจากระบบ</a>
+            <a href="/Pro_letter/logout.php"
+              class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">ออกจากระบบ</a>
             <button onclick="closeMenu()" class="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">
               อยู่ต่อ
             </button>
           </div>
         </div>
+
+
+        <!-- <div id="profileMenu" class="hidden absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-50">
+          <a href="/Pro_letter/logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">ออกจากระบบ</a>
+          <button onclick="closeMenu()"
+            class="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">อยู่ต่อ</button>
+        </div>
+      </div> -->
+
       </div>
     </header>
+    <script>
+const templateBtn = document.getElementById("templateBtn");
+const templateMenu = document.getElementById("templateMenu");
+
+templateBtn.addEventListener("click", () => {
+  templateMenu.classList.toggle("hidden");
+});
+
+// ปิด dropdown ถ้าคลิกนอกเมนู
+document.addEventListener("click", (e) => {
+  if (!templateBtn.contains(e.target) && !templateMenu.contains(e.target)) {
+    templateMenu.classList.add("hidden");
+  }
+});
+    </script>

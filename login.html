@@ -2,20 +2,19 @@
 <html lang="th">
 
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Login | Smart Government</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-white font-sans">
-
   <!-- Header -->
   <header class="bg-teal-500 text-white p-4 flex justify-between items-center shadow-md">
     <!-- Logo -->
     <div class="flex items-center space-x-3">
       <div class="w-[56px] h-[56px] flex items-center justify-center relative overflow-visible">
         <svg xmlns="http://www.w3.org/2000/svg" class="absolute scale-[1.4] text-white"
-          style="width: 60px; height: 60px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          style="width: 60px; height: 60px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
             d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m0 0a2 2 0 00-2-2H5a2 2 0 00-2 2m18 0v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8" />
         </svg>
@@ -46,6 +45,8 @@
     </nav>
   </div>
 
+
+
   <!-- Login Form -->
   <div class="flex justify-center mt-8">
     <div class="w-full max-w-md bg-white border border-gray-200 shadow-lg p-6 rounded-xl">
@@ -64,11 +65,10 @@
             class="w-full px-4 py-2 border-2 border-teal-400 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500">
           <small id="error-user" class="text-red-500 text-xs mt-1 hidden"></small>
         </div>
-
         <div>
           <label class="block text-sm text-teal-500 mb-1">Password</label>
           <input type="password" name="password" placeholder="Password" required
-            class="w-full px-4 py-2 border-2 border-teal-400 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500">
+            class="w-full px-4 py-2 border-2 border-teal-400 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500" />
           <small id="error-pass" class="text-red-500 text-xs mt-1 hidden"></small>
         </div>
 
@@ -124,7 +124,8 @@
           failText.textContent = "รหัสผ่านไม่ถูกต้อง";
           break;
         case "inactive":
-          failText.textContent = "บัญชีนี้ถูกปิดการใช้งาน โปรดติดต่อผู้ดูแลระบบ";
+          failText.textContent =
+            "บัญชีนี้ถูกปิดการใช้งาน โปรดติดต่อผู้ดูแลระบบ";
           break;
         case "db":
           failText.textContent = "ไม่สามารถเชื่อมต่อฐานข้อมูลได้";
@@ -142,6 +143,6 @@
       window.history.replaceState({}, document.title, "login.html");
     });
   </script>
-
 </body>
+
 </html>
