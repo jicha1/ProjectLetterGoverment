@@ -15,6 +15,8 @@ if (!isset($_SESSION['user_id'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>รายการส่งคำขอ (Officer)</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <style>
   html,
   body {
@@ -215,10 +217,10 @@ if (!isset($_SESSION['user_id'])) {
     requestList.innerHTML = shown.map(req => `
     <div class="bg-gray-50 p-4 rounded-xl shadow flex justify-between items-start">
       <div>
-        <a href="../edit_document.php?id=${req.document_id}" 
-           class="font-semibold text-teal-600 hover:underline">
-           ${req.title}
-        </a>
+        <a href="#" onclick="openDocument(${req.document_id})" 
+   class="font-semibold text-teal-600 hover:underline">${req.title}
+   </a>
+
         <div class="text-sm text-gray-500 mt-1 flex items-center space-x-2">
           <span>${req.detail}</span>
           <span> | สถานะ:</span> 
@@ -298,6 +300,46 @@ if (!isset($_SESSION['user_id'])) {
       profileMenu.classList.add("hidden");
     }
   });
+
+  function openDocument(docId) {
+    fetch("../check_view_permission.php?id=" + docId)
+
+      .then(r => r.json())
+      .then(res => {
+        console.log("Returned JSON:", res); // ⭐ Debug
+
+        if (!res || typeof res.allowed === "undefined") {
+          Swal.fire("Error", "ข้อมูลที่ส่งกลับไม่ถูกต้อง", "error");
+          return;
+        }
+
+        if (res.allowed === true) {
+          window.location.href = "../edit_document.php?id=" + docId;
+          return;
+        }
+
+        if (res.reason === "not_login") {
+          Swal.fire("กรุณาเข้าสู่ระบบ", "", "warning");
+          return;
+        }
+
+        if (res.reason === "no_permission") {
+          Swal.fire({
+            title: "ไม่มีสิทธิ์เข้าดูเอกสารนี้",
+            text: "คุณไม่สามารถเข้าถึงเอกสารนี้ได้",
+            icon: "error",
+            confirmButtonText: "ตกลง"
+          });
+          return;
+        }
+
+        Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถตรวจสอบสิทธิ์ได้", "error");
+      })
+      .catch(err => {
+        console.log("Fetch error:", err); // ⭐ Debug
+        Swal.fire("Error", "ไม่สามารถตรวจสอบสิทธิ์ได้", "error");
+      });
+  }
   </script>
 </body>
 
