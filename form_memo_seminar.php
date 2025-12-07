@@ -6,28 +6,28 @@ require_once __DIR__ . '/functions.php';
    ตรวจ session
 -------------------------------------------------- */
 if (empty($_SESSION['user_id'])) {
-    http_response_code(401);
-    exit("Unauthorized");
+  http_response_code(401);
+  exit("Unauthorized");
 }
 
 $userId = (int) $_SESSION['user_id'];
-$role   = strtolower($_SESSION['role_name'] ?? 'user');
+$role = strtolower($_SESSION['role_name'] ?? 'user');
 
 /* --------------------------------------------------
    ตั้ง homePath ตาม role
 -------------------------------------------------- */
 $roleId = $_SESSION['role_id'] ?? 0;
-$roleId = (int)($_SESSION['role_id'] ?? 0);
+$roleId = (int) ($_SESSION['role_id'] ?? 0);
 $isAdmin = ($roleId === 1);
 $isOfficer = ($roleId === 2);
 
 
 if ($roleId == 1) {
-    $homePath = "/Pro_letter/admin/home.php";
+  $homePath = "/Pro_letter/admin/home.php";
 } elseif ($roleId == 2) {
-    $homePath = "/Pro_letter/officer/home.php";
+  $homePath = "/Pro_letter/officer/home.php";
 } else {
-    $homePath = "/Pro_letter/user/home.php";
+  $homePath = "/Pro_letter/user/home.php";
 }
 
 
@@ -35,20 +35,21 @@ if ($roleId == 1) {
    รับ document_id
 -------------------------------------------------- */
 $pdo = db();
-$docId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$docId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
 if ($docId <= 0) {
-    $q = $pdo->prepare("
+  $q = $pdo->prepare("
         SELECT document_id 
         FROM documents 
         WHERE owner_id = :uid
         ORDER BY document_id DESC
         LIMIT 1
     ");
-    $q->execute([':uid' => $userId]);
-    $docId = (int) ($q->fetchColumn() ?: 0);
+  $q->execute([':uid' => $userId]);
+  $docId = (int) ($q->fetchColumn() ?: 0);
 
-    if ($docId <= 0) exit("ยังไม่มีเอกสารของคุณ");
+  if ($docId <= 0)
+    exit("ยังไม่มีเอกสารของคุณ");
 }
 
 /* --------------------------------------------------
@@ -64,22 +65,23 @@ $stmt = $pdo->prepare("
 $stmt->execute([':id' => $docId]);
 $document = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$document) exit("ไม่พบเอกสาร");
+if (!$document)
+  exit("ไม่พบเอกสาร");
 
 /* --------------------------------------------------
    สิทธิ์ดูเอกสาร
 -------------------------------------------------- */
 // Officer: role_id = 2
 // Admin:   role_id = 1
-$roleId = (int)($_SESSION['role_id'] ?? 0);
+$roleId = (int) ($_SESSION['role_id'] ?? 0);
 
 // officer & admin ดูได้ทุกอัน
 if ($roleId !== 1 && $roleId !== 2) {
-    // user: ดูเฉพาะของตัวเอง
-    if ($document['owner_id'] != $userId) {
-        header("Location: {$homePath}?err=no_view");
-        exit;
-    }
+  // user: ดูเฉพาะของตัวเอง
+  if ($document['owner_id'] != $userId) {
+    header("Location: {$homePath}?err=no_view");
+    exit;
+  }
 }
 
 
@@ -109,58 +111,68 @@ $q->execute([':id' => $docId]);
 
 $valueMap = [];
 foreach ($q->fetchAll(PDO::FETCH_ASSOC) as $row) {
-    $valueMap[(int)$row['field_id']] = $row['value_text'];
+  $valueMap[(int) $row['field_id']] = $row['value_text'];
 }
 
 /* --------------------------------------------------
    ฟังก์ชัน helper
 -------------------------------------------------- */
-function h($s) {
-    return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
+function h($s)
+{
+  return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8');
 }
 
-function thai_date($ymd) {
-    if (!$ymd || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $ymd)) return "";
-    [$y,$m,$d] = explode("-", $ymd);
-    $months = [
-        1=>"มกราคม",2=>"กุมภาพันธ์",3=>"มีนาคม",4=>"เมษายน",5=>"พฤษภาคม",
-        6=>"มิถุนายน",7=>"กรกฎาคม",8=>"สิงหาคม",9=>"กันยายน",10=>"ตุลาคม",
-        11=>"พฤศจิกายน",12=>"ธันวาคม"
-    ];
-    return intval($d)." ".$months[intval($m)]." ".(intval($y)+543);
+function thai_date($ymd)
+{
+  if (!$ymd || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $ymd))
+    return "";
+  [$y, $m, $d] = explode("-", $ymd);
+  $months = [
+    1 => "มกราคม",
+    2 => "กุมภาพันธ์",
+    3 => "มีนาคม",
+    4 => "เมษายน",
+    5 => "พฤษภาคม",
+    6 => "มิถุนายน",
+    7 => "กรกฎาคม",
+    8 => "สิงหาคม",
+    9 => "กันยายน",
+    10 => "ตุลาคม",
+    11 => "พฤศจิกายน",
+    12 => "ธันวาคม"
+  ];
+  return intval($d) . " " . $months[intval($m)] . " " . (intval($y) + 543);
 }
 
 /* --------------------------------------------------
    Mapping ตัวแปรหลักจาก document_values
 -------------------------------------------------- */
-$docDate    = $valueMap[1] ?? $document['doc_date'];
-$ownerName  = $valueMap[2] ?? "";
-$position   = $valueMap[3] ?? "";
-$joinType   = $valueMap[4] ?? "";
+$docDate = $valueMap[1] ?? $document['doc_date'];
+$ownerName = $valueMap[2] ?? "";
+$position = $valueMap[3] ?? "";
+$joinType = $valueMap[4] ?? "";
 $courseName = $valueMap[5] ?? "";
-$joinDates  = $valueMap[6] ?? "";
-$location   = $valueMap[7] ?? "";
-$amountStr  = $valueMap[8] ?? "";
-$vehicle    = $valueMap[9] ?? "";
-$faculty    = $valueMap[10] ?? "";
+$joinDates = $valueMap[6] ?? "";
+$location = $valueMap[7] ?? "";
+$amountStr = $valueMap[8] ?? "";
+$vehicle = $valueMap[9] ?? "";
+$faculty = $valueMap[10] ?? "";
 $department = $valueMap[11] ?? "";
-$semester = $valueMap[12] ?? "";
-
 /* --------------------------------------------------
    Mapping joinType → purposeCode (รหัส)
 -------------------------------------------------- */
 $purposeCode = 'other';
 
 switch (trim($joinType)) {
-    case 'นำเสนอผลงานทางวิชาการ':
-        $purposeCode = 'academic';
-        break;
-    case 'เข้าร่วมประชุมวิชาการในงาน':
-        $purposeCode = 'meeting';
-        break;
-    case 'เข้ารับการฝึกอบรมหลักสูตร':
-        $purposeCode = 'training';
-        break;
+  case 'นำเสนอผลงานทางวิชาการ':
+    $purposeCode = 'academic';
+    break;
+  case 'เข้าร่วมประชุมวิชาการในงาน':
+    $purposeCode = 'meeting';
+    break;
+  case 'เข้ารับการฝึกอบรมหลักสูตร':
+    $purposeCode = 'training';
+    break;
 }
 
 /* --------------------------------------------------
@@ -168,21 +180,21 @@ switch (trim($joinType)) {
 -------------------------------------------------- */
 
 $header_text = $document["header_text"] ?? "";
-$doc_no      = $document["doc_no"] ?? "";
-$subject     = $document["subject"] ?? "";
+$doc_no = $document["doc_no"] ?? "";
+$subject = $document["subject"] ?? "";
 
 /* --------------------------------------------------
    คำนวณวันที่ไทย, งบประมาณ
 -------------------------------------------------- */
 $thaiDocDate = thai_date($docDate);
-$prettyAmount = $amountStr !== "" ? number_format((float)$amountStr, 2) : "";
+$prettyAmount = $amountStr !== "" ? number_format((float) $amountStr, 2) : "";
 
 /* --------------------------------------------------
    สร้างข้อความส่วนหัวที่ใช้ในเนื้อหา
 -------------------------------------------------- */
 $hdr_agency = trim(
-    ($faculty ?: "คณะ..................................") . " " .
-    ($department ? "ภาควิชา" . $department : "ภาควิชา........................")
+  ($faculty ?: "คณะ..................................") . " " .
+  ($department ? "ภาควิชา" . $department : "ภาควิชา........................")
 );
 
 $hdr_subject = $joinType ?: "เข้ารับการฝึกอบรมหลักสูตร";
@@ -193,7 +205,7 @@ $hdr_to = "คณบดี" . ($faculty ?: "คณะ...........................
 -------------------------------------------------- */
 $thaiYear = "";
 if ($docDate && preg_match('/^\d{4}/', $docDate)) {
-    $thaiYear = ((int) substr($docDate, 0, 4) + 543);
+  $thaiYear = ((int) substr($docDate, 0, 4) + 543);
 }
 
 /* --------------------------------------------------
@@ -215,6 +227,7 @@ $len = max(20, $len);
     <title>บันทึกข้อความ #<?= h($document['document_id']) ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <style>
     @import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap");
@@ -261,28 +274,14 @@ $len = max(20, $len);
         margin-right: 2px;
     }
 
-    /* ✅ เส้นจุดจริง */
-    .dot-line {
-        flex: 1;
-        display: flex;
-        align-items: flex-end;
-        height: 22px;
-        margin: 0;
-        position: relative;
+    /* .dot-line { flex: 1; display: flex; align-items: flex-end; height: 22px; margin: 0; position: relative; } .doc-line { display: flex; align-items: center; } */
+    .doc-spacer {
+        display: inline-block;
+        width: 2.5cm;
+        /* ← ขนาดช่องว่าง ปรับตรงนี้ */
     }
 
-    .dot-line::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 2px;
-        height: 2px;
-        background-image: radial-gradient(circle, #000 1px, transparent 1px);
-        background-size: 6px 2px;
-        background-repeat: repeat-x;
-    }
-
+    /* .dot-line::after { content: ""; position: absolute; left: 0; right: 0; bottom: 2px; height: 2px; background-image: radial-gradient(circle, #000 1px, transparent 1px); background-size: 6px 2px; background-repeat: repeat-x; } */
     .dot-input {
         border: none;
         background: transparent;
@@ -296,7 +295,6 @@ $len = max(20, $len);
         box-sizing: border-box;
         position: relative;
         z-index: 1;
-        /* ให้ข้อความอยู่บนเส้น */
     }
 
     .dot-input.box {
@@ -336,21 +334,17 @@ $len = max(20, $len);
         display: block;
     }
 
-    /* ✅ ปรับขนาด SweetAlert ให้ใหญ่เท่าหน้า home */
+    /* SweetAlert */
     .swal2-popup {
         font-size: 1rem !important;
-        /* ขยายทั้งกล่อง */
         font-family: 'Arial', sans-serif !important;
-        /* ใช้ฟอนต์เดียวกับหน้า Home */
     }
 
-    /* ถ้าอยากให้ title ใหญ่ขึ้นนิด */
     .swal2-title {
         font-size: 1.5rem !important;
         font-weight: 700 !important;
     }
 
-    /* ถ้าอยากให้ข้อความ (text) ใหญ่กว่าปกติหน่อย */
     .swal2-html-container {
         font-size: 1rem !important;
     }
@@ -414,6 +408,44 @@ $len = max(20, $len);
         border-top: 1px solid #e5e7eb;
     }
 
+    .dot-line {
+        flex: 1;
+        position: relative;
+        height: 28px;
+        display: flex;
+        align-items: flex-end !important;
+    }
+
+    .dot-line::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 4px;
+        height: 2px;
+        background-image: radial-gradient(circle, #000 1px, transparent 1px);
+        background-size: 6px 2px;
+        background-repeat: repeat-x;
+    }
+
+    /* ระยะว่างหน้าคำ + หลังคำ ตามรูป */
+    .dot-line .chip {
+        line-height: 0.9 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+
+        margin-left: 14px !important;
+        margin-right: 6px !important;
+
+        display: inline-flex !important;
+        align-items: flex-end !important;
+        /* ดึงข้อความให้แตะเส้น */
+        position: relative;
+        top: 3px;
+        /* ⭐ กดลงมาอีกนิดเพื่อให้ชิดเส้นมากที่สุด */
+    }
+
+    /* สำหรับ print */
     @media print {
 
         header,
@@ -429,8 +461,7 @@ $len = max(20, $len);
         .page {
             margin: 0;
             box-shadow: none;
-            /* กำหนดขอบแต่ละด้าน: บน 2cm, ขวา 2cm, ล่าง 2cm, ซ้าย 2.5cm */
-            padding: 3cm 2cm 3cm 3cm;
+            padding: 0.5cm 1cm 2cm 2.2cm !important;
             width: 21cm;
             min-height: 29.7cm;
             border: 2px solid #fff !important;
@@ -445,8 +476,6 @@ $len = max(20, $len);
             height: 2px;
             background-image: radial-gradient(circle, #000 0.6px, transparent 0.6px);
             background-size: 4px 2px;
-
-
             background-repeat: repeat-x;
         }
 
@@ -470,7 +499,6 @@ $len = max(20, $len);
         }
     }
 
-
     /* ฟอนต์ Sarabun */
     @font-face {
         font-family: 'TH SarabunPSK';
@@ -493,6 +521,79 @@ $len = max(20, $len);
 
     body {
         font-family: 'TH SarabunPSK', sans-serif;
+    }
+
+    /* ⭐⭐⭐ อันที่คุณย้ำว่าห้ามหาย — ใส่ให้อยู่ท้ายเหมือนเดิม ⭐⭐⭐ */
+    .doc-header .doc-row {
+        margin-bottom: 12px !important;
+        /* เดิม 6px → เพิ่มเป็น 12px */
+        line-height: 0.5 !important;
+        /* เพิ่มความสูงบรรทัด */
+    }
+
+    /* ให้กล่อง (chip) ขยับออกจากคำ โดยเส้นยังติดกับคำ */
+    /* ⭐ ขยับกล่องออกจากคำอีกนิด */
+    .doc-row .dot-line .chip {
+        margin-left: 14px !important;
+        /* เดิม 10px → เพิ่มออกมาอีก */
+        margin-right: 6px !important;
+        /* ขยับปลายด้านหลังให้สวยขึ้น */
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+        padding-top: 2px !important;
+        padding-bottom: 2px !important;
+        display: inline-flex !important;
+        align-items: flex-end !important;
+    }
+
+
+    .doc-row .doc-label {
+        line-height: 1.0 !important;
+        height: 32px !important;
+        display: flex;
+        align-items: flex-end;
+    }
+
+    /* ★ สำหรับบรรทัด "ที่ – วันที่" ให้เส้นประต่อกันสนิท */
+    .row-ty-date .ty-left::after {
+        margin-right: -13px !important;
+        /* ดึงเส้นให้ต่อกับคำว่า “วันที่” */
+    }
+
+    .row-ty-date .ty-right::after {
+        margin-left: -6px !important;
+        /* ดึงเส้นให้ต่อจากเส้นฝั่งซ้าย */
+    }
+
+    /* ลดช่องว่างหลังกล่อง เพื่อไม่ให้เกิดรูเล็กๆ */
+    .row-ty-date .chip {
+        margin-right: 0px !important;
+        margin-left: 12px !important;
+        /* เว้นหลังคำว่า “ที่” พอดี */
+    }
+
+    /* เอาช่องว่างเล็กๆ หลังเลขเอกสารออก */
+    .row-ty-date .ty-left .chip {
+        margin-right: 0 !important;
+    }
+
+    /* ⭐ ขยับ "วันที่" ไปทางซ้าย */
+    .row-ty-date .doc-label[style*="margin-left"] {
+        margin-left: 0.2cm !important;
+        /* ← จาก 1cm ลดเหลือ 0.6cm (ขยับซ้าย) */
+    }
+
+    .font-regular {
+        font-family: 'Sarabun', sans-serif !important;
+        font-weight: 20 !important;
+    }
+
+    .content-block,
+    .chip {
+        font-family: "TH SarabunPSK";
+        font-size: 16pt !important;
+        /* ← เทียบเท่า 16pt จริงใน Word */
+        font-weight: 400 !important;
     }
     </style>
 </head>
@@ -586,97 +687,99 @@ $len = max(20, $len);
             <!-- หัวบันทึก -->
             <div style="display:flex; align-items:flex-end; justify-content:flex-start; gap:20px; margin-bottom:0.5em;">
                 <img src="https://i.pinimg.com/474x/bd/55/cc/bd55ccc4416012910a723da8f810658b.jpg"
-                    style="height:1.5cm; width:auto;" />
-                <h1 class="doc-title"
-                    style="font-size:29pt;font-weight:bold;font-family:'TH SarabunPSK';line-height:1.0;text-align:center;flex:1;">
+                    style="height:1.6cm; width:auto; margin-top:0;" />
+
+                <h1 class="doc-title" style="font-size:30pt;font-weight:bold;font-family:'TH SarabunPSK';
+      line-height:1.0;margin-bottom:-10px;text-align:center;flex:1;
+      transform: translateX(-0.3cm);">
                     บันทึกข้อความ
                 </h1>
             </div>
 
-            <!-- ส่วนหัว -->
-            <div class="doc-header" style="margin-top:5px;">
-
-                <!-- ส่วนราชการ -->
-                <div class="doc-row">
-                    <div class="doc-label" style="font-size:20pt;font-weight:bold;">ส่วนราชการ</div>
-                    <div class="dot-line">
-                        <span class="chip" contenteditable="true" data-target="header_text">
-                            <?= h($header_text ?: 'คณะ... ภาค... โทร...') ?>
-                        </span>
-                    </div>
+            <!-- ส่วนราชการ -->
+            <div class="doc-row">
+                <div class="doc-label" style="font-size:20pt;font-weight:bold;">ส่วนราชการ</div>
+                <div class="dot-line">
+                    <span class="chip" contenteditable="true" data-target="header_text">
+                        <?= h($header_text ?: 'คณะ... ภาค... โทร...') ?>
+                    </span>
                 </div>
-                <input type="hidden" name="header_text" id="hidden_header_text" value="<?= h($header_text) ?>">
+            </div>
 
-                <!-- ที่ -->
-                <div class="doc-row">
-                    <div class="doc-label" style="font-size:20pt;font-weight:bold;">ที่</div>
-                    <div class="dot-line">
-                        <span class="chip" contenteditable="true" data-target="doc_no">
-                            <?= h($doc_no ?: 'ทส. พิเศษ.486/2568') ?>
-                        </span>
-                    </div>
-                    <input type="hidden" name="doc_no" id="hidden_doc_no" value="<?= h($doc_no) ?>">
+            <div class="doc-row row-ty-date">
+                <div class="doc-label" style="font-size:20pt;font-weight:bold;">ที่</div>
 
-                    <!-- วันที่ -->
-                    <div class="doc-label" style="font-size:20pt;font-weight:bold;">วันที่</div>
-                    <div class="dot-line">
-                        <span class="chip" contenteditable="true" data-target="doc_date_display">
-                            <?= h($thaiDocDate ?: '') ?>
-                        </span>
-                    </div>
-                    <input type="hidden" name="doc_date_display" id="hidden_doc_date_display"
-                        value="<?= h($thaiDocDate) ?>">
+                <div class="dot-line ty-left">
+                    <span class="chip" contenteditable="true" data-target="doc_no">
+                        <?= h($doc_no ?: 'ทส.486/2568') ?>
+                    </span>
                 </div>
 
-                <!-- เรื่อง -->
-                <div class="doc-row">
-                    <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
-                    <div class="dot-line">
-                        <input type="text" class="dot-input box" name="subject" id="subject_input"
-                            style="font-size:16pt;width:<?= $len ?>ch;" value="<?= h($subject) ?>">
-                    </div>
+                <div class="doc-label" style="font-size:20pt;font-weight:bold;margin-left:1cm;">วันที่</div>
+
+                <div class="dot-line ty-right">
+                    <span class="chip" contenteditable="true" data-target="doc_date_display">
+                        <?= h($thaiDocDate ?: '') ?>
+                    </span>
                 </div>
             </div>
 
 
-            <!-- ======================= -->
-            <!--   เนื้อหาเหมือนภาพตัวอย่าง  -->
-            <!-- ======================= -->
 
-            <!-- บรรทัด เรียน -->
+            <!-- เรื่อง -->
+            <div class="doc-row">
+                <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
+                <div class="dot-line">
+                    <span class="chip" contenteditable="true" data-target="subject">
+                        <?= h($subject ?: 'ขออนุมัติ...') ?>
+                    </span>
+                </div>
+            </div>
+
+
+            <!-- บรรทัด “เรียน ...” -->
             <div class="content-block single">
                 เรียน คณบดีคณะเทคโนโลยีและการจัดการอุตสาหกรรม
             </div>
 
             <!-- ย่อหน้า 1 -->
             <div class="content-block paragraph">
-                ตามที่ AWS และ GOVINSIDER ได้ดำเนินการจัดงาน “Public Sector Day Thailand”
-                ในวันที่ 27 พฤศจิกายน 2567 ณ Eastin Grand Hotel Phayathai กรุงเทพมหานคร โดยได้ขอเรียนเชิญ
-                ให้ข้าพเจ้า อาจารย์
-                <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'ดร.ศรายุทธ ธเนศสกุลวัฒน์') ?>
+                ตามที่
+                AWS และ GOVINSIDER ได้ดำเนินการจัดงาน
+                “Public Sector Day Thailand”
+                ในวันที่
+                <span class="chip" contenteditable="true" data-target="eventDate">
+                    <?= h($eventDate ?? '27 พฤศจิกายน 2567') ?>
                 </span>
-                เข้าร่วมงานสัมมนาดังกล่าว ซึ่งจัดขึ้นสำหรับเครือข่ายองค์กรและ
-                บุคลากรภาครัฐ สถาบันการศึกษา องค์กรด้านสาธารณสุขและองค์กรไม่แสวงหากำไร เพื่อเข้าร่วม
-                ประชุมสัมมนาเสริมสร้างประสบการณ์และยกระดับความปลอดภัยทางระบบเครือข่ายเทคโนโลยีสารสนเทศ
+                ณ Eastin Grand Hotel Phayathai กรุงเทพฯ
+                โดยได้ขอเรียนเชิญให้ข้าพเจ้า
+                <span class="chip" contenteditable="true" data-target="ownerName">
+                    <?= h($ownerName ?? 'อาจารย์ ดร.ศรยุทธ ธเนศศุภ์วัฒนา') ?>
+                </span>
+                เข้าร่วมงานสัมมนาที่จัดขึ้นสำหรับเครือข่ายองค์กรและบุคลากรภาครัฐ
+                สถาบันการศึกษา องค์กรด้านสาธารณสุข และองค์กรไม่แสวงหากำไร
+                เพื่อเข้าร่วมประชุมสัมมนา เสริมสร้างประสบการณ์และยกระดับความปลอดภัยทางระบบเครือข่ายเทคโนโลยีสารสนเทศ
             </div>
 
             <!-- ย่อหน้า 2 -->
             <div class="content-block paragraph">
-                ในการนี้ข้าพเจ้า อาจารย์
+                ในการนี้ ข้าพเจ้า
                 <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'ดร.ศรายุทธ ธเนศสกุลวัฒน์') ?>
+                    <?= h($ownerName ?? 'อาจารย์ ดร.ศรยุทธ ธเนศศุภ์วัฒนา') ?>
                 </span>
-                บุคลากรสังกัดภาควิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีและการจัดการอุตสาหกรรม
+                บุคลากรสังกัดภาควิชาเทคโนโลยีสารสนเทศ
+                คณะเทคโนโลยีและการจัดการอุตสาหกรรม
                 มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ วิทยาเขตปราจีนบุรี
-                จึงขออนุมัติเดินทางเพื่อเข้าร่วมงาน “Public Sector Day Thailand” ตามวัน
-                เวลา และสถานที่ที่กล่าวข้างต้น โดยไม่มีค่าใช้จ่าย (รายละเอียดตามเอกสารแนบ)
+                จึงขออนุมัติตัวบุคลากรเพื่อเดินทางไปเข้าร่วมงาน “Public Sector Day Thailand”
+                ตามวัน เวลา และสถานที่ที่กล่าวข้างต้น โดยไม่มีค่าใช้จ่าย
+                (รายละเอียดตามเอกสารแนบ)
             </div>
 
-            <!-- ปิดท้าย -->
+            <!-- ย่อหน้า 3 -->
             <div class="content-block paragraph">
                 จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ
             </div>
+
 
 
             <div class="signature-wrapper">
@@ -692,37 +795,44 @@ $len = max(20, $len);
                 นามี)<br /> หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ </div>
             <div class="footer-actions">
 
-                <?php if ($canEdit): ?>
+                <!-- 🔵 ปุ่มแรก: พิมพ์/ดูตัวอย่าง (ทุก role ต้องมี และอยู่ลำดับแรก) -->
+                <button type="button" onclick="window.print()"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md text-xl font-bold">
+                    พิมพ์/ดูตัวอย่าง
+                </button>
+
+                <!-- 🟩 USER: ปุ่มยืนยัน -->
+                <?php if ($roleId === 3): ?>
                 <button type="submit"
                     class="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-md text-xl font-bold">
                     ยืนยันการแก้ไข
                 </button>
                 <?php endif; ?>
 
+                <!-- 🟦 OFFICER & ADMIN -->
                 <?php if ($isAdmin || $isOfficer): ?>
+
+                <!-- ปุ่มอนุมัติ -->
                 <button type="button" onclick="updateStatus('approved')"
-                    class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-md text-xl font-bold">
-                    ✔ อนุมัติ
+                    class="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-md text-xl font-bold">
+                    ยืนยันการแก้ไข
                 </button>
 
+                <!-- ปุ่มไม่ผ่าน -->
                 <button type="button" onclick="updateStatus('rejected')"
                     class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md text-xl font-bold">
-                    ✘ ไม่ผ่าน / ส่งกลับรอแก้ไข
+                    ไม่ผ่าน
                 </button>
+
                 <?php endif; ?>
 
-                <button type="button" onclick="window.print()"
-                    class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md text-xl font-bold">
-                    พิมพ์/ดูตัวอย่าง
-                </button>
-
+                <!-- ปุ่มกลับหน้าหลัก (ทุก role มี) -->
                 <a href="<?= $homePath ?>"
                     class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md text-xl font-bold">
                     กลับหน้าหลัก
                 </a>
 
             </div>
-
 
         </form>
     </main>

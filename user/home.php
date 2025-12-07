@@ -1,11 +1,12 @@
 <?php
 session_start();
-require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../functions.php'; 
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.html");
     exit;
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -63,15 +64,17 @@ if (!isset($_SESSION['user_id'])) {
             </div>
         </div>
         <div class="flex items-center space-x-4">
-            <a href="home.html">
+            <a href="home.php">
                 <div class="px-4 py-2 rounded-[11px] font-bold transition bg-white text-teal-500 shadow">หน้าหลัก</div>
             </a>
+
             <?php 
                 if (isset($_SESSION['permissions']) && in_array(3, $_SESSION['permissions'])) {
                     renderAdminExtraMenus(); 
                 }
             ?>
-            <a href="form_Memo.html">
+
+            <a href="form_Memo.php">
                 <div class="px-4 py-2 rounded-[11px] font-bold transition text-white">แบบฟอร์มบันทึกข้อความ</div>
             </a>
             <div class="relative">
@@ -353,26 +356,30 @@ if (!isset($_SESSION['user_id'])) {
             profileMenu.classList.add("hidden");
         }
     });
+    </script>
+    =======
+    });
 
     document.addEventListener("DOMContentLoaded", () => {
-        const params = new URLSearchParams(window.location.search);
-        const errType = params.get("err");
+    const params = new URLSearchParams(window.location.search);
+    const errType = params.get("err");
 
-        if (errType === "no_view") {
-            Swal.fire({
-                title: "ไม่มีสิทธิ์ดูเอกสารนี้",
-                text: "คุณไม่มีสิทธิ์ในการเข้าถึงเอกสารนี้",
-                icon: "error",
-                confirmButtonText: "ตกลง",
-                confirmButtonColor: "#3085d6",
-            }).then(() => {
-                const url = new URL(window.location.href);
-                url.searchParams.delete("err");
-                window.history.replaceState({}, "", url.toString());
-            });
-        }
+    if (errType === "no_view") {
+    Swal.fire({
+    title: "ไม่มีสิทธิ์ดูเอกสารนี้",
+    text: "คุณไม่มีสิทธิ์ในการเข้าถึงเอกสารนี้",
+    icon: "error",
+    confirmButtonText: "ตกลง",
+    confirmButtonColor: "#3085d6",
+    }).then(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("err");
+    window.history.replaceState({}, "", url.toString());
+    });
+    }
     });
     </script>
+    >>>>>>> 400b2a825c68f3000347a1bbdbf134c585aec8e0
 </body>
 
 </html>
