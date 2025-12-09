@@ -1,7 +1,7 @@
-<!-- ภายใน บันทึกข้อความ -->
+<!-- ขออนุมัติตัวบุคคลเป็นวิทยากร (ของอาจารย์) -->
 <?php
 session_start();
-require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '../functions.php';
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.html");
     exit;
@@ -272,86 +272,218 @@ if (!isset($_SESSION['user_id'])) {
                 </div>
             </div>
 
+
             <!-- ข้อ 1 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 items-end">
                 <div class="flex items-center gap-3">
-                    <label class="lbl text-gray-800 whitespace-nowrap" for="docDate">1. วัน เดือน ปี :</label>
+                    <label class="lbl text-gray-800 whitespace-nowrap" for="docDate">1.วัน เดือน ปี :</label>
                     <div class="flex-1">
                         <input type="date" name="doc_date" class="w-full border rounded-md p-2" id="docDate" />
                     </div>
+                    <label class="lbl text-gray-800 whitespace-nowrap">ที่ต้องการให้ปรากฎบนบันทึกข้อความ</label>
                 </div>
             </div>
 
             <!-- ข้อ 2 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 items-end">
                 <div class="flex items-center gap-3">
-                    <label class="lbl text-gray-800 whitespace-nowrap" for="fullname">2. ชื่อ – นามสกุล :</label>
-                    <input type="text" name="fullname" class="flex-1 border rounded-md p-2" id="fullname" />
+                    <label class="lbl text-gray-800 whitespace-nowrap" for="fullname">2.ชื่อ - นามสกุล :</label>
+                    <select name="fullname" class="flex-1 border rounded-md p-2" id="fullname">
+                        <option>อาจารย์ ดร.พิทย์พิมล ชูรอด</option>
+                    </select>
                 </div>
                 <div class="flex items-center gap-3">
                     <label class="lbl text-gray-800 whitespace-nowrap" for="position">ตำแหน่ง :</label>
-                    <input type="text" name="position" class="flex-1 border rounded-md p-2" id="position" />
+                    <input type="text" name="position" class="flex-1 border rounded-md p-2" id="position"
+                        value="อาจารย์ประจำภาควิชาเทคโนโลยีสารสนเทศ" />
                 </div>
             </div>
 
+
             <!-- ข้อ 3 -->
             <div class="mb-4 flex items-start gap-4">
-                <label class="lbl text-gray-800 whitespace-nowrap pt-2">3. ขออนุมัติใช้ห้อง/อาคาร :</label>
+                <label class="lbl text-gray-800 whitespace-nowrap pt-2" for="eventTitle">
+                    3.ชื่อโครงการอบรม / หลักสูตร :
+                </label>
                 <div class="w-full">
-                    <input type="text" name="building_request" class="w-full border rounded-md p-2 shadow-sm"
-                        placeholder="เช่น ขออนุมัติใช้ห้องเรียน อาคาร B" />
+                    <textarea name="event_title" rows="2" class="w-full border rounded-md p-2 shadow-sm"
+                        id="eventTitle"></textarea>
                 </div>
             </div>
 
             <!-- ข้อ 4 -->
             <div class="mb-4 flex items-start gap-4">
-                <label class="lbl text-gray-800 whitespace-nowrap pt-2">4. รหัสรายวิชา / ชื่อรายวิชา :</label>
+                <label class="lbl text-gray-800 whitespace-nowrap pt-2" for="researchTitle">
+                    4. ชื่อหัวข้อหลักสูตร :
+                </label>
                 <div class="w-full">
-                    <input type="text" name="subject_code" class="border rounded-md p-2 w-full shadow-sm"
-                        placeholder="เช่น 060243xxx / Programming Fundamentals" />
+                    <textarea name="research_title" rows="2" class="w-full border rounded-md p-2 shadow-sm"
+                        id="researchTitle"></textarea>
                 </div>
             </div>
 
             <!-- ข้อ 5 -->
-            <div class="mb-4 flex items-start gap-4">
-                <label class="lbl text-gray-800 whitespace-nowrap pt-2">5. เหตุผลในการขอใช้ห้อง :</label>
-                <div class="w-full">
-                    <textarea name="usage_reason" rows="2" class="w-full border rounded-md p-2 shadow-sm"
-                        placeholder="เช่น ใช้สำหรับการสอบกลางภาค / จัดกิจกรรมกลุ่ม"></textarea>
+            <div class="mb-6">
+                <label class="lbl text-gray-800 block mb-2" id="dateLabel">5. วันที่เข้าร่วม</label>
+
+                <div class="space-y-4 ml-6 text-gray-800">
+                    <!-- 🔹 วันเดียว -->
+                    <div class="flex items-center gap-2">
+                        <input type="radio" name="date_option" value="single" id="optSingle" class="accent-[#11C2B9]"
+                            checked />
+                        <span>วันเดียว :</span>
+                        <div class="relative">
+                            <input type="text" name="single_date" id="singleDate"
+                                class="border rounded-md p-2 shadow-sm w-48 pr-10 cursor-pointer"
+                                placeholder="เลือกวันที่" readonly />
+                            <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- 🔹 หลายวัน -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <input type="radio" name="date_option" value="range" id="optRange" class="accent-[#11C2B9]" />
+                        <span>หลายวัน :</span>
+
+                        <!-- วันที่เริ่มต้น -->
+                        <div class="relative">
+                            <input type="text" id="startDate"
+                                class="border rounded-md p-2 shadow-sm w-44 pr-10 cursor-pointer" placeholder="เริ่มต้น"
+                                readonly />
+                            <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+
+                        <span>ถึง</span>
+
+                        <!-- วันที่สิ้นสุด -->
+                        <div class="relative">
+                            <input type="text" id="endDate"
+                                class="border rounded-md p-2 shadow-sm w-44 pr-10 cursor-pointer" placeholder="สิ้นสุด"
+                                readonly />
+                            <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+
+                        <!-- 🔹 แสดงผลรูปแบบวันที่ -->
+                        <input type="text" id="rangeDisplay"
+                            class="border rounded-md p-2 shadow-sm w-64 bg-gray-50 text-gray-600"
+                            placeholder="10 - 11 กรกฎาคม 2568" readonly />
+
+                        <!-- ซ่อนค่ารวมเพื่อส่งข้อมูล -->
+                        <input type="hidden" name="range_date" id="rangeDate" value="" />
+                    </div>
                 </div>
             </div>
 
             <!-- ข้อ 6 -->
-            <div class="mb-4 flex items-start gap-4">
-                <label class="lbl text-gray-800 whitespace-nowrap pt-2">6. ห้องที่ต้องการใช้ / อาคารที่ใช้ :</label>
-                <div class="w-full flex gap-4">
-                    <input type="text" name="room" class="border rounded-md p-2 w-[180px] shadow-sm"
-                        placeholder="เช่น B4-15" />
-                    <input type="text" name="building" class="border rounded-md p-2 w-[250px] shadow-sm"
-                        placeholder="เช่น อาคาร B4" />
+            <div class="mb-4">
+                <!-- บรรทัดคำถาม -->
+                <label class="lbl text-gray-800 block mb-2">
+                    6. ชื่อสถานที่จัดประชุมวิชาการ / สถานที่จัดอบรม / เข้าร่วมรูปแบบออนไลน์
+                </label>
+
+                <div class="ml-7 space-y-2">
+
+                    <!-- ออนไลน์ -->
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" id="onlineCheckbox" name="is_online" value="1" class="accent-black">
+                        เข้าร่วมรูปแบบออนไลน์
+                    </label>
+
+                    <!-- ออนไซต์ + ช่องกรอก (ต่อท้ายในบรรทัดเดียว) -->
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" id="onsiteCheckbox" class="accent-black">
+                        ออนไซต์ ณ
+                        <input type="text" name="place" id="placeInput"
+                            class="border rounded-md p-2 w-[350px] shadow-sm"
+                            placeholder="เช่น โรงแรม Best Western PLUS จังหวัดนนทบุรี" disabled>
+                    </label>
+
                 </div>
             </div>
 
-            <!-- ข้อ 7 : เพิ่มรายการวัน/เวลาได้หลายช่วง -->
+            <!-- ข้อ 7 -->
             <div class="mb-6">
-                <label class="lbl text-gray-800 block mb-2">7. รายการวัน/เวลาในการใช้ห้อง :</label>
-
-                <div id="timeList" class="space-y-3 ml-6">
-                    <!-- ตัวแรก -->
-                    <div class="flex items-center gap-3">
-                        <input type="date" name="use_date[]" class="border rounded-md p-2" />
-                        <input type="time" name="start_time[]" class="border rounded-md p-2" />
-                        <span>ถึง</span>
-                        <input type="time" name="end_time[]" class="border rounded-md p-2" />
+                <div class="flex items-center gap-2 mb-2">
+                    <label class="lbl text-gray-800" for="amountInput">7.รวมยอดประมาณการค่าใช้จ่าย :</label>
+                    <div class="flex flex-col">
+                        <div class="flex items-center gap-2">
+                            <input type="text" name="amount" class="border rounded-md p-2 w-36" id="amountInput"
+                                value="0.00" />
+                            <span>บาท</span>
+                        </div>
                     </div>
                 </div>
-
-                <!-- ปุ่มเพิ่มรายการ -->
-                <button type="button" onclick="addTimeRow()"
-                    class="mt-3 ml-6 bg-[#11C2B9] text-white px-3 py-1 rounded-md">
-                    + เพิ่มช่วงเวลา
-                </button>
+                <label class="flex items-center gap-2 ml-6 mt-2">
+                    <input type="checkbox" name="no_cost" value="1" class="accent-black" id="noCostCheckbox" />
+                    โดยไม่เบิกค่าใช้จ่ายใดๆทั้งสิ้น
+                </label>
             </div>
+
+
+            <!-- ข้อ 8 -->
+            <div class="mb-6">
+                <label class="lbl block text-gray-800 mb-2" id="carLabel">8.กรณีไปรถยนต์ส่วนตัว</label>
+                <div class="flex items-center gap-2 ml-6">
+                    <input type="checkbox" name="car_used" value="1" class="accent-black" id="carCheckbox" />
+                    <label for="carPlateInput" class="lbl">ระบุหมายเลขทะเบียนรถยนต์ :</label>
+                    <div class="flex flex-col">
+                        <input type="text" name="car_plate" class="border rounded-md p-2 w-[250px]" id="carPlateInput"
+                            placeholder="เช่น กร 1906 พัทลุง" disabled />
+                    </div>
+                </div>
+            </div>
+
+
+            <script>
+            // ✅ ดึง element ที่เกี่ยวข้อง
+            const onlineCheckbox = document.getElementById("onlineCheckbox");
+            const onsiteCheckbox = document.getElementById("onsiteCheckbox");
+            const placeInput = document.getElementById("placeInput");
+
+            // ✅ ฟังก์ชันจัดการให้เลือกได้เพียง 1 ช่อง
+            function selectOnly(selected) {
+                if (selected === "online") {
+                    onlineCheckbox.checked = true;
+                    onsiteCheckbox.checked = false;
+                    placeInput.value = "";
+                    placeInput.disabled = true;
+                    placeInput.classList.add("bg-gray-100", "text-gray-400");
+                } else if (selected === "onsite") {
+                    onsiteCheckbox.checked = true;
+                    onlineCheckbox.checked = false;
+                    placeInput.disabled = false;
+                    placeInput.classList.remove("bg-gray-100", "text-gray-400");
+                    placeInput.focus();
+                } else {
+                    // ถ้าไม่มีการเลือกเลย
+                    placeInput.value = "";
+                    placeInput.disabled = true;
+                    placeInput.classList.add("bg-gray-100", "text-gray-400");
+                }
+            }
+
+            // ✅ ผูก event ให้เลือกได้ช่องเดียวทันที
+            onlineCheckbox.addEventListener("click", () => selectOnly("online"));
+            onsiteCheckbox.addEventListener("click", () => selectOnly("onsite"));
+
+            // ✅ ตั้งค่าเริ่มต้น
+            selectOnly();
+            </script>
 
             <!-- ปุ่ม -->
             <div class="relative mt-20">
@@ -364,24 +496,6 @@ if (!isset($_SESSION['user_id'])) {
             </div>
         </div>
     </form>
-
-    <script>
-    // เพิ่มแถววัน/เวลา
-    function addTimeRow() {
-        const list = document.getElementById("timeList");
-        const row = document.createElement("div");
-        row.className = "flex items-center gap-3";
-
-        row.innerHTML = `
-        <input type="date" name="use_date[]" class="border rounded-md p-2" />
-        <input type="time" name="start_time[]" class="border rounded-md p-2" />
-        <span>ถึง</span>
-        <input type="time" name="end_time[]" class="border rounded-md p-2" />
-    `;
-
-        list.appendChild(row);
-    }
-    </script>
 
     <script>
     /* ====== Helpers ====== */

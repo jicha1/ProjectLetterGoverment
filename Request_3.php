@@ -1,7 +1,7 @@
 <!-- ขอห้องพักรับรอง (ของอาจารย์) -->
 <?php
 session_start();
-require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '../functions.php';
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.html");
     exit;
@@ -405,12 +405,69 @@ if (!isset($_SESSION['user_id'])) {
                 </div>
             </div>
 
-            <!-- ข้อ 7 -->
-            <div class="mb-4 flex items-start gap-4">
-                <label class="lbl text-gray-800 whitespace-nowrap pt-2">7. วันที่เข้าพัก :</label>
+            <div class="mb-6">
+                <label class="lbl text-gray-800 block mb-2" id="dateLabel">7. วันที่เข้าพัก : </label>
 
-                <div class="w-full">
-                    <input type="date" name="stay_date" class="border rounded-md p-2 shadow-sm w-[200px]" id="stayDate">
+                <div class="space-y-4 ml-6 text-gray-800">
+                    <!-- 🔹 วันเดียว -->
+                    <div class="flex items-center gap-2">
+                        <input type="radio" name="date_option" value="single" id="optSingle" class="accent-[#11C2B9]"
+                            checked />
+                        <span>วันเดียว :</span>
+                        <div class="relative">
+                            <input type="text" name="single_date" id="singleDate"
+                                class="border rounded-md p-2 shadow-sm w-48 pr-10 cursor-pointer"
+                                placeholder="เลือกวันที่" readonly />
+                            <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- 🔹 หลายวัน -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <input type="radio" name="date_option" value="range" id="optRange" class="accent-[#11C2B9]" />
+                        <span>หลายวัน :</span>
+
+                        <!-- วันที่เริ่มต้น -->
+                        <div class="relative">
+                            <input type="text" id="startDate"
+                                class="border rounded-md p-2 shadow-sm w-44 pr-10 cursor-pointer" placeholder="เริ่มต้น"
+                                readonly />
+                            <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+
+                        <span>ถึง</span>
+
+                        <!-- วันที่สิ้นสุด -->
+                        <div class="relative">
+                            <input type="text" id="endDate"
+                                class="border rounded-md p-2 shadow-sm w-44 pr-10 cursor-pointer" placeholder="สิ้นสุด"
+                                readonly />
+                            <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+
+                        <!-- 🔹 แสดงผลรูปแบบวันที่ -->
+                        <input type="text" id="rangeDisplay"
+                            class="border rounded-md p-2 shadow-sm w-64 bg-gray-50 text-gray-600"
+                            placeholder="10 - 11 กรกฎาคม 2568" readonly />
+
+                        <!-- ซ่อนค่ารวมเพื่อส่งข้อมูล -->
+                        <input type="hidden" name="range_date" id="rangeDate" value="" />
+                    </div>
                 </div>
             </div>
 
