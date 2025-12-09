@@ -1,7 +1,7 @@
 <!-- ภายใน บันทึกข้อความ -->
 <?php
 session_start();
-require_once __DIR__ . '../functions.php';
+require_once __DIR__ . '/../functions.php';
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.html");
     exit;
@@ -426,225 +426,383 @@ if (!isset($_SESSION['user_id'])) {
                     </div>
                 </div>
             </div>
+            <script>
+            const purposeOtherRadio = document.getElementById("purposeOtherRadio");
+            const purposeOtherInput = document.getElementById("purposeOtherInput");
+            const purposeRadios = document.querySelectorAll('input[name="purpose"]');
+
+            purposeRadios.forEach(radio => {
+                radio.addEventListener("change", () => {
+                    if (purposeOtherRadio.checked) {
+                        purposeOtherInput.disabled = false;
+                        purposeOtherInput.classList.remove("bg-gray-100", "text-gray-400");
+                        purposeOtherInput.focus();
+                    } else {
+                        purposeOtherInput.disabled = true;
+                        purposeOtherInput.classList.add("bg-gray-100", "text-gray-400");
+                        purposeOtherInput.value = "";
+                    }
+                });
+            });
+            </script>
+            <script>
+            const otherRadio = document.getElementById("otherTypeRadio");
+            const otherInput = document.getElementById("otherTypeInput");
+            const typeRadios = document.querySelectorAll('input[name="presentation_type"]');
+
+            typeRadios.forEach(radio => {
+                radio.addEventListener("change", () => {
+                    if (otherRadio.checked) {
+                        otherInput.disabled = false;
+                        otherInput.classList.remove("bg-gray-100", "text-gray-400");
+                        otherInput.focus();
+                    } else {
+                        otherInput.disabled = true;
+                        otherInput.classList.add("bg-gray-100", "text-gray-400");
+                        otherInput.value = "";
+                    }
+                });
+            });
+            </script>
 
 
             <script>
-            /* ====== Helpers ====== */
-            const $ = (s) => document.querySelector(s);
-            const $$ = (s) => Array.from(document.querySelectorAll(s));
-            const byId = (id) => document.getElementById(id);
-            const labelFor = (id) => document.querySelector(`label[for="${id}"]`);
-            const setErr = (el, on = true) => {
-                if (!el) return;
-                el.classList.toggle("error", on);
-                if (on) {
-                    el.classList.add("shake");
-                    setTimeout(() => el.classList.remove("shake"), 250);
-                }
-                el.setAttribute("aria-invalid", on ? "true" : "false");
-            };
-            const setStar = (labelEl, on = true) => {
-                if (labelEl) labelEl.classList.toggle("asterisk", on);
-            };
+            const otherRadio = document.getElementById("otherTypeRadio");
+            const otherInput = document.getElementById("otherTypeInput");
+            const typeRadios = document.querySelectorAll('input[name="presentation_type"]');
 
-            /* ====== Elements ====== */
-            const form = byId("memoForm");
-            const docDate = byId("docDate");
-            const eventTitle = byId("eventTitle");
-
-            const purposeRadios = $$('input[name="purpose"]');
-            const purposeGroup = byId("purposeGroup");
-            const purposeLabel = byId("purposeLabel");
-
-            const optSingle = byId("optSingle");
-            const singleDate = byId("singleDate");
-            const optRange = byId("optRange");
-            const rangeDate = byId("rangeDate");
-            const dateLabel = byId("dateLabel");
-
-            const online_Checkbox = byId("onlineCheckbox");
-            const place_Input = byId("placeInput");
-
-            const amountInput = byId("amountInput");
-            const noCostCheckbox = byId("noCostCheckbox");
-
-            const carCheckbox = byId("carCheckbox");
-            const carPlateInput = byId("carPlateInput");
-
-            /* ====== Sync UI (ไม่สร้าง/ลบ element) ====== */
-            function syncDateOptionUI() {
-                if (optSingle.checked) {
-                    singleDate.disabled = false;
-                    rangeDate.disabled = true;
-                    setErr(rangeDate, false);
-                } else {
-                    singleDate.disabled = true;
-                    setErr(singleDate, false);
-                    rangeDate.disabled = false;
-                }
-            }
-
-            function syncOnlineUI() {
-                if (onlineCheckbox.checked) {
-                    placeInput.value = "";
-                    placeInput.disabled = true;
-                    setErr(placeInput, false);
-                } else {
-                    placeInput.disabled = false;
-                }
-            }
-
-            function syncCostUI() {
-                if (noCostCheckbox.checked) {
-                    amountInput.value = "0.00";
-                    amountInput.disabled = true;
-                    setErr(amountInput, false);
-                } else {
-                    amountInput.disabled = false;
-                }
-            }
-
-            function syncCarUI() {
-                if (carCheckbox.checked) {
-                    carPlateInput.disabled = false;
-                } else {
-                    carPlateInput.value = "";
-                    carPlateInput.disabled = true;
-                    setErr(carPlateInput, false);
-                }
-            }
-
-            optSingle.addEventListener("change", syncDateOptionUI);
-            optRange.addEventListener("change", syncDateOptionUI);
-            onlineCheckbox.addEventListener("change", syncOnlineUI);
-            noCostCheckbox.addEventListener("change", syncCostUI);
-            carCheckbox.addEventListener("change", syncCarUI);
-
-            syncDateOptionUI();
-            syncOnlineUI();
-            syncCostUI();
-            syncCarUI();
-
-            /* เคลียร์ error เมื่อมีการแก้ไข */
-            [
-                docDate,
-                eventTitle,
-                singleDate,
-                rangeDate,
-                placeInput,
-                amountInput,
-                carPlateInput,
-            ].forEach((el) => {
-                el.addEventListener("input", () => setErr(el, false));
-                el.addEventListener("change", () => setErr(el, false));
-            });
-            purposeRadios.forEach((r) => {
-                r.addEventListener("change", () => {
-                    purposeGroup.classList.remove("ring-2", "ring-red-300");
-                    setStar(purposeLabel, false);
+            typeRadios.forEach(radio => {
+                radio.addEventListener("change", () => {
+                    if (otherRadio.checked) {
+                        otherInput.disabled = false;
+                        otherInput.classList.remove("bg-gray-100", "text-gray-400");
+                        otherInput.focus();
+                    } else {
+                        otherInput.disabled = true;
+                        otherInput.classList.add("bg-gray-100", "text-gray-400");
+                        otherInput.value = "";
+                    }
                 });
-            });
-
-            /* ====== Validate (ใส่กรอบแดง + ดอกจันเท่านั้น) ====== */
-            function scrollFocus(el) {
-                if (!el) return;
-                el.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center"
-                });
-                setTimeout(() => el.focus?.(), 200);
-            }
-
-            function validate() {
-                let firstInvalid = null;
-                // ล้างดอกจันทั้งหมด
-                $$(".lbl").forEach((l) => setStar(l, false));
-
-                // 1) วันที่เอกสาร
-                if (!docDate.value) {
-                    setErr(docDate, true);
-                    setStar(labelFor("docDate"), true);
-                    firstInvalid = firstInvalid || docDate;
-                }
-
-                // 3) วัตถุประสงค์
-                const hasPurpose = purposeRadios.some((r) => r.checked);
-                if (!hasPurpose) {
-                    purposeGroup.classList.add("shake", "ring-2", "ring-red-300");
-                    setTimeout(() => purposeGroup.classList.remove("shake"), 250);
-                    setStar(purposeLabel, true);
-                    firstInvalid = firstInvalid || purposeRadios[0];
-                }
-
-                // 4) ชื่องาน/หลักสูตร
-                if (!eventTitle.value.trim()) {
-                    setErr(eventTitle, true);
-                    setStar(labelFor("eventTitle"), true);
-                    firstInvalid = firstInvalid || eventTitle;
-                }
-
-                // 5) วันที่เข้าร่วม
-                if (optSingle.checked) {
-                    if (!singleDate.value.trim()) {
-                        setErr(singleDate, true);
-                        setStar(dateLabel, true);
-                        firstInvalid = firstInvalid || singleDate;
-                    }
-                } else if (optRange.checked) {
-                    if (!rangeDate.value.trim()) {
-                        setErr(rangeDate, true);
-                        setStar(dateLabel, true);
-                        firstInvalid = firstInvalid || rangeDate;
-                    }
-                } else {
-                    setStar(dateLabel, true);
-                    firstInvalid = firstInvalid || optRange;
-                }
-
-                // 6) สถานที่ (เฉพาะกรณีไม่ออนไลน์)
-                if (!onlineCheckbox.checked && !placeInput.value.trim()) {
-                    setErr(placeInput, true);
-                    setStar(labelFor("placeInput"), true);
-                    firstInvalid = firstInvalid || placeInput;
-                }
-
-                // 7) จำนวนเงิน (ถ้าไม่ได้ติ๊กไม่เบิก)
-                if (!noCostCheckbox.checked) {
-                    const raw = amountInput.value.replace(/,/g, "").trim();
-                    const val = Number(raw);
-                    if (raw === "" || isNaN(val)) {
-                        setErr(amountInput, true);
-                        setStar(labelFor("amountInput"), true);
-                        firstInvalid = firstInvalid || amountInput;
-                    }
-                }
-
-                // 8) ทะเบียนรถ (เมื่อเลือกใช้รถ)
-                if (carCheckbox.checked && !carPlateInput.value.trim()) {
-                    setErr(carPlateInput, true);
-                    setStar(byId("carLabel"), true);
-                    firstInvalid = firstInvalid || carPlateInput;
-                }
-
-                if (firstInvalid) {
-                    scrollFocus(firstInvalid);
-                    return false;
-                }
-                return true;
-            }
-
-            /* ====== Submit แบบปกติ ====== */
-            form.addEventListener("submit", (e) => {
-                if (!validate()) {
-                    e.preventDefault();
-                }
             });
             </script>
 
             <script>
-            flatpickr.localize(flatpickr.l10ns.th);
+            // ✅ ดึง element ที่เกี่ยวข้อง
+            const onlineCheckbox = document.getElementById("onlineCheckbox");
+            const onsiteCheckbox = document.getElementById("onsiteCheckbox");
+            const placeInput = document.getElementById("placeInput");
 
-            const monthsTH = [
+            // ✅ ฟังก์ชันจัดการให้เลือกได้เพียง 1 ช่อง
+            function selectOnly(selected) {
+                if (selected === "online") {
+                    onlineCheckbox.checked = true;
+                    onsiteCheckbox.checked = false;
+                    placeInput.value = "";
+                    placeInput.disabled = true;
+                    placeInput.classList.add("bg-gray-100", "text-gray-400");
+                } else if (selected === "onsite") {
+                    onsiteCheckbox.checked = true;
+                    onlineCheckbox.checked = false;
+                    placeInput.disabled = false;
+                    placeInput.classList.remove("bg-gray-100", "text-gray-400");
+                    placeInput.focus();
+                } else {
+                    // ถ้าไม่มีการเลือกเลย
+                    placeInput.value = "";
+                    placeInput.disabled = true;
+                    placeInput.classList.add("bg-gray-100", "text-gray-400");
+                }
+            }
+
+            // ✅ ผูก event ให้เลือกได้ช่องเดียวทันที
+            onlineCheckbox.addEventListener("click", () => selectOnly("online"));
+            onsiteCheckbox.addEventListener("click", () => selectOnly("onsite"));
+
+            // ✅ ตั้งค่าเริ่มต้น
+            selectOnly();
+            </script>
+
+            <!-- ปุ่ม -->
+            <div class="relative mt-20">
+                <div class="absolute right-0 bottom-0">
+                    <a href="../form_memo_speaker.php"
+                        class="bg-[#11C2B9] hover:bg-[#0fa39c] text-white font-bold w-[130px] h-[35px] rounded-md flex items-center justify-center transition">
+                        ดำเนินการ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <script>
+    /* ====== Helpers ====== */
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => Array.from(document.querySelectorAll(s));
+    const byId = (id) => document.getElementById(id);
+    const labelFor = (id) => document.querySelector(`label[for="${id}"]`);
+    const setErr = (el, on = true) => {
+        if (!el) return;
+        el.classList.toggle("error", on);
+        if (on) {
+            el.classList.add("shake");
+            setTimeout(() => el.classList.remove("shake"), 250);
+        }
+        el.setAttribute("aria-invalid", on ? "true" : "false");
+    };
+    const setStar = (labelEl, on = true) => {
+        if (labelEl) labelEl.classList.toggle("asterisk", on);
+    };
+
+    /* ====== Elements ====== */
+    const form = byId("memoForm");
+    const docDate = byId("docDate");
+    const eventTitle = byId("eventTitle");
+
+    const purposeRadios = $$('input[name="purpose"]');
+    const purposeGroup = byId("purposeGroup");
+    const purposeLabel = byId("purposeLabel");
+
+    const optSingle = byId("optSingle");
+    const singleDate = byId("singleDate");
+    const optRange = byId("optRange");
+    const rangeDate = byId("rangeDate");
+    const dateLabel = byId("dateLabel");
+
+    const online_Checkbox = byId("onlineCheckbox");
+    const place_Input = byId("placeInput");
+
+    const amountInput = byId("amountInput");
+    const noCostCheckbox = byId("noCostCheckbox");
+
+    const carCheckbox = byId("carCheckbox");
+    const carPlateInput = byId("carPlateInput");
+
+    /* ====== Sync UI (ไม่สร้าง/ลบ element) ====== */
+    function syncDateOptionUI() {
+        if (optSingle.checked) {
+            singleDate.disabled = false;
+            rangeDate.disabled = true;
+            setErr(rangeDate, false);
+        } else {
+            singleDate.disabled = true;
+            setErr(singleDate, false);
+            rangeDate.disabled = false;
+        }
+    }
+
+    function syncOnlineUI() {
+        if (onlineCheckbox.checked) {
+            placeInput.value = "";
+            placeInput.disabled = true;
+            setErr(placeInput, false);
+        } else {
+            placeInput.disabled = false;
+        }
+    }
+
+    function syncCostUI() {
+        if (noCostCheckbox.checked) {
+            amountInput.value = "0.00";
+            amountInput.disabled = true;
+            setErr(amountInput, false);
+        } else {
+            amountInput.disabled = false;
+        }
+    }
+
+    function syncCarUI() {
+        if (carCheckbox.checked) {
+            carPlateInput.disabled = false;
+        } else {
+            carPlateInput.value = "";
+            carPlateInput.disabled = true;
+            setErr(carPlateInput, false);
+        }
+    }
+
+    optSingle.addEventListener("change", syncDateOptionUI);
+    optRange.addEventListener("change", syncDateOptionUI);
+    onlineCheckbox.addEventListener("change", syncOnlineUI);
+    noCostCheckbox.addEventListener("change", syncCostUI);
+    carCheckbox.addEventListener("change", syncCarUI);
+
+    syncDateOptionUI();
+    syncOnlineUI();
+    syncCostUI();
+    syncCarUI();
+
+    /* เคลียร์ error เมื่อมีการแก้ไข */
+    [
+        docDate,
+        eventTitle,
+        singleDate,
+        rangeDate,
+        placeInput,
+        amountInput,
+        carPlateInput,
+    ].forEach((el) => {
+        el.addEventListener("input", () => setErr(el, false));
+        el.addEventListener("change", () => setErr(el, false));
+    });
+    purposeRadios.forEach((r) => {
+        r.addEventListener("change", () => {
+            purposeGroup.classList.remove("ring-2", "ring-red-300");
+            setStar(purposeLabel, false);
+        });
+    });
+
+    /* ====== Validate (ใส่กรอบแดง + ดอกจันเท่านั้น) ====== */
+    function scrollFocus(el) {
+        if (!el) return;
+        el.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+        setTimeout(() => el.focus?.(), 200);
+    }
+
+    function validate() {
+        let firstInvalid = null;
+        // ล้างดอกจันทั้งหมด
+        $$(".lbl").forEach((l) => setStar(l, false));
+
+        // 1) วันที่เอกสาร
+        if (!docDate.value) {
+            setErr(docDate, true);
+            setStar(labelFor("docDate"), true);
+            firstInvalid = firstInvalid || docDate;
+        }
+
+        // 3) วัตถุประสงค์
+        const hasPurpose = purposeRadios.some((r) => r.checked);
+        if (!hasPurpose) {
+            purposeGroup.classList.add("shake", "ring-2", "ring-red-300");
+            setTimeout(() => purposeGroup.classList.remove("shake"), 250);
+            setStar(purposeLabel, true);
+            firstInvalid = firstInvalid || purposeRadios[0];
+        }
+
+        // 4) ชื่องาน/หลักสูตร
+        if (!eventTitle.value.trim()) {
+            setErr(eventTitle, true);
+            setStar(labelFor("eventTitle"), true);
+            firstInvalid = firstInvalid || eventTitle;
+        }
+
+        // 5) วันที่เข้าร่วม
+        if (optSingle.checked) {
+            if (!singleDate.value.trim()) {
+                setErr(singleDate, true);
+                setStar(dateLabel, true);
+                firstInvalid = firstInvalid || singleDate;
+            }
+        } else if (optRange.checked) {
+            if (!rangeDate.value.trim()) {
+                setErr(rangeDate, true);
+                setStar(dateLabel, true);
+                firstInvalid = firstInvalid || rangeDate;
+            }
+        } else {
+            setStar(dateLabel, true);
+            firstInvalid = firstInvalid || optRange;
+        }
+
+        // 6) สถานที่ (เฉพาะกรณีไม่ออนไลน์)
+        if (!onlineCheckbox.checked && !placeInput.value.trim()) {
+            setErr(placeInput, true);
+            setStar(labelFor("placeInput"), true);
+            firstInvalid = firstInvalid || placeInput;
+        }
+
+        // 7) จำนวนเงิน (ถ้าไม่ได้ติ๊กไม่เบิก)
+        if (!noCostCheckbox.checked) {
+            const raw = amountInput.value.replace(/,/g, "").trim();
+            const val = Number(raw);
+            if (raw === "" || isNaN(val)) {
+                setErr(amountInput, true);
+                setStar(labelFor("amountInput"), true);
+                firstInvalid = firstInvalid || amountInput;
+            }
+        }
+
+        // 8) ทะเบียนรถ (เมื่อเลือกใช้รถ)
+        if (carCheckbox.checked && !carPlateInput.value.trim()) {
+            setErr(carPlateInput, true);
+            setStar(byId("carLabel"), true);
+            firstInvalid = firstInvalid || carPlateInput;
+        }
+
+        if (firstInvalid) {
+            scrollFocus(firstInvalid);
+            return false;
+        }
+        return true;
+    }
+
+    /* ====== Submit แบบปกติ ====== */
+    form.addEventListener("submit", (e) => {
+        if (!validate()) {
+            e.preventDefault();
+        }
+    });
+    </script>
+
+    <script>
+    flatpickr.localize(flatpickr.l10ns.th);
+
+    const monthsTH = [
+        "มกราคม",
+        "กุมภาพันธ์",
+        "มีนาคม",
+        "เมษายน",
+        "พฤษภาคม",
+        "มิถุนายน",
+        "กรกฎาคม",
+        "สิงหาคม",
+        "กันยายน",
+        "ตุลาคม",
+        "พฤศจิกายน",
+        "ธันวาคม",
+    ];
+
+    // ✅ ปฏิทินวันเดียว
+    flatpickr("#singleDate", {
+        dateFormat: "d/m/Y",
+        disableMobile: true,
+        onChange: function(selectedDates, dateStr, instance) {
+            if (selectedDates.length > 0) {
+                const date = selectedDates[0];
+                const day = date.getDate();
+                const month = monthsTH[date.getMonth()];
+                const year = date.getFullYear() + 543;
+                const formatted = `${day} ${month} ${year}`;
+
+                // 🔹 แสดงผลรูปแบบไทยในช่อง input (แทนค่าเก่า)
+                instance.input.value = formatted;
+            }
+        },
+    });
+
+    // ===== ปฏิทินช่วงวันที่ (เริ่มต้น / สิ้นสุด) =====
+    const startPicker = flatpickr("#startDate", {
+        dateFormat: "d/m/Y",
+        disableMobile: true,
+        onChange: updateRangeDisplay,
+    });
+
+    const endPicker = flatpickr("#endDate", {
+        dateFormat: "d/m/Y",
+        disableMobile: true,
+        onChange: updateRangeDisplay,
+    });
+
+    // ===== ฟังก์ชันแปลงและแสดงผล =====
+    function updateRangeDisplay() {
+        const start = startPicker.selectedDates[0];
+        const end = endPicker.selectedDates[0];
+        if (start && end) {
+            const months = [
                 "มกราคม",
                 "กุมภาพันธ์",
                 "มีนาคม",
@@ -659,137 +817,86 @@ if (!isset($_SESSION['user_id'])) {
                 "ธันวาคม",
             ];
 
-            // ✅ ปฏิทินวันเดียว
-            flatpickr("#singleDate", {
-                dateFormat: "d/m/Y",
-                disableMobile: true,
-                onChange: function(selectedDates, dateStr, instance) {
-                    if (selectedDates.length > 0) {
-                        const date = selectedDates[0];
-                        const day = date.getDate();
-                        const month = monthsTH[date.getMonth()];
-                        const year = date.getFullYear() + 543;
-                        const formatted = `${day} ${month} ${year}`;
+            const startDay = start.getDate();
+            const endDay = end.getDate();
+            const startMonth = months[start.getMonth()];
+            const endMonth = months[end.getMonth()];
+            const startYear = start.getFullYear() + 543;
+            const endYear = end.getFullYear() + 543;
 
-                        // 🔹 แสดงผลรูปแบบไทยในช่อง input (แทนค่าเก่า)
-                        instance.input.value = formatted;
-                    }
-                },
-            });
+            let displayText = "";
 
-            // ===== ปฏิทินช่วงวันที่ (เริ่มต้น / สิ้นสุด) =====
-            const startPicker = flatpickr("#startDate", {
-                dateFormat: "d/m/Y",
-                disableMobile: true,
-                onChange: updateRangeDisplay,
-            });
-
-            const endPicker = flatpickr("#endDate", {
-                dateFormat: "d/m/Y",
-                disableMobile: true,
-                onChange: updateRangeDisplay,
-            });
-
-            // ===== ฟังก์ชันแปลงและแสดงผล =====
-            function updateRangeDisplay() {
-                const start = startPicker.selectedDates[0];
-                const end = endPicker.selectedDates[0];
-                if (start && end) {
-                    const months = [
-                        "มกราคม",
-                        "กุมภาพันธ์",
-                        "มีนาคม",
-                        "เมษายน",
-                        "พฤษภาคม",
-                        "มิถุนายน",
-                        "กรกฎาคม",
-                        "สิงหาคม",
-                        "กันยายน",
-                        "ตุลาคม",
-                        "พฤศจิกายน",
-                        "ธันวาคม",
-                    ];
-
-                    const startDay = start.getDate();
-                    const endDay = end.getDate();
-                    const startMonth = months[start.getMonth()];
-                    const endMonth = months[end.getMonth()];
-                    const startYear = start.getFullYear() + 543;
-                    const endYear = end.getFullYear() + 543;
-
-                    let displayText = "";
-
-                    // ✅ ถ้าเดือนเดียวกันและปีเดียวกัน
-                    if (
-                        start.getMonth() === end.getMonth() &&
-                        start.getFullYear() === end.getFullYear()
-                    ) {
-                        displayText = `${startDay} - ${endDay} ${endMonth} ${endYear}`;
-                    }
-                    // ✅ ถ้าเดือนหรือปีต่างกัน
-                    else {
-                        displayText = `${startDay} ${startMonth} ${startYear} - ${endDay} ${endMonth} ${endYear}`;
-                    }
-
-                    // ✅ แสดงผลในช่องรูปแบบและช่องซ่อน
-                    document.getElementById("rangeDisplay").value = displayText;
-                    document.getElementById("rangeDate").value = displayText;
-                }
+            // ✅ ถ้าเดือนเดียวกันและปีเดียวกัน
+            if (
+                start.getMonth() === end.getMonth() &&
+                start.getFullYear() === end.getFullYear()
+            ) {
+                displayText = `${startDay} - ${endDay} ${endMonth} ${endYear}`;
+            }
+            // ✅ ถ้าเดือนหรือปีต่างกัน
+            else {
+                displayText = `${startDay} ${startMonth} ${startYear} - ${endDay} ${endMonth} ${endYear}`;
             }
 
-            // ===== สลับสถานะช่องเมื่อเลือก radio =====
-            document
-                .getElementById("optSingle")
-                .addEventListener("change", toggleDatePickers);
-            document
-                .getElementById("optRange")
-                .addEventListener("change", toggleDatePickers);
+            // ✅ แสดงผลในช่องรูปแบบและช่องซ่อน
+            document.getElementById("rangeDisplay").value = displayText;
+            document.getElementById("rangeDate").value = displayText;
+        }
+    }
 
-            function toggleDatePickers() {
-                const single = document.getElementById("singleDate");
-                const start = document.getElementById("startDate");
-                const end = document.getElementById("endDate");
-                const display = document.getElementById("rangeDisplay");
+    // ===== สลับสถานะช่องเมื่อเลือก radio =====
+    document
+        .getElementById("optSingle")
+        .addEventListener("change", toggleDatePickers);
+    document
+        .getElementById("optRange")
+        .addEventListener("change", toggleDatePickers);
 
-                if (document.getElementById("optSingle").checked) {
-                    single.disabled = false;
-                    start.disabled = true;
-                    end.disabled = true;
-                    display.disabled = true;
-                } else {
-                    single.disabled = true;
-                    start.disabled = false;
-                    end.disabled = false;
-                    display.disabled = false;
-                }
-            }
-            // เรียกครั้งแรกให้ตรงตามค่า checked เริ่มต้น
-            toggleDatePickers();
-            </script>
-            <script>
-            // ✅ ระบบเปิด/ปิดเมนูโปรไฟล์
-            const profileBtn = document.getElementById("profileBtn");
-            const profileMenu = document.getElementById("profileMenu");
+    function toggleDatePickers() {
+        const single = document.getElementById("singleDate");
+        const start = document.getElementById("startDate");
+        const end = document.getElementById("endDate");
+        const display = document.getElementById("rangeDisplay");
 
-            if (profileBtn && profileMenu) {
-                profileBtn.addEventListener("click", (e) => {
-                    e.stopPropagation(); // ป้องกันการคลิกซ้ำซ้อน
-                    profileMenu.classList.toggle("hidden");
-                });
+        if (document.getElementById("optSingle").checked) {
+            single.disabled = false;
+            start.disabled = true;
+            end.disabled = true;
+            display.disabled = true;
+        } else {
+            single.disabled = true;
+            start.disabled = false;
+            end.disabled = false;
+            display.disabled = false;
+        }
+    }
+    // เรียกครั้งแรกให้ตรงตามค่า checked เริ่มต้น
+    toggleDatePickers();
+    </script>
+    <script>
+    // ✅ ระบบเปิด/ปิดเมนูโปรไฟล์
+    const profileBtn = document.getElementById("profileBtn");
+    const profileMenu = document.getElementById("profileMenu");
 
-                // ปิดเมนูเมื่อคลิกนอกกรอบ
-                window.addEventListener("click", (e) => {
-                    if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
-                        profileMenu.classList.add("hidden");
-                    }
-                });
-            }
+    if (profileBtn && profileMenu) {
+        profileBtn.addEventListener("click", (e) => {
+            e.stopPropagation(); // ป้องกันการคลิกซ้ำซ้อน
+            profileMenu.classList.toggle("hidden");
+        });
 
-            // ✅ ปุ่ม "อยู่ต่อ" ให้ปิดเมนู dropdown
-            function closeMenu() {
+        // ปิดเมนูเมื่อคลิกนอกกรอบ
+        window.addEventListener("click", (e) => {
+            if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
                 profileMenu.classList.add("hidden");
             }
-            </script>
+        });
+    }
+
+    // ✅ ปุ่ม "อยู่ต่อ" ให้ปิดเมนู dropdown
+    function closeMenu() {
+        profileMenu.classList.add("hidden");
+    }
+    </script>
 
 
 </body>
