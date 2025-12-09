@@ -1,3 +1,4 @@
+<!-- ขอแจ้งเรียนการเป็นผู้ร่วมวิจัยโครงการบริการวิชาการ -->
 <?php
 session_start();
 require_once __DIR__ . '/functions.php';

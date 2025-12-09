@@ -1,3 +1,5 @@
+<!-- ขออนุมัติตัวบุคคลเดินทางไปเข้าร่วมการแลกเปลี่ยนทางวิชาการ ณ Vietnam – Korea University of
+Information and Communication Technology สาธารณรัฐสังคมนิยมเวียดนาม -->
 <?php
 session_start();
 require_once __DIR__ . '/functions.php';
