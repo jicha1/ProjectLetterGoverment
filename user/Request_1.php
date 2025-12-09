@@ -249,10 +249,8 @@ if (!isset($_SESSION['user_id'])) {
               <option value="academic" <?= ($CURRENT_MAIN=="academic"?"selected":"") ?>>
                 ประชุมวิชาการ/ศึกษาดูงาน/สัมมนาวิชาการ</option>
               <option value="external" <?= ($CURRENT_MAIN=="external"?"selected":"") ?>>ภายนอก</option>
-              <option value="internal" <?= ($CURRENT_MAIN=="internal"?"selected":"") ?>>ภายใน(บันทึกข้อความ)
-              </option>
+              <option value="internal" <?= ($CURRENT_MAIN=="internal"?"selected":"") ?>>ภายใน(บันทึกข้อความ)</option>
             </select>
-
 
           </div>
         </div>
@@ -669,11 +667,12 @@ if (!isset($_SESSION['user_id'])) {
       <!-- ปุ่ม -->
       <div class="relative mt-20">
         <div class="absolute right-0 bottom-0">
-          <button type="submit" id="submitBtn"
-            class="bg-[#11C2B9] hover:bg-[#0fa39c] text-white font-bold w-[130px] h-[35px] rounded-md transition">
+          <a href="../form_memo_academic_1.php"
+            class="bg-[#11C2B9] hover:bg-[#0fa39c] text-white font-bold w-[130px] h-[35px] rounded-md flex items-center justify-center transition">
             ดำเนินการ
-          </button>
+          </a>
         </div>
+
       </div>
     </div>
   </form>
@@ -1039,8 +1038,7 @@ if (!isset($_SESSION['user_id'])) {
   function closeMenu() {
     profileMenu.classList.add("hidden");
   }
-  </script>
-  <script>
+
   const main = document.getElementById("mainCategory");
   const sub = document.getElementById("subCategory");
 
@@ -1048,8 +1046,8 @@ if (!isset($_SESSION['user_id'])) {
   const redirectMain = {
     train: "form_Memo.php",
     academic: "Request_1.php",
-    external: null, // ไม่มีฟอร์มโดยตรง
-    internal: null // ต้องเลือกหมวดย่อย
+    external: null, // ยังไม่มีฟอร์ม
+    internal: null // ให้เลือกหมวดย่อยแทน
   };
 
   const redirectSub = {
@@ -1061,18 +1059,10 @@ if (!isset($_SESSION['user_id'])) {
     "ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย": "Request_7.php"
   };
 
+  // หมวดย่อยของ "ภายใน"
   const subInternal = Object.keys(redirectSub);
 
-  // ป้องกัน redirect ซ้ำ (ถ้าอยู่หน้าเดียวกัน)
-  function redirectIfDifferent(file) {
-    if (!file) return;
-    const currentPage = window.location.pathname.split("/").pop();
-    if (currentPage !== file) {
-      window.location.href = file;
-    }
-  }
-
-  // เมื่อเลือกหมวดหลัก
+  // เมื่อเลือก "หมวดหลัก"
   main.addEventListener("change", () => {
     const value = main.value;
 
@@ -1080,21 +1070,20 @@ if (!isset($_SESSION['user_id'])) {
     sub.innerHTML = `<option value="">-- เลือกหมวดย่อย --</option>`;
     sub.disabled = true;
 
-    // ถ้าเลือกหมวดที่มี redirect แบบหน้าเดียว เช่น "ฝึกอบรม"
+    // ถ้าเลือกหมวดที่มี redirect ทันที เช่น ฝึกอบรม, ประชุมฯ
     if (redirectMain[value]) {
-      redirectIfDifferent(redirectMain[value]);
+      window.location.href = redirectMain[value];
       return;
     }
 
-    // ถ้าเป็นหมวดภายนอก → ไม่มีฟอร์มในระบบ
+    // ถ้าเลือก "ภายนอก" → ไม่ redirect, ไม่เปิดหมวดย่อย
     if (value === "external") {
       return;
     }
 
-    // หมวดภายใน → เปิดหมวดย่อย
+    // ถ้าเลือก "ภายใน" → เปิดหมวดย่อย
     if (value === "internal") {
       sub.disabled = false;
-
       subInternal.forEach(text => {
         const opt = document.createElement("option");
         opt.value = text;
@@ -1104,11 +1093,11 @@ if (!isset($_SESSION['user_id'])) {
     }
   });
 
-  // เมื่อเลือกหมวดย่อย → redirect
+  // เมื่อเลือกหมวดย่อยของภายใน → redirect
   sub.addEventListener("change", () => {
     const value = sub.value;
     if (redirectSub[value]) {
-      redirectIfDifferent(redirectSub[value]);
+      window.location.href = redirectSub[value];
     }
   });
   </script>

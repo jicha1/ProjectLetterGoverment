@@ -1,7 +1,7 @@
-<?php 
+<?php
 // ต้องวางตรงนี้! บรรทัดแรกของไฟล์
-$CURRENT_MAIN = "internal";     
-$CURRENT_SUB  = "ขออนุมัติตัวบุคคลเป็นวิทยากร";           // ถ้าไม่มีหมวดย่อย ให้เว้นว่าง
+$CURRENT_MAIN = "internal";
+$CURRENT_SUB = "ขออนุมัติตัวบุคคลเป็นวิทยากร"; // ถ้าไม่มีหมวดย่อย ให้เว้นว่าง
 ?>
 <!-- ขออนุมัติตัวบุคคลเป็นวิทยากร (ของอาจารย์) -->
 <?php
@@ -237,6 +237,7 @@ if (!isset($_SESSION['user_id'])) {
       <!-- หมวดหมู่ -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 rounded-[25px] border-2" style="
 
+
             background-color: #e3f9f8;
             border-color: #11c2b9;
             min-height: 170px;
@@ -250,7 +251,8 @@ if (!isset($_SESSION['user_id'])) {
               <option value="academic" <?= ($CURRENT_MAIN=="academic"?"selected":"") ?>>
                 ประชุมวิชาการ/ศึกษาดูงาน/สัมมนาวิชาการ</option>
               <option value="external" <?= ($CURRENT_MAIN=="external"?"selected":"") ?>>ภายนอก</option>
-              <option value="internal" <?= ($CURRENT_MAIN=="internal"?"selected":"") ?>>ภายใน(บันทึกข้อความ)</option>
+              <option value="internal" <?= ($CURRENT_MAIN=="internal"?"selected":"") ?>>ภายใน(บันทึกข้อความ)
+              </option>
             </select>
 
           </div>
@@ -521,11 +523,12 @@ if (!isset($_SESSION['user_id'])) {
       <!-- ปุ่ม -->
       <div class="relative mt-20">
         <div class="absolute right-0 bottom-0">
-          <button type="submit" id="submitBtn"
-            class="bg-[#11C2B9] hover:bg-[#0fa39c] text-white font-bold w-[130px] h-[35px] rounded-md transition">
+          <a href="../form_memo_room_request.php"
+            class="bg-[#11C2B9] hover:bg-[#0fa39c] text-white font-bold w-[130px] h-[35px] rounded-md flex items-center justify-center transition">
             ดำเนินการ
-          </button>
+          </a>
         </div>
+
       </div>
     </div>
   </form>
@@ -809,7 +812,11 @@ if (!isset($_SESSION['user_id'])) {
         "กันยายน",
         "ตุลาคม",
         "พฤศจิกายน",
-        "ธันวาคม",
+        "ธันวาคม", <<
+        <<
+        <<
+        <
+        HEAD
       ];
 
       const startDay = start.getDate();
@@ -965,6 +972,7 @@ if (!isset($_SESSION['user_id'])) {
     }
   });
   </script>
+
 </body>
 
 </html>
