@@ -1,3 +1,8 @@
+<?php 
+// ต้องวางตรงนี้! บรรทัดแรกของไฟล์
+$CURRENT_MAIN = "train";     
+$CURRENT_SUB  = "ฝึกอบรม";           // ถ้าไม่มีหมวดย่อย ให้เว้นว่าง
+?>
 <?php
 session_start();
 require_once __DIR__ . '/../functions.php';
@@ -238,18 +243,59 @@ if (!isset($_SESSION['user_id'])) {
           <label class="lbl text-gray-800 w-28 text-right">หมวดหลัก:</label>
           <div class="relative w-full">
             <select name="main_category" class="custom-select w-full" id="mainCategory">
-              <option selected>ฝึกอบรม</option>
+              <option value="">-- เลือกหมวดหลัก --</option>
+              <option value="train" <?= ($CURRENT_MAIN=="train"?"selected":"") ?>>ฝึกอบรม</option>
+              <option value="academic" <?= ($CURRENT_MAIN=="academic"?"selected":"") ?>>
+                ประชุมวิชาการ/ศึกษาดูงาน/สัมมนาวิชาการ</option>
+              <option value="external" <?= ($CURRENT_MAIN=="external"?"selected":"") ?>>ภายนอก</option>
+              <option value="internal" <?= ($CURRENT_MAIN=="internal"?"selected":"") ?>>ภายใน(บันทึกข้อความ)</option>
             </select>
+
           </div>
         </div>
+
         <div class="flex items-center gap-3">
           <label class="lbl text-gray-800 w-28 text-right">หมวดย่อย:</label>
           <div class="relative w-full">
-            <select name="sub_category" class="custom-select w-full" id="subCategory">
-              <option>ฝึกอบรม</option>
+            <select name="sub_category" class="custom-select w-full" id="subCategory"
+              <?= ($CURRENT_MAIN!="internal"?"disabled":"") ?>>
+              <option value="">-- เลือกหมวดย่อย --</option>
+
+              <?php if ($CURRENT_MAIN == "internal"): ?>
+              <option value="ขอใช้อาคารวันหยุดราชการ" <?= ($CURRENT_SUB=="ขอใช้อาคารวันหยุดราชการ"?"selected":"") ?>>
+                ขอใช้อาคารวันหยุดราชการ
+              </option>
+
+              <option value="ขอห้องพักรับรอง" <?= ($CURRENT_SUB=="ขอห้องพักรับรอง"?"selected":"") ?>>
+                ขอห้องพักรับรอง
+              </option>
+
+              <option value="ขออนุมัติตัวบุคคลเป็นวิทยากร"
+                <?= ($CURRENT_SUB=="ขออนุมัติตัวบุคคลเป็นวิทยากร"?"selected":"") ?>>
+                ขออนุมัติตัวบุคคลเป็นวิทยากร
+              </option>
+
+              <option value="ขออนุมัติไม่เข้าร่วมโครงการ"
+                <?= ($CURRENT_SUB=="ขออนุมัติไม่เข้าร่วมโครงการ"?"selected":"") ?>>
+                ขออนุมัติไม่เข้าร่วมโครงการ
+              </option>
+
+              <option value="การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์"
+                <?= ($CURRENT_SUB=="การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์"?"selected":"") ?>>
+                การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์
+              </option>
+
+              <option value="ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย"
+                <?= ($CURRENT_SUB=="ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย"?"selected":"") ?>>
+                ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย
+              </option>
+              <?php endif; ?>
             </select>
+
           </div>
         </div>
+
+
         <div class="flex items-center gap-3">
           <label class="lbl text-gray-800 w-28 text-right">คณะ:</label>
           <div class="relative w-full">
@@ -853,6 +899,79 @@ if (!isset($_SESSION['user_id'])) {
     profileMenu.classList.add("hidden");
   }
   </script>
+  <script>
+  const main = document.getElementById("mainCategory");
+  const sub = document.getElementById("subCategory");
+
+  // Mapping ไฟล์สำหรับ redirect
+  const redirectMain = {
+    train: "form_Memo.php",
+    academic: "Request_1.php",
+    external: null, // ไม่มีฟอร์มโดยตรง
+    internal: null // ต้องเลือกหมวดย่อย
+  };
+
+  const redirectSub = {
+    "ขอใช้อาคารวันหยุดราชการ": "Request_2.php",
+    "ขอห้องพักรับรอง": "Request_3.php",
+    "ขออนุมัติตัวบุคคลเป็นวิทยากร": "Request_4.php",
+    "ขออนุมัติไม่เข้าร่วมโครงการ": "Request_5.php",
+    "การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์": "Request_6.php",
+    "ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย": "Request_7.php"
+  };
+
+  const subInternal = Object.keys(redirectSub);
+
+  // ป้องกัน redirect ซ้ำ (ถ้าอยู่หน้าเดียวกัน)
+  function redirectIfDifferent(file) {
+    if (!file) return;
+    const currentPage = window.location.pathname.split("/").pop();
+    if (currentPage !== file) {
+      window.location.href = file;
+    }
+  }
+
+  // เมื่อเลือกหมวดหลัก
+  main.addEventListener("change", () => {
+    const value = main.value;
+
+    // เคลียร์หมวดย่อยก่อน
+    sub.innerHTML = `<option value="">-- เลือกหมวดย่อย --</option>`;
+    sub.disabled = true;
+
+    // ถ้าเลือกหมวดที่มี redirect แบบหน้าเดียว เช่น "ฝึกอบรม"
+    if (redirectMain[value]) {
+      redirectIfDifferent(redirectMain[value]);
+      return;
+    }
+
+    // ถ้าเป็นหมวดภายนอก → ไม่มีฟอร์มในระบบ
+    if (value === "external") {
+      return;
+    }
+
+    // หมวดภายใน → เปิดหมวดย่อย
+    if (value === "internal") {
+      sub.disabled = false;
+
+      subInternal.forEach(text => {
+        const opt = document.createElement("option");
+        opt.value = text;
+        opt.textContent = text;
+        sub.appendChild(opt);
+      });
+    }
+  });
+
+  // เมื่อเลือกหมวดย่อย → redirect
+  sub.addEventListener("change", () => {
+    const value = sub.value;
+    if (redirectSub[value]) {
+      redirectIfDifferent(redirectSub[value]);
+    }
+  });
+  </script>
+
 
 </body>
 
