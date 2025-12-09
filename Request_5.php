@@ -418,14 +418,68 @@ if (!isset($_SESSION['user_id'])) {
       </div>
 
       <!-- ข้อ 9 -->
-      <div class="mb-4 flex items-start gap-4">
-        <label class="lbl text-gray-800 whitespace-nowrap pt-2">
-          9. ชื่อสถานที่จัดประชุมวิชาการ / อบรม / ออนไลน์ :
+      <div class="mb-6">
+        <!-- หัวข้อหลัก -->
+        <label class="lbl text-gray-800 block mb-2" for="onlineCheckbox">
+          9. ชื่อสถานที่จัดประชุมวิชาการ / สถานที่จัดอบรม /
+          เข้าร่วมรูปแบบออนไลน์
         </label>
-        <div class="w-full">
-          <input type="text" name="meeting_place" class="w-full border rounded-md p-2 shadow-sm">
+
+        <!-- 🔹 ตัวเลือกออนไลน์ -->
+        <div class="flex items-center ml-6 gap-2 mb-3">
+          <input type="checkbox" name="is_online" value="1" class="accent-black" id="onlineCheckbox" />
+          <span>เข้าร่วมในรูปแบบออนไลน์</span>
+        </div>
+
+        <!-- 🔹 ระบุสถานที่ไป + ออนไซต์ -->
+        <div class="flex items-center ml-6 gap-2">
+          <!-- ✅ เพิ่มช่องติ๊ก "ออนไซต์" -->
+          <input type="checkbox" id="onsiteCheckbox" class="accent-black" />
+          <span>เข้าร่วมในรูปแบบออนไซต์</span>
+
+          <label class="lbl text-gray-800 mr-2" for="placeInput">ระบุสถานที่ไป :</label>
+
+          <!-- ช่องกรอกสถานที่ -->
+          <input type="text" name="place" class="border rounded-md p-2 w-[400px]" id="placeInput"
+            placeholder="เช่น โรงแรม Best Western PLUS ถนนแจ้งวัฒนะ จังหวัดนนทบุรี" disabled />
         </div>
       </div>
+
+      <script>
+      // ✅ ดึง element ที่เกี่ยวข้อง
+      const onlineCheckbox = document.getElementById("onlineCheckbox");
+      const onsiteCheckbox = document.getElementById("onsiteCheckbox");
+      const placeInput = document.getElementById("placeInput");
+
+      // ✅ ฟังก์ชันจัดการให้เลือกได้เพียง 1 ช่อง
+      function selectOnly(selected) {
+        if (selected === "online") {
+          onlineCheckbox.checked = true;
+          onsiteCheckbox.checked = false;
+          placeInput.value = "";
+          placeInput.disabled = true;
+          placeInput.classList.add("bg-gray-100", "text-gray-400");
+        } else if (selected === "onsite") {
+          onsiteCheckbox.checked = true;
+          onlineCheckbox.checked = false;
+          placeInput.disabled = false;
+          placeInput.classList.remove("bg-gray-100", "text-gray-400");
+          placeInput.focus();
+        } else {
+          // ถ้าไม่มีการเลือกเลย
+          placeInput.value = "";
+          placeInput.disabled = true;
+          placeInput.classList.add("bg-gray-100", "text-gray-400");
+        }
+      }
+
+      // ✅ ผูก event ให้เลือกได้ช่องเดียวทันที
+      onlineCheckbox.addEventListener("click", () => selectOnly("online"));
+      onsiteCheckbox.addEventListener("click", () => selectOnly("onsite"));
+
+      // ✅ ตั้งค่าเริ่มต้น
+      selectOnly();
+      </script>
 
       <!-- ข้อ 10 -->
       <div class="mb-4 flex items-start gap-4">
