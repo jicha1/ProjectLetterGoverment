@@ -298,6 +298,7 @@ if (!isset($_SESSION['user_id'])) {
                         value="อาจารย์ประจำภาควิชาเทคโนโลยีสารสนเทศ" />
                 </div>
             </div>
+
             <!-- ข้อ 3 -->
             <div class="mb-4">
                 <div class="flex items-start gap-4">
@@ -306,7 +307,8 @@ if (!isset($_SESSION['user_id'])) {
                         3. ขออนุมัติไปเข้าร่วม :
                     </label>
 
-                    <div class="text-gray-800 space-y-1 mt-2" id="purposeGroup" role="radiogroup"
+                    <!-- ดันกลุ่มตัวเลือกลง -->
+                    <div class="space-y-2 text-gray-800 mt-2" id="purposeGroup" role="radiogroup"
                         aria-labelledby="purposeLabel">
 
                         <label class="flex items-center gap-2">
@@ -324,22 +326,15 @@ if (!isset($_SESSION['user_id'])) {
                             เข้าร่วมสัมมนาวิชาการ
                         </label>
 
-                        <!-- 🔹 อื่น ๆ (ระบุ) แบบเดียวกับข้อ 6 -->
-                        <div class="flex items-center gap-2">
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="purpose" value="อื่นๆ" class="accent-black"
-                                    id="purposeOtherRadio">
-                                อื่น ๆ (ระบุ)
-                            </label>
-
-                            <input type="text" name="purpose_other_detail" id="purposeOtherInput"
-                                class="border rounded-md p-2 w-[260px] ml-3 bg-gray-100 text-gray-400"
-                                placeholder="โปรดระบุ" disabled>
-                        </div>
+                        <label class="flex items-center gap-2">
+                            <input type="radio" name="purpose" value="อื่นๆ" class="accent-black" />
+                            อื่นๆ
+                        </label>
 
                     </div>
                 </div>
             </div>
+
 
 
             <!-- ข้อ 4 -->
@@ -370,7 +365,7 @@ if (!isset($_SESSION['user_id'])) {
                     6. ประเภทการนำเสนอ :
                 </label>
 
-                <div class="w-full ml-1 space-y-1 mt-2" id="presentationType">
+                <div class="w-full ml-1 space-y-2 mt-2" id="presentationType">
 
                     <label class="flex items-center gap-2">
                         <input type="radio" name="presentation_type" value="oral" class="accent-black option-radio">
@@ -382,8 +377,8 @@ if (!isset($_SESSION['user_id'])) {
                         Poster
                     </label>
 
-                    <!-- ลดช่องว่างของบรรทัดนี้ -->
-                    <div class="flex items-center gap-2">
+                    <!-- 🔹 อื่น ๆ แบบมีช่องให้ระบุ (1 บรรทัด) -->
+                    <div class="flex items-center gap-3">
                         <label class="flex items-center gap-2">
                             <input type="radio" name="presentation_type" value="other" class="accent-black"
                                 id="otherTypeRadio">
@@ -391,12 +386,13 @@ if (!isset($_SESSION['user_id'])) {
                         </label>
 
                         <input type="text" name="presentation_other_detail" id="otherTypeInput"
-                            class="border rounded-md p-2 w-[260px] ml-3 bg-gray-100 text-gray-400"
-                            placeholder="โปรดระบุ" disabled>
+                            class="border rounded-md p-2 w-[260px] bg-gray-100 text-gray-400" placeholder="โปรดระบุ"
+                            disabled>
                     </div>
 
                 </div>
             </div>
+
 
 
             <div class="mb-6">
@@ -469,7 +465,7 @@ if (!isset($_SESSION['user_id'])) {
             <div class="mb-4">
                 <!-- บรรทัดคำถาม -->
                 <label class="lbl text-gray-800 block mb-2">
-                    8. ชื่อสถานที่จัดประชุมวิชาการ / สถานที่จัดอบรม / เข้าร่วมรูปแบบออนไลน์ :
+                    8. ชื่อสถานที่จัดประชุมวิชาการ / สถานที่จัดอบรม / เข้าร่วมรูปแบบออนไลน์
                 </label>
 
                 <div class="ml-7 space-y-2">
@@ -537,25 +533,6 @@ if (!isset($_SESSION['user_id'])) {
                     </div>
                 </div>
             </div>
-            <script>
-            const purposeOtherRadio = document.getElementById("purposeOtherRadio");
-            const purposeOtherInput = document.getElementById("purposeOtherInput");
-            const purposeRadios = document.querySelectorAll('input[name="purpose"]');
-
-            purposeRadios.forEach(radio => {
-                radio.addEventListener("change", () => {
-                    if (purposeOtherRadio.checked) {
-                        purposeOtherInput.disabled = false;
-                        purposeOtherInput.classList.remove("bg-gray-100", "text-gray-400");
-                        purposeOtherInput.focus();
-                    } else {
-                        purposeOtherInput.disabled = true;
-                        purposeOtherInput.classList.add("bg-gray-100", "text-gray-400");
-                        purposeOtherInput.value = "";
-                    }
-                });
-            });
-            </script>
 
             <script>
             const otherRadio = document.getElementById("otherTypeRadio");
