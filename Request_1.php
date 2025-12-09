@@ -307,8 +307,7 @@ if (!isset($_SESSION['user_id'])) {
                         3. ขออนุมัติไปเข้าร่วม :
                     </label>
 
-                    <!-- ดันกลุ่มตัวเลือกลง -->
-                    <div class="space-y-2 text-gray-800 mt-2" id="purposeGroup" role="radiogroup"
+                    <div class="text-gray-800 space-y-1 mt-2" id="purposeGroup" role="radiogroup"
                         aria-labelledby="purposeLabel">
 
                         <label class="flex items-center gap-2">
@@ -326,10 +325,18 @@ if (!isset($_SESSION['user_id'])) {
                             เข้าร่วมสัมมนาวิชาการ
                         </label>
 
-                        <label class="flex items-center gap-2">
-                            <input type="radio" name="purpose" value="อื่นๆ" class="accent-black" />
-                            อื่นๆ
-                        </label>
+                        <!-- 🔹 อื่น ๆ (ระบุ) แบบเดียวกับข้อ 6 -->
+                        <div class="flex items-center gap-2">
+                            <label class="flex items-center gap-2">
+                                <input type="radio" name="purpose" value="อื่นๆ" class="accent-black"
+                                    id="purposeOtherRadio">
+                                อื่น ๆ (ระบุ)
+                            </label>
+
+                            <input type="text" name="purpose_other_detail" id="purposeOtherInput"
+                                class="border rounded-md p-2 w-[260px] ml-3 bg-gray-100 text-gray-400"
+                                placeholder="โปรดระบุ" disabled>
+                        </div>
 
                     </div>
                 </div>
@@ -365,7 +372,7 @@ if (!isset($_SESSION['user_id'])) {
                     6. ประเภทการนำเสนอ :
                 </label>
 
-                <div class="w-full ml-1 space-y-2 mt-2" id="presentationType">
+                <div class="w-full ml-1 space-y-1 mt-2" id="presentationType">
 
                     <label class="flex items-center gap-2">
                         <input type="radio" name="presentation_type" value="oral" class="accent-black option-radio">
@@ -377,8 +384,8 @@ if (!isset($_SESSION['user_id'])) {
                         Poster
                     </label>
 
-                    <!-- 🔹 อื่น ๆ แบบมีช่องให้ระบุ (1 บรรทัด) -->
-                    <div class="flex items-center gap-3">
+                    <!-- ลดช่องว่างของบรรทัดนี้ -->
+                    <div class="flex items-center gap-2">
                         <label class="flex items-center gap-2">
                             <input type="radio" name="presentation_type" value="other" class="accent-black"
                                 id="otherTypeRadio">
@@ -386,12 +393,13 @@ if (!isset($_SESSION['user_id'])) {
                         </label>
 
                         <input type="text" name="presentation_other_detail" id="otherTypeInput"
-                            class="border rounded-md p-2 w-[260px] bg-gray-100 text-gray-400" placeholder="โปรดระบุ"
-                            disabled>
+                            class="border rounded-md p-2 w-[260px] ml-3 bg-gray-100 text-gray-400"
+                            placeholder="โปรดระบุ" disabled>
                     </div>
 
                 </div>
             </div>
+
 
 
 
@@ -533,6 +541,45 @@ if (!isset($_SESSION['user_id'])) {
                     </div>
                 </div>
             </div>
+            <script>
+            const purposeOtherRadio = document.getElementById("purposeOtherRadio");
+            const purposeOtherInput = document.getElementById("purposeOtherInput");
+            const purposeRadios = document.querySelectorAll('input[name="purpose"]');
+
+            purposeRadios.forEach(radio => {
+                radio.addEventListener("change", () => {
+                    if (purposeOtherRadio.checked) {
+                        purposeOtherInput.disabled = false;
+                        purposeOtherInput.classList.remove("bg-gray-100", "text-gray-400");
+                        purposeOtherInput.focus();
+                    } else {
+                        purposeOtherInput.disabled = true;
+                        purposeOtherInput.classList.add("bg-gray-100", "text-gray-400");
+                        purposeOtherInput.value = "";
+                    }
+                });
+            });
+            </script>
+            <script>
+            const otherRadio = document.getElementById("otherTypeRadio");
+            const otherInput = document.getElementById("otherTypeInput");
+            const typeRadios = document.querySelectorAll('input[name="presentation_type"]');
+
+            typeRadios.forEach(radio => {
+                radio.addEventListener("change", () => {
+                    if (otherRadio.checked) {
+                        otherInput.disabled = false;
+                        otherInput.classList.remove("bg-gray-100", "text-gray-400");
+                        otherInput.focus();
+                    } else {
+                        otherInput.disabled = true;
+                        otherInput.classList.add("bg-gray-100", "text-gray-400");
+                        otherInput.value = "";
+                    }
+                });
+            });
+            </script>
+
 
             <script>
             const otherRadio = document.getElementById("otherTypeRadio");
