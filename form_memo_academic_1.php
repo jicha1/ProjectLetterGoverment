@@ -1,4 +1,4 @@
-<!-- ขออนุมัติตัวบุคคลเพื่อไปน าเสนอผลงานวิจัยในงานประชุมวิชาการระดับนานาชาติACIE 2025 -->
+<!-- ขออนุมัติตัวบุคคลเพื่อไปนำเสนอผลงานวิจัยในงานประชุมวิชาการระดับนานาชาติACIE 2025 -->
 <?php 
 session_start();
 require_once __DIR__ . '/functions.php';
@@ -726,16 +726,16 @@ $len = max(20, $len);
             </div>
 
 
-
             <!-- เรื่อง -->
-            <div class="doc-row">
+            <div class="doc-row subject-row">
                 <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
-                <div class="dot-line">
+                <div class="dot-line subject-line">
                     <span class="chip" contenteditable="true" data-target="subject">
-                        <?= h($subject ?: 'ขออนุมัติ...') ?>
+                        ขออนุมัติตัวบุคคลเพื่อไปนำเสนอผลงานวิจัยในงานประชุมวิชาการระดับนานาชาติACIE 2025
                     </span>
                 </div>
             </div>
+
 
 
             <!-- บรรทัด “เรียน ...” -->
@@ -747,37 +747,39 @@ $len = max(20, $len);
             <div class="content-block paragraph">
                 ตามที่ ข้าพเจ้า
                 <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา นามี') ?>
+                    ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา นามี
                 </span>
                 พนักงานมหาวิทยาลัย สังกัดภาควิชาเทคโนโลยีสารสนเทศ
                 คณะเทคโนโลยีและการจัดการอุตสาหกรรม มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ
-                วิทยาเขตปราจีนบุรี ได้รับการตอบรับให้เข้าร่วม นำเสนอผลงานวิจัยในการประชุมวิชาการระดับนานาชาติ
+                วิทยาเขตปราจีนบุรี ได้รับการตอบรับให้เข้าร่วม นำเสนอผลงานวิจัยในงานประชุมวิชาการระดับนานาชาติ
                 The 5<sup>th</sup> Asia Conference on Information Engineering (ACIE 2025)
                 ในหัวข้อ “API-Based Personal Healthcare Application: Securing Data and Ensuring Patient Privacy”
                 ซึ่งจัดขึ้นที่โรงแรม Beyond Kata จังหวัดภูเก็ต ในระหว่างวันที่
                 <span class="chip" contenteditable="true" data-target="joinDates">
-                    <?= h($joinDates ?: '10 – 12 มกราคม 2568') ?>
+                    10 – 12 มกราคม 2568
                 </span>
                 โดยเอกสารงานประชุมวิชาการจะถูกตีพิมพ์อยู่ในฐานข้อมูล Scopus นั้น
             </div>
+
 
             <!-- ย่อหน้า 2 -->
             <div class="content-block paragraph">
                 การนี้ ข้าพเจ้า จึงมีความประสงค์ขออนุมัติเดินทางเพื่อไปนำเสนอผลงานวิจัย
                 ในงานประชุมวิชาการระดับนานาชาติ ACIE 2025 ในระหว่างวันที่
                 <span class="chip" contenteditable="true" data-target="duration">
-                    <?= h($valueMap['duration'] ?? '9 – 12 มกราคม 2568') ?>
+                    9 – 12 มกราคม 2568
                 </span>
                 (รวมเวลาเดินทาง) ตามวัน เวลา และสถานที่ดังกล่าว
                 โดยการนำเสนอผลงานวิจัยในครั้งนี้เป็นประโยชน์ต่อการพัฒนาการเรียนการสอนงานวิจัย
                 และสร้างชื่อเสียงให้กับมหาวิทยาลัย โดยขอใช้งบจัดสรรให้หน่วยงาน
                 ประจำปีงบประมาณ พ.ศ.
                 <span class="chip" contenteditable="true" data-target="fiscal_year_display">
-                    <?= h($thaiYear ?: '2568') ?>
+                    2568
                 </span>
                 ในส่วนของสาขาเทคโนโลยีสารสนเทศ แผนงานจัดการศึกษาระดับอุดมศึกษา
                 หมวดค่าใช้สอย (รายละเอียดตามเอกสารแนบ)
             </div>
+
 
             <!-- ย่อหน้า 3 -->
             <div class="content-block paragraph">
@@ -787,8 +789,8 @@ $len = max(20, $len);
 
             <div class="signature-wrapper">
                 <div class="signature-block" id="signatureBlock">
-                    <div class="sig-name">(<?= h($ownerName ?: '') ?>)</div>
-                    <div class="sig-position"><?= h($position ?: '') ?></div>
+                    <div class="sig-name">(ผู้ช่วยศาสตราจารย์ ดร.ขนิษฐา นามี)</div>
+                    <div class="sig-position">หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ</div>
                 </div>
             </div>
 

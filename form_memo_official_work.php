@@ -1,4 +1,4 @@
-<!-- ขออนุมัติตัวบุคลากรเดินทางไปนําเสนองานพัฒนาระบบ ณ กรมราชทัณฑ จังหวัดนนทบุรี -->
+<!-- ขออนุมัติตัวบุคลากรเดินทางไปนำเสนองานพัฒนาระบบ ณ กรมราชทัณฑ์ จังหวัดนนทบุรี -->
 <?php
 session_start();
 require_once __DIR__ . '/functions.php';
@@ -744,13 +744,12 @@ $len = max(20, $len);
             </div>
 
 
-
             <!-- เรื่อง -->
             <div class="doc-row">
                 <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
                 <div class="dot-line">
-                    <span class="chip" contenteditable="true" data-target="subject">
-                        <?= h($subject ?: 'ขออนุมัติ...') ?>
+                    <span class="chip" contenteditable="true">
+                        ขออนุมัติตัวบุคลากรเดินทางไปนำเสนองานพัฒนาระบบ ณ กรมราชทัณฑ์ จังหวัดนนทบุรี
                     </span>
                 </div>
             </div>
@@ -766,35 +765,34 @@ $len = max(20, $len);
             <!-- ย่อหน้า 1 -->
             <div class="content-block paragraph">
                 อ้างถึง หนังสือกรมราชทัณฑ์ จังหวัดนนทบุรี ที่ ยธ 0705.3/17028 ลงวันที่
-                <span class="chip" contenteditable="true" data-target="ref_date">29 พฤษภาคม 2566</span>
+                <span class="chip" contenteditable="true">29 พฤษภาคม 2566</span>
                 เรื่อง ขอความอนุเคราะห์จัดทำ ระบบบันทึกข้อมูลผู้ต้องขังป่วยโรคติดต่อ โรคระบาด และภัยสุขภาพในเรือนจำ
                 เพื่อให้การพัฒนาระบบดังกล่าว เป็นไปด้วยความเรียบร้อย และทำงานได้ครอบคลุมตามความต้องการของหน่วยงานนั้น
                 จึงมีความจำเป็นต้องเดินทางไปยัง กองบริหารการแพทย์ กรมราชทัณฑ์ จังหวัดนนทบุรี
-                เพื่อขอเข้าไปนำเสนอ งานพัฒนาระบบเทคโนโลยีสารสนเทศ รับฟังข้อมูล และข้อเสนอแนะในการพัฒนาระบบดังกล่าว
-                ให้สมบูรณ์และตรงตามวัตถุประสงค์ของหน่วยงานดังกล่าว
+                เพื่อขอเข้าไปนำเสนองานพัฒนาระบบเทคโนโลยีสารสนเทศ รับฟังข้อมูลและข้อเสนอแนะ
+                ในการพัฒนาระบบดังกล่าวให้สมบูรณ์และตรงตามวัตถุประสงค์ของหน่วยงานดังกล่าว
             </div>
 
             <!-- ย่อหน้า 2 -->
             <div class="content-block paragraph">
                 การนี้ ข้าพเจ้า
-                <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'ผู้ช่วยศาสตราจารย์นนทัถ ทองใบ') ?>
-                </span>
-                สังกัดภาควิชาเทคโนโลยีสารสนเทศ
-                คณะเทคโนโลยีและการจัดการอุตสาหกรรม มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ วิทยาเขตปราจีนบุรี
+                <span class="chip" contenteditable="true">ผู้ช่วยศาสตราจารย์นพเกล้า ทองใบ</span>
+                สังกัดภาควิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีและการจัดการอุตสาหกรรม
+                มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ วิทยาเขตปราจีนบุรี
                 จึงมีความประสงค์ขออนุมัติให้บุคลากรภาควิชาเทคโนโลยีสารสนเทศ จำนวน 2 คน
                 เพื่อเดินทางไป กรมราชทัณฑ์ จังหวัดนนทบุรี ในวันที่
-                <span class="chip" contenteditable="true" data-target="travel_date">29 สิงหาคม 2566</span>
+                <span class="chip" contenteditable="true">29 สิงหาคม 2566</span>
                 ดังรายชื่อต่อไปนี้ (รายละเอียดตามเอกสารแนบ)
             </div>
 
+
             <div class="teacher-list">
                 <div>1.</div>
-                <div>ผู้ช่วยศาสตราจารย์เมท้า ทองใบ</div>
+                <div>ผู้ช่วยศาสตราจารย์นพเกล้า ทองใบ</div>
                 <div>อาจารย์ที่ปรึกษาโครงการพิเศษ</div>
 
                 <div>2.</div>
-                <div>รองศาสตราจารย์ ดร.ยุทธ์ สรรพคุณ</div>
+                <div>รองศาสตราจารย์ ดร.ยุพิน สรรพคุณ</div>
                 <div>อาจารย์ที่ปรึกษาร่วมโครงการพิเศษ</div>
             </div>
 
@@ -805,14 +803,22 @@ $len = max(20, $len);
 
             <div class="signature-wrapper">
                 <div class="signature-block" id="signatureBlock">
-                    <div class="sig-name">(<?= h($ownerName ?: '') ?>)</div>
+                    <div class="sig-name">(ผู้ช่วยศาสตราจารย์นพเกล้า ทองใบ)</div>
                     <div class="sig-position"><?= h($position ?: '') ?></div>
                 </div>
             </div>
 
+
             <div style="font-family:'TH SarabunPSK'; font-size:16pt; line-height:1.2;"> เรียน <?= h($hdr_to) ?> </div>
-            <div class="content-block single align-to-dean"> เพื่อโปรดพิจารณาอนุมัติ </div>
-            <div class="content-block single align-to-dean" style="margin-top:50px;;"> (ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา
+            <div style="
+    font-family:'TH SarabunPSK';
+    font-size:16pt;
+    line-height:1.2;
+    margin-left:30px;   /* ← ปรับค่าตรงนี้เพื่อเลื่อนขวา */
+">
+                เพื่อโปรดพิจารณาอนุมัติ
+            </div>
+            <div class="content-block single align-to-dean" style="margin-top:50px;;"> (ผู้ช่วยศาสตราจารย์ดร.ขนิษฐา
                 นามี)<br /> หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ </div>
             <div class="footer-actions">
 

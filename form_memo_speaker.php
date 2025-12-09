@@ -1,4 +1,4 @@
-<!-- ขออนุมัติตัวบุคคลเปนวิทยากรบรรยายในโครงการอบรมเชิงปฏิบัติการ -->
+<!-- ขออนุมัติคัตตัวบุคคลเป็นวิทยากรบรรยายในโครงการอบรมเชิงปฏิบัติการ -->
 <?php
 session_start();
 require_once __DIR__ . '/functions.php';
@@ -729,18 +729,15 @@ $len = max(20, $len);
                 </div>
             </div>
 
-
-
             <!-- เรื่อง -->
-            <div class="doc-row">
+            <div class="doc-row subject-row">
                 <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
-                <div class="dot-line">
-                    <span class="chip" contenteditable="true" data-target="subject">
-                        <?= h($subject ?: 'ขออนุมัติ...') ?>
+                <div class="dot-line subject-line">
+                    <span class="chip" contenteditable="true">
+                        ขออนุมัติคัตตัวบุคคลเป็นวิทยากรบรรยายในโครงการอบรมเชิงปฏิบัติการ
                     </span>
                 </div>
             </div>
-
 
             <!-- บรรทัด “เรียน ...” -->
             <div class="content-block single">
@@ -749,42 +746,30 @@ $len = max(20, $len);
 
             <!-- ย่อหน้า 1 -->
             <div class="content-block paragraph">
-                อ้างถึง หนังสือจาก ศูนย์นวัตกรรมและการจัดการเทคโนโลยีดิจิทัล
-                วิทยาลัยศิลปะ สื่อ และเทคโนโลยี มหาวิทยาลัยเชียงใหม่
-                เลขที่ อว 8393(22).3/1102.2 ลงวันที่
-                <span class="chip" contenteditable="true" data-target="refDate">
-                    <?= h($refDate ?: '21 มกราคม 2568') ?>
-                </span>
+                อ้างถึง หนังสือจาก ศูนย์นวัตกรรมและการจัดการเทคโนโลยีดิจิทัล วิทยาลัยศิลปะ สื่อ และเทคโนโลยี
+                มหาวิทยาลัยเชียงใหม่ เลขที่ อว 8393(22).3/1102.2 ลงวันที่
+                <span class="chip" contenteditable="true">21 มกราคม 2568</span>
                 เรื่อง ขอเรียนเชิญบุคลากรในสังกัดเป็นวิทยากรบรรยายในโครงการอบรมเชิงปฏิบัติการ
                 หลักสูตรการปรับเปลี่ยนองค์กรภาครัฐสู่ดิจิทัลด้วยกระบวนการคิดเชิงออกแบบ
                 (Government Digital Transformation by Design Thinking)
                 ในระหว่างวันที่
-                <span class="chip" contenteditable="true" data-target="eventRange">
-                    <?= h($eventRange ?: '25 – 26 กุมภาพันธ์ 2568') ?>
-                </span>
+                <span class="chip" contenteditable="true">25 – 26 กุมภาพันธ์ 2568</span>
                 ณ
-                <span class="chip" contenteditable="true" data-target="eventPlace">
-                    <?= h($eventPlace ?: 'อุทยานหลวงราชพฤกษ์ จังหวัดเชียงใหม่') ?>
-                </span>
+                <span class="chip" contenteditable="true">อุทยานหลวงราชพฤกษ์ จังหวัดเชียงใหม่</span>
                 นั้น
             </div>
 
             <!-- ย่อหน้า 2 -->
             <div class="content-block paragraph">
-                ในการนี้ ข้าพเจ้า ผู้ช่วยศาสตราจารย์
-                <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'สุฏิญา กุลจันทร์') ?>
-                </span>
-                สังกัดภาควิชาเทคโนโลยีสารสนเทศ
-                คณะเทคโนโลยีและการจัดการอุตสาหกรรม
+                ในการนี้ ข้าพเจ้า
+                <span class="chip" contenteditable="true">ผู้ช่วยศาสตราจารย์สุปีติ กุลจันทร์</span>
+                สังกัดภาควิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีและการจัดการอุตสาหกรรม
                 มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ วิทยาเขตปราจีนบุรี
                 ข้าพเจ้ามีความประสงค์ขออนุมัติเดินทางไปร่วมเป็นวิทยากรบรรยายในโครงการอบรมเชิงปฏิบัติการ
                 หลักสูตรการปรับเปลี่ยนองค์กรภาครัฐสู่ดิจิทัลด้วยกระบวนการคิดเชิงออกแบบ
                 (Government Digital Transformation by Design Thinking)
                 ระหว่างวันที่
-                <span class="chip" contenteditable="true" data-target="joinDates">
-                    <?= h($joinDates ?: '24 – 27 กุมภาพันธ์ 2568') ?>
-                </span>
+                <span class="chip" contenteditable="true">24 – 27 กุมภาพันธ์ 2568</span>
                 (รวมระยะเวลาในการเดินทาง) รายละเอียดตามเอกสารแนบ
             </div>
 
@@ -793,11 +778,9 @@ $len = max(20, $len);
                 จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ
             </div>
 
-
-
             <div class="signature-wrapper">
                 <div class="signature-block" id="signatureBlock">
-                    <div class="sig-name">(<?= h($ownerName ?: '') ?>)</div>
+                    <div class="sig-name">(ผู้ช่วยศาสตราจารย์สุปีติ กุลจันทร์)</div>
                     <div class="sig-position"><?= h($position ?: '') ?></div>
                 </div>
             </div>

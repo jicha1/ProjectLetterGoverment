@@ -1,5 +1,4 @@
-<!-- ขออนุมัติตัวบุคคลเข้ารับการฝึกอบรมหลักสูตร “พัฒนา Mobile App ด้วย React Native,
-TypeScript และ Expo” ในรูปแบบออนไลน์ -->
+<!-- ขอส่งรายงานความก้าวหน้า รอบ 6 เดือน สัญญาเลขที่ KMUTNB-66-BASIC-24 -->
 <?php
 session_start();
 require_once __DIR__ . '/functions.php';
@@ -745,19 +744,16 @@ $len = max(20, $len);
             </div>
 
 
-
             <!-- เรื่อง -->
             <div class="doc-row">
                 <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
                 <div class="dot-line">
-                    <span class="chip" contenteditable="true" data-target="subject">
-                        <?= h($subject ?: 'ขออนุมัติ...') ?>
+                    <span class="chip" contenteditable="true">
+                        ขอส่งรายงานความก้าวหน้า รอบ 6 เดือน สัญญาเลขที่ KMUTNB-66-BASIC-24
                     </span>
                 </div>
             </div>
 
-
-            <!-- เนื้อหาใหม่ – ตรงตามภาพ -->
 
             <!-- บรรทัด “เรียน ...” -->
             <div class="content-block single">
@@ -766,29 +762,22 @@ $len = max(20, $len);
 
             <!-- ย่อหน้า 1 -->
             <div class="content-block paragraph">
-                ด้วยข้าพเจ้าผู้ช่วยศาสตราจารย์
-                <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'ดร.ณัฐพันธ์ นาคพงษ์') ?>
-                </span>
+                ด้วยข้าพเจ้า
+                <span class="chip" contenteditable="true">ผู้ช่วยศาสตราจารย์ ดร.นัฎฐพันธ์ นาคพงษ์</span>
                 อาจารย์ประจำภาควิชาเทคโนโลยีสารสนเทศ
                 คณะเทคโนโลยีและการจัดการอุตสาหกรรม ได้รับทุนอุดหนุนการวิจัยจากเงินรายได้มหาวิทยาลัย
                 ประจำปีงบประมาณ 2566 (ทุนพัฒนาบุคลากรผู้มีพื้นฐาน) ให้ดำเนินโครงการวิจัยเรื่อง
                 การเกษตรแม่ข่ายด้วยอินเทอร์เน็ตของสรรพสิ่ง สัญญาเลขที่
-                <span class="chip" contenteditable="true" data-target="contractNo">
-                    <?= h($contractNo ?: 'KMUTNB-66-BASIC-24') ?>
-                </span>
+                <span class="chip" contenteditable="true">KMUTNB-66-BASIC-24</span>
                 ซึ่งได้ครบกำหนดรายงานความก้าวหน้า รอบ 6 เดือน ในวันที่
-                <span class="chip" contenteditable="true" data-target="reportDate">
-                    <?= h($reportDate ?: '1 เมษายน 2566') ?>
-                </span>
+                <span class="chip" contenteditable="true">1 เมษายน 2566</span>
                 นั้น
             </div>
 
             <!-- ย่อหน้า 2 -->
             <div class="content-block paragraph">
-                บัดนี้ ข้าพเจ้าได้ดำเนินงานวิจัยไปแล้ว ร้อยละ 60 ของงานวิจัยทั้งหมด
-                จึงขอส่งเอกสารรายงานความก้าวหน้าโครงการวิจัย รอบ 6 เดือน
-                พร้อมเอกสารแนบทั้งหมด 2 รายการดังนี้
+                บัดนี้ ข้าพเจ้าได้ดำเนินงานวิจัยไปแล้ว ร้อยละ 60 ของงานวิจัยทั้งหมด จึงขอส่งเอกสารรายงานความก้าวหน้า
+                โครงการวิจัย รอบ 6 เดือน พร้อมเอกสารแนบทั้งหมด 2 รายการดังนี้
                 <br>
                 <div class="teacher-list">
                     <div>1) แบบรายงานความก้าวหน้างานวิจัย (F-BASIC-07)</div>
@@ -803,8 +792,8 @@ $len = max(20, $len);
 
             <div class="signature-wrapper">
                 <div class="signature-block" id="signatureBlock">
-                    <div class="sig-name">(<?= h($ownerName ?: '') ?>)</div>
-                    <div class="sig-position"><?= h($position ?: '') ?></div>
+                    <div class="sig-name">(ผู้ช่วยศาสตราจารย์ ดร.นัฎฐพันธ์ นาคพงษ์)</div>
+                    <div class="sig-position">หัวหน้าโครงการ</div>
                 </div>
             </div>
 

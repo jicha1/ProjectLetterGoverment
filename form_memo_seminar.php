@@ -726,14 +726,12 @@ $len = max(20, $len);
             </div>
 
 
-
             <!-- เรื่อง -->
             <div class="doc-row">
                 <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
                 <div class="dot-line">
-                    <span class="chip" contenteditable="true" data-target="subject">
-                        <?= h($subject ?: 'ขออนุมัติ...') ?>
-                    </span>
+                    <span class="chip" contenteditable="true">ขออนุมัติตัวบุคคลเดินทางไปเข้าร่วมงานสัมมนา Public Sector
+                        Day Thailand</span>
                 </div>
             </div>
 
@@ -745,29 +743,21 @@ $len = max(20, $len);
 
             <!-- ย่อหน้า 1 -->
             <div class="content-block paragraph">
-                ตามที่
-                AWS และ GOVINSIDER ได้ดำเนินการจัดงาน
-                “Public Sector Day Thailand”
+                ตามที่ AWS และ GOVINSIDER ได้ดำเนินการจัดงาน “Public Sector Day Thailand”
                 ในวันที่
-                <span class="chip" contenteditable="true" data-target="eventDate">
-                    <?= h($eventDate ?? '27 พฤศจิกายน 2567') ?>
-                </span>
-                ณ Eastin Grand Hotel Phayathai กรุงเทพฯ
+                <span class="chip" contenteditable="true">27 พฤศจิกายน 2567</span>
+                ณ Eastin Grand Hotel Phayathai กรุงเทพมหานคร
                 โดยได้ขอเรียนเชิญให้ข้าพเจ้า
-                <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?? 'อาจารย์ ดร.ศรยุทธ ธเนศศุภ์วัฒนา') ?>
-                </span>
-                เข้าร่วมงานสัมมนาที่จัดขึ้นสำหรับเครือข่ายองค์กรและบุคลากรภาครัฐ
-                สถาบันการศึกษา องค์กรด้านสาธารณสุข และองค์กรไม่แสวงหากำไร
-                เพื่อเข้าร่วมประชุมสัมมนา เสริมสร้างประสบการณ์และยกระดับความปลอดภัยทางระบบเครือข่ายเทคโนโลยีสารสนเทศ
+                <span class="chip" contenteditable="true">อาจารย์ ดร.ศรายุทธ ธเนศสกุลวัฒนา</span>
+                เข้าร่วมงานสัมมนาที่จัดขึ้นสำหรับเครือข่ายองค์กรและบุคลากรภาครัฐ สถาบันการศึกษา องค์กรด้านสาธารณสุข
+                และองค์กรไม่แสวงหากำไร
+                เพื่อเข้าร่วมประชุมสัมมนาเสริมสร้างประสบการณ์และยกระดับความปลอดภัยทางระบบเครือข่ายเทคโนโลยีสารสนเทศ
             </div>
 
             <!-- ย่อหน้า 2 -->
             <div class="content-block paragraph">
                 ในการนี้ ข้าพเจ้า
-                <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?? 'อาจารย์ ดร.ศรยุทธ ธเนศศุภ์วัฒนา') ?>
-                </span>
+                <span class="chip" contenteditable="true">อาจารย์ ดร.ศรายุทธ ธเนศสกุลวัฒนา</span>
                 บุคลากรสังกัดภาควิชาเทคโนโลยีสารสนเทศ
                 คณะเทคโนโลยีและการจัดการอุตสาหกรรม
                 มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ วิทยาเขตปราจีนบุรี
@@ -776,23 +766,37 @@ $len = max(20, $len);
                 (รายละเอียดตามเอกสารแนบ)
             </div>
 
+
             <!-- ย่อหน้า 3 -->
             <div class="content-block paragraph">
                 จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ
             </div>
 
 
+            <div class="signature-wrapper">
+                <div class="signature-block" id="signatureBlock">
+                    <div class="sig-name">(อาจารย์ ดร.ศรายุทธ ธเนศสกุลวัฒนา)</div>
+                    <div class="sig-position"><?= h($position ?: '') ?></div>
+                </div>
+            </div>
 
             <div class="signature-wrapper">
                 <div class="signature-block" id="signatureBlock">
-                    <div class="sig-name">(<?= h($ownerName ?: '') ?>)</div>
+                    <div class="sig-name">(ผู้ช่วยศาสตราจารย์ดร.วันทนี ประจวบศุภกิจ)</div>
                     <div class="sig-position"><?= h($position ?: '') ?></div>
                 </div>
             </div>
 
             <div style="font-family:'TH SarabunPSK'; font-size:16pt; line-height:1.2;"> เรียน <?= h($hdr_to) ?> </div>
-            <div class="content-block single align-to-dean"> เพื่อโปรดพิจารณาอนุมัติ </div>
-            <div class="content-block single align-to-dean" style="margin-top:50px;;"> (ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา
+            <div style="
+    font-family:'TH SarabunPSK';
+    font-size:16pt;
+    line-height:1.2;
+    margin-left:30px;   /* ← ปรับค่าตรงนี้เพื่อเลื่อนขวา */
+">
+                เพื่อโปรดพิจารณาอนุมัติ
+            </div>
+            <div class="content-block single align-to-dean" style="margin-top:50px;;"> (ผู้ช่วยศาสตราจารย์ ดร.ขนิษฐา
                 นามี)<br /> หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ </div>
             <div class="footer-actions">
 

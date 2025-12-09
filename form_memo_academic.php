@@ -372,6 +372,15 @@ $len = max(20, $len);
         vertical-align: baseline;
     }
 
+    /* ⭐ อนุญาตให้ข้อความในช่องเรื่อง (chip) ตัดบรรทัดได้ */
+    .doc-row .dot-line .chip {
+        white-space: normal !important;
+        display: inline-block !important;
+        word-break: break-word;
+        max-width: 100%;
+    }
+
+
     .keep {
         white-space: nowrap;
     }
@@ -449,6 +458,13 @@ $len = max(20, $len);
 
     /* สำหรับ print */
     @media print {
+
+        .subject-row .dot-line,
+        .subject-row .chip {
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+        }
 
         header,
         .footer-actions {
@@ -726,20 +742,15 @@ $len = max(20, $len);
                 </div>
             </div>
 
-
-
             <!-- เรื่อง -->
-            <div class="doc-row">
+            <div class="doc-row subject-row">
                 <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
-                <div class="dot-line">
+                <div class="dot-line subject-line">
                     <span class="chip" contenteditable="true" data-target="subject">
-                        <?= h($subject ?: 'ขออนุมัติ...') ?>
+                        ขออนุมัติตัวบุคคลเข้ารับการฝึกอบรมหลักสูตร “พัฒนา Mobile App ด้วย React Native, ...
                     </span>
                 </div>
             </div>
-
-
-            <!-- เนื้อหาใหม่ – ตรงตามภาพ -->
 
             <!-- บรรทัด “เรียน ...” -->
             <div class="content-block single">
@@ -748,60 +759,49 @@ $len = max(20, $len);
 
             <!-- ย่อหน้า 1 -->
             <div class="content-block paragraph">
-                ตามที่ บริษัท โคดิ้ง คอนเนคต์ (ไทยแลนด์) จำกัด (codingthailand.com) ได้ดำเนินการ
-                จัดฝึกอบรมหลักสูตร “พัฒนา Mobile App ด้วย React Native, TypeScript และ Expo”
-                ในรูปแบบออนไลน์ ระหว่างวันที่
-                <span class="chip" contenteditable="true" data-target="joinDates">
-                    <?= h($joinDates ?: '14 – 15 ธันวาคม 2567 และ 21 – 22 ธันวาคม 2567') ?>
-                </span>
+                ตามที่ บริษัท โคดิ้ง คอนเนคต์ (ไทยแลนด์) จำกัด (codingthailand.com)
+                ได้ดำเนินการจัดฝึกอบรมหลักสูตร
+                “พัฒนา Mobile App ด้วย React Native, TypeScript และ Expo” ในรูปแบบออนไลน์
+                ระหว่างวันที่
+                <span class="chip" contenteditable="true">14 – 15 ธันวาคม 2567 และ 21 – 22 ธันวาคม 2567</span>
                 โดยเข้ารับการฝึกอบรมในวันเสาร์และวันอาทิตย์ รวมระยะเวลาในการฝึกอบรม
-                <span class="chip" contenteditable="true" data-target="duration">
-                    <?= h($valueMap['duration'] ?? '4') ?>
-                </span>
-                วัน ซึ่งหลักสูตรและเนื้อหาต่าง ๆ ที่ได้กล่าวไปข้างต้นเป็นประโยชน์ต่อพัฒนาการเรียนการสอน
-                ให้กับนักศึกษาวิชาการด้านเทคโนโลยีสารสนเทศได้เป็นอย่างดี
+                <span class="chip" contenteditable="true">4</span>
+                วัน ซึ่งหลักสูตรและเนื้อหาดังกล่าวเป็นประโยชน์ต่อพัฒนาการเรียนการสอน
+                ให้กับนักศึกษาภาควิชาเทคโนโลยีสารสนเทศได้เป็นอย่างดี
             </div>
+
 
             <!-- ย่อหน้า 2 -->
             <div class="content-block paragraph">
                 ในการนี้ ข้าพเจ้า
-                <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'ผู้ช่วยศาสตราจารย์ นพชัย เสียงเพชรพิมล') ?>
-                </span>
-                <span class="chip" contenteditable="true" data-target="position">
-                    <?= h($position ?: 'สังกัดภาควิชาเทคโนโลยีสารสนเทศ') ?>
-                </span>
+                <span class="chip" contenteditable="true">ผู้ช่วยศาสตราจารย์สมชัย เชียงพงศ์พันธ์ุ</span>
+                <span class="chip" contenteditable="true">สังกัดภาควิชาเทคโนโลยีสารสนเทศ</span>
                 คณะ
-                <span class="chip" contenteditable="true" data-target="faculty">
-                    <?= h($faculty ?: 'คณะเทคโนโลยีและการจัดการอุตสาหกรรม') ?>
-                </span>
-                มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ วิทยาเขตปราจีนบุรี จึงมีความประสงค์ขออนุมัติ
-                เข้ารับการอบรมหลักสูตร “พัฒนา Mobile App ด้วย React Native, TypeScript และ Expo”
-                ในรูปแบบออนไลน์ ตามวัน เวลา และเนื้อหาดังกล่าว โดยขอใช้แหล่งเงินจัดสรรให้หน่วยงาน
-                ประจำปีงบประมาณ พ.ศ.
-                <span class="chip" contenteditable="true" data-target="fiscal_year_display">
-                    <?= h($thaiYear ?: '2568') ?>
-                </span>
-                ในส่วนของภาควิชาเทคโนโลยีสารสนเทศ แผนงานจัดการศึกษาระดับอุดมศึกษา กองทุนพัฒนาบุคลากร
-                หมวดค่าใช้สอย (รายละเอียดตามเอกสารแนบ)
+                <span class="chip" contenteditable="true">คณะเทคโนโลยีและการจัดการอุตสาหกรรม</span>
+                มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ วิทยาเขตปราจีนบุรี
+                จึงมีความประสงค์ขออนุมัติเข้ารับการฝึกอบรมหลักสูตร
+                “พัฒนา Mobile App ด้วย React Native, TypeScript และ Expo”
+                ในรูปแบบออนไลน์ ตามวัน เวลา และเนื้อหาดังกล่าว
+                โดยขอใช้แหล่งเงินจัดสรรให้หน่วยงาน ประจำปีงบประมาณ พ.ศ.
+                <span class="chip" contenteditable="true">2568</span>
+                ในส่วนของภาควิชาเทคโนโลยีสารสนเทศ แผนงานจัดการศึกษาระดับอุดมศึกษา
+                กองทุนพัฒนาบุคลากร หมวดค่าใช้สอย (รายละเอียดตามเอกสารแนบ)
             </div>
+
 
             <!-- ย่อหน้า 3 -->
             <div class="content-block paragraph">
                 จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ
             </div>
 
+            <!-- ลายเซ็น -->
             <div class="signature-wrapper">
                 <div class="signature-block" id="signatureBlock">
-                    <div class="sig-name">(<?= h($ownerName ?: '') ?>)</div>
-                    <div class="sig-position"><?= h($position ?: '') ?></div>
+                    <div class="sig-name">(ผู้ช่วยศาสตราจารย์สมชัย เชียงพงศ์พันธุ์)</div>
+                    <div class="sig-position">อาจารย์ประจำภาควิชาเทคโนโลยีสารสนเทศ</div>
                 </div>
             </div>
 
-            <!-- <div style="font-family:'TH SarabunPSK'; font-size:16pt; line-height:1.2;"> เรียน <?= h($hdr_to) ?> </div>
-            <div class="content-block single align-to-dean"> เพื่อโปรดพิจารณาอนุมัติ </div>
-            <div class="content-block single align-to-dean" style="margin-top:50px;;"> (ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา
-                นามี)<br /> หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ </div> -->
             <div class="footer-actions">
 
                 <!-- 🔵 ปุ่มแรก: พิมพ์/ดูตัวอย่าง (ทุก role ต้องมี และอยู่ลำดับแรก) -->

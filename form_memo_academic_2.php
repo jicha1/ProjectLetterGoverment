@@ -1,4 +1,4 @@
-<!-- ขออนุมัติตัวบุคคลเพื่อไปน าเสนอผลงานวิจัยในงานประชุมวิชาการระดับนานาชาติCIIS 2023 -->
+<!--  ขออนุมัติตัวบุคคลเพื่อไปนำเสนอผลงานวิจัยในการประชุมวิชาการระดับนานาชาติ CIIS 2023 -->
 <?php
 session_start();
 require_once __DIR__ . '/functions.php';
@@ -725,14 +725,12 @@ $len = max(20, $len);
                 </div>
             </div>
 
-
-
             <!-- เรื่อง -->
-            <div class="doc-row">
+            <div class="doc-row subject-row">
                 <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
-                <div class="dot-line">
+                <div class="dot-line subject-line">
                     <span class="chip" contenteditable="true" data-target="subject">
-                        <?= h($subject ?: 'ขออนุมัติ...') ?>
+                        ขออนุมัติตัวบุคคลเพื่อไปนำเสนอผลงานวิจัยในการประชุมวิชาการระดับนานาชาติ CIIS 2023
                     </span>
                 </div>
             </div>
@@ -747,45 +745,44 @@ $len = max(20, $len);
             <div class="content-block paragraph">
                 ตามที่ ข้าพเจ้า
                 <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา นามี') ?>
+                    ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา นามี
                 </span>
                 พนักงานมหาวิทยาลัย สังกัดภาควิชาเทคโนโลยีสารสนเทศ
                 คณะเทคโนโลยีและการจัดการอุตสาหกรรม มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ
                 วิทยาเขตปราจีนบุรี ได้รับการตอบรับให้เข้าร่วม นำเสนอผลงานวิจัย
-                ในงานประชุมวิชาการระดับนานาชาติ The 6<sup>th</sup> International Conference
-                on Computational Intelligence and Intelligent Systems (CIIS 2023)
+                ในงานประชุมวิชาการระดับนานาชาติ The 6<sup>th</sup> International Conference on Computational
+                Intelligence and Intelligent Systems (CIIS 2023)
                 ในหัวข้อ “Enhancing Indoor Positioning Accuracy: A Comprehensive Study on Euclidean Distance,
                 Trilateration, Wi-Fi RTT and FTM Protocol Integration”
                 ซึ่งจัดขึ้นที่ Waseda University, Tokyo ประเทศญี่ปุ่น
                 ในระหว่างวันที่
                 <span class="chip" contenteditable="true" data-target="joinDates">
-                    <?= h($joinDates ?: '25 – 27 พฤศจิกายน 2566') ?>
+                    25 – 27 พฤศจิกายน 2566
                 </span>
                 โดยเอกสารงานประชุมวิชาการจะถูกตีพิมพ์อยู่ในฐานข้อมูล Scopus นั้น
             </div>
 
+
             <!-- ย่อหน้า 2 -->
             <div class="content-block paragraph">
-                การนี้ ข้าพเจ้า จึงมีความประสงค์ขออนุมัติเดินทางเพื่อไปนำเสนอผลงานวิจัย
-                ในงานประชุมวิชาการระดับนานาชาติ CIIS 2023
-                ในระหว่างวันที่
+                การนี้ ข้าพเจ้า จึงมีความประสงค์ขออนุมัติตัวบุคคลเพื่อไปนำเสนอผลงานวิจัย
+                ในงานประชุมวิชาการระดับนานาชาติ CIIS 2023 ในระหว่างวันที่
                 <span class="chip" contenteditable="true" data-target="duration">
-                    <?= h($valueMap['duration'] ?? '24 – 28 พฤศจิกายน 2566') ?>
+                    24 – 28 พฤศจิกายน 2566
                 </span>
-                ณ ประเทศญี่ปุ่น
-                โดยออกเดินทางในวันที่
+                ณ ประเทศญี่ปุ่น โดยออกเดินทางในวันที่
                 <span class="chip" contenteditable="true" data-target="travelStart">
-                    <?= h($valueMap['travelStart'] ?? '24 พฤศจิกายน 2566') ?>
+                    24 พฤศจิกายน 2566
                 </span>
                 โดยการนำเสนอผลงานวิจัยในครั้งนี้เป็นประโยชน์ต่อการพัฒนาการเรียนการสอน งานวิจัย
-                และสร้างชื่อเสียงให้กับมหาวิทยาลัย โดยขอใช้งบจัดสรรให้หน่วยงาน
-                ประจำปีงบประมาณ พ.ศ.
+                และสร้างชื่อเสียงให้กับมหาวิทยาลัย โดยขอใช้งบจัดสรรให้หน่วยงาน ประจำปีงบประมาณ พ.ศ.
                 <span class="chip" contenteditable="true" data-target="fiscal_year_display">
-                    <?= h($thaiYear ?: '2567') ?>
+                    2567
                 </span>
-                ในส่วนของสำนักงานคณบดี แผนงานคนดี กองทุนวิจัย หมวดเงินอุดหนุน
+                ในส่วนของสำนักงานคณบดี แผนงานวิจัย กองทุนวิจัย หมวดเงินอุดหนุน
                 (รายละเอียดตามเอกสารแนบ)
             </div>
+
 
             <!-- ย่อหน้า 3 -->
             <div class="content-block paragraph">
@@ -796,8 +793,8 @@ $len = max(20, $len);
 
             <div class="signature-wrapper">
                 <div class="signature-block" id="signatureBlock">
-                    <div class="sig-name">(<?= h($ownerName ?: '') ?>)</div>
-                    <div class="sig-position"><?= h($position ?: '') ?></div>
+                    <div class="sig-name">(ผู้ช่วยศาสตราจารย์ ดร.ขนิษฐา นามี)</div>
+                    <div class="sig-position">หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ</div>
                 </div>
             </div>
 

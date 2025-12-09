@@ -1,4 +1,4 @@
-<!-- ขออนุมัติเขารวมโครงการอบรม เรื่อง หลักจริยธรรมการวิจัยในมนุษยเบื้องตน ประจําป 2566 -->
+<!-- ขออนุมัติเข้าร่วมโครงการอบรม เรื่อง หลักจริยธรรมการวิจัยในมนุษย์เบื้องต้น ประจำปี 2566 -->
 <?php
 session_start();
 require_once __DIR__ . '/functions.php';
@@ -729,13 +729,12 @@ $len = max(20, $len);
             </div>
 
 
-
             <!-- เรื่อง -->
             <div class="doc-row">
                 <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
                 <div class="dot-line">
-                    <span class="chip" contenteditable="true" data-target="subject">
-                        <?= h($subject ?: 'ขออนุมัติ...') ?>
+                    <span class="chip" contenteditable="true">
+                        ขออนุมัติเข้าร่วมโครงการอบรม เรื่อง หลักจริยธรรมการวิจัยในมนุษย์เบื้องต้น ประจำปี 2566
                     </span>
                 </div>
             </div>
@@ -749,26 +748,20 @@ $len = max(20, $len);
             <!-- ย่อหน้า 1 -->
             <div class="content-block paragraph">
                 ด้วยข้าพเจ้า
-                <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'นางสาวอรอุษาปวี รุฒิมลชัย') ?>
-                </span>
+                <span class="chip" contenteditable="true">นางสาวอรบุษป์ วุฒิกมลชัย</span>
                 พนักงานมหาวิทยาลัย ตำแหน่ง ผู้ช่วยศาสตราจารย์
                 มีความประสงค์ขออนุมัติเข้าร่วมโครงการอบรม เรื่อง
-                <span class="chip" contenteditable="true" data-target="courseName">
-                    <?= h($courseName ?: 'หลักจริยธรรมการวิจัยในมนุษย์เบื้องต้น ประจำปี 2566') ?>
-                </span>
+                <span class="chip" contenteditable="true">หลักจริยธรรมการวิจัยในมนุษย์เบื้องต้น ประจำปี 2566</span>
                 จัดโดยฝ่ายส่งเสริมการวิจัย สำนักวิจัยวิทยาศาสตร์และเทคโนโลยี
                 ในวันศุกร์ที่
-                <span class="chip" contenteditable="true" data-target="eventDate">
-                    <?= h($eventDate ?: '9 มิถุนายน พ.ศ. 2566') ?>
-                </span>
+                <span class="chip" contenteditable="true">9 มิถุนายน พ.ศ. 2566</span>
                 เวลา 8.00 – 16.30 น. ณ
-                <span class="chip" contenteditable="true" data-target="eventPlace">
-                    <?= h($eventPlace ?: 'ห้องประชุม Cloud 9 ชั้น 9 อาคารสำนักวิจัยวิทยาศาสตร์และเทคโนโลยี') ?>
-                </span>
+                <span class="chip" contenteditable="true">ห้องประชุม Cloud 9 ชั้น 9
+                    อาคารสำนักวิจัยวิทยาศาสตร์และเทคโนโลยี</span>
                 โดยไม่เสียค่าใช้จ่าย ข้าพเจ้าจะใช้ความรู้
                 ความสามารถที่ได้รับจากการอบรมในหลักสูตรดังกล่าวไปปฏิบัติงานให้กับมหาวิทยาลัยอย่างเต็มที่
             </div>
+
 
             <!-- ย่อหน้า 2 -->
             <div class="content-block paragraph">
@@ -784,7 +777,7 @@ $len = max(20, $len);
 
             <div class="signature-wrapper">
                 <div class="signature-block" id="signatureBlock">
-                    <div class="sig-name">(<?= h($ownerName ?: '') ?>)</div>
+                    <div class="sig-name">(ผู้ช่วยศาสตราจารย์อรบุษป์ วุฒิกมลชัย)</div>
                     <div class="sig-position"><?= h($position ?: '') ?></div>
                 </div>
             </div>

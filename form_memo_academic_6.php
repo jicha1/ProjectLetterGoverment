@@ -1,4 +1,4 @@
-<!-- การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์ -->
+<!-- การเผยแพร่ผลงานวิจัยและเบิกค่าตอบแทนการตีพิมพ์ -->
 <?php
 session_start();
 require_once __DIR__ . '/functions.php';
@@ -733,8 +733,8 @@ $len = max(20, $len);
             <div class="doc-row">
                 <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
                 <div class="dot-line">
-                    <span class="chip" contenteditable="true" data-target="subject">
-                        <?= h($subject ?: 'ขออนุมัติเดินทางไปเข้าร่วมโครงการแลกเปลี่ยนทางวิชาการ') ?>
+                    <span class="chip" contenteditable="true">
+                        การเผยแพร่ผลงานวิจัยและเบิกค่าตอบแทนการตีพิมพ์
                     </span>
                 </div>
             </div>
@@ -746,10 +746,8 @@ $len = max(20, $len);
 
             <!-- ย่อหน้า 1 -->
             <div class="content-block paragraph">
-                ด้วยข้าพเจ้า อาจารย์
-                <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'ดร.กฤษณ์ ณ ศรีธนะ') ?>
-                </span>
+                ด้วยข้าพเจ้า
+                <span class="chip" contenteditable="true">อาจารย์ ดร.กาญจน์ ณ ศรีธะ</span>
                 สังกัดภาควิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีและการจัดการอุตสาหกรรม
                 ขอรายงานการเผยแพร่ผลงานวิจัย และเบิกค่าตอบแทนการตีพิมพ์
                 เรื่อง “Using big data to assess an affective domain for distance education”
@@ -757,7 +755,7 @@ $len = max(20, $len);
                 (ISSN: 0167-739X) Volume 160, Year 2024
                 (https://doi.org/10.1016/j.future.2024.05.057)
                 ในฐานข้อมูล WoS/SCIE ดังเอกสารแนบ และบทความวิจัยนี้
-                ไม่ได้อยู่ในเงื่อนไขการปิดกั้นทุนวิจัยของมหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ
+                ไม่ได้อยู่ในเงื่อนไขในการปิดกั้นทุนวิจัยของมหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ
             </div>
 
             <!-- ย่อหน้า 2 -->
@@ -768,7 +766,7 @@ $len = max(20, $len);
 
             <div class="signature-wrapper">
                 <div class="signature-block" id="signatureBlock">
-                    <div class="sig-name">(<?= h($ownerName ?: '') ?>)</div>
+                    <div class="sig-name">(อาจารย์ ดร.กาญจน์ ณ ศรีธะ)</div>
                     <div class="sig-position"><?= h($position ?: '') ?></div>
                 </div>
             </div>

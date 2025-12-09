@@ -1,5 +1,4 @@
-<!-- ขออนุมัติตัวบุคคลเพื่อไปน าเสนอผลงานวิจัยในงานประชุมวิชาการระดับนานาชาติICT-Knowledge
-Engineering 2022 -->
+<!--  ขออนุมัติตัวบุคคลเพื่อไปนำเสนอผลงานวิจัยในการประชุมวิชาการระดับนานาชาติ ICT-Knowledge... -->
 <?php
 session_start();
 require_once __DIR__ . '/functions.php';
@@ -728,15 +727,15 @@ $len = max(20, $len);
 
 
             <!-- เรื่อง -->
-            <div class="doc-row">
+            <div class="doc-row subject-row">
                 <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
-                <div class="dot-line">
+                <div class="dot-line subject-line">
                     <span class="chip" contenteditable="true" data-target="subject">
-                        <?= h($subject ?: 'ขออนุมัติ...') ?>
+                        ขออนุมัติตัวบุคคลเพื่อไปนำเสนอผลงานวิจัยในการประชุมวิชาการระดับนานาชาติ ICT-Knowledge
+                        ...
                     </span>
                 </div>
             </div>
-
 
             <!-- บรรทัด “เรียน ...” -->
             <div class="content-block single">
@@ -747,64 +746,68 @@ $len = max(20, $len);
             <div class="content-block paragraph">
                 ตามที่ ข้าพเจ้า
                 <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา นามี') ?>
+                    ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา นามี
                 </span>
                 พนักงานมหาวิทยาลัย สังกัดภาควิชาเทคโนโลยีสารสนเทศ
                 คณะเทคโนโลยีและการจัดการอุตสาหกรรม มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ
-                วิทยาเขตปราจีนบุรี ได้รับการตอบรับให้เข้าร่วม นำเสนอผลงานวิจัย
-                ในงานประชุมวิชาการระดับนานาชาติ The 20<sup>th</sup> IEEE International Conference of ICT and
-                Knowledge Engineering ในหัวข้อ
-                “A Study of the Accuracy of the Software Site Survey to Find the Appropriate Location
-                to Install the Access Point for Indoor Positioning”
-                จัดขึ้นที่มหาวิทยาลัยสยาม กรุงเทพมหานคร
+                วิทยาเขตปราจีนบุรี ได้รับการตอบรับให้เข้าร่วม นำเสนอผลงานวิจัยในการประชุมวิชาการระดับนานาชาติ
+                The 20<sup>th</sup> IEEE International Conference of ICT and Knowledge Engineering
+                ในหัวข้อ “A Study of the Accuracy of the Software Site Survey to Find the Appropriate Location
+                to Install the Access Point for Indoor Positioning” จัดขึ้นที่มหาวิทยาลัยสยาม กรุงเทพมหานคร
                 ในระหว่างวันที่
                 <span class="chip" contenteditable="true" data-target="joinDates">
-                    <?= h($joinDates ?: '23 – 25 พฤศจิกายน 2565') ?>
+                    23 – 25 พฤศจิกายน 2565
                 </span>
                 โดยเอกสารงานประชุมวิชาการจะถูกตีพิมพ์อยู่ในฐานข้อมูล Scopus นั้น
             </div>
 
+
             <!-- ย่อหน้า 2 -->
             <div class="content-block paragraph">
-                การนี้ ข้าพเจ้า จึงมีความประสงค์ขออนุมัติเดินทางเพื่อไปนำเสนอผลงานวิจัย
+                การนี้ ข้าพเจ้า จึงมีความประสงค์ขออนุมัติตัวบุคคลเพื่อไปนำเสนอผลงานวิจัย
                 ในงานประชุมวิชาการระดับนานาชาติ ICT-Knowledge Engineering 2022
                 ในระหว่างวันที่
                 <span class="chip" contenteditable="true" data-target="duration">
-                    <?= h($valueMap['duration'] ?? '22 – 25 พฤศจิกายน 2565') ?>
+                    22 – 25 พฤศจิกายน 2565
                 </span>
                 รวมระยะเวลาในการเดินทาง (โดยออกเดินทางในวันที่
                 <span class="chip" contenteditable="true" data-target="travelStart">
-                    <?= h($valueMap['travelStart'] ?? '22 พฤศจิกายน 2565') ?>
+                    22 พฤศจิกายน 2565
                 </span>
                 ) ตามวัน เวลา และสถานที่ดังกล่าว
                 โดยการนำเสนอผลงานวิจัยในครั้งนี้เป็นประโยชน์ต่อการพัฒนาการเรียนการสอน งานวิจัย
-                และสร้างชื่อเสียงให้กับมหาวิทยาลัย โดยขอใช้งบจัดสรรให้หน่วยงาน
-                ประจำปีงบประมาณ พ.ศ.
+                และสร้างชื่อเสียงให้กับมหาวิทยาลัย โดยขอใช้งบจัดสรรให้หน่วยงาน ประจำปีงบประมาณ พ.ศ.
                 <span class="chip" contenteditable="true" data-target="fiscal_year_display">
-                    <?= h($thaiYear ?: '2566') ?>
+                    2566
                 </span>
                 ในส่วนของสำนักงานคณบดี แผนงานวิจัย กองทุนวิจัย หมวดเงินอุดหนุน
                 (รายละเอียดตามเอกสารแนบ)
             </div>
+
 
             <!-- ย่อหน้า 3 -->
             <div class="content-block paragraph">
                 จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ
             </div>
 
-
-
             <div class="signature-wrapper">
                 <div class="signature-block" id="signatureBlock">
-                    <div class="sig-name">(<?= h($ownerName ?: '') ?>)</div>
+                    <div class="sig-name">(ผู้ช่วยศาสตราจารย์ ดร.ขนิษฐา นามี)</div>
                     <div class="sig-position"><?= h($position ?: '') ?></div>
                 </div>
             </div>
 
-            <!-- <div style="font-family:'TH SarabunPSK'; font-size:16pt; line-height:1.2;"> เรียน <?= h($hdr_to) ?> </div>
-            <div class="content-block single align-to-dean"> เพื่อโปรดพิจารณาอนุมัติ </div>
-            <div class="content-block single align-to-dean" style="margin-top:50px;;"> (ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา
-                นามี)<br /> หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ </div> -->
+            <div style="font-family:'TH SarabunPSK'; font-size:16pt; line-height:1.2;"> เรียน <?= h($hdr_to) ?> </div>
+            <div style="
+    font-family:'TH SarabunPSK';
+    font-size:16pt;
+    line-height:1.2;
+    margin-left:30px;   /* ← ปรับค่าตรงนี้เพื่อเลื่อนขวา */
+">
+                เพื่อโปรดพิจารณาอนุมัติ
+            </div>
+            <div class="content-block single align-to-dean" style="margin-top:50px;;"> (ผู้ช่วยศาสตราจารย์สมชัย
+                เสียงพงศ์พันธุ์)<br /> หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ </div>
             <div class="footer-actions">
 
                 <!-- 🔵 ปุ่มแรก: พิมพ์/ดูตัวอย่าง (ทุก role ต้องมี และอยู่ลำดับแรก) -->
