@@ -1,8 +1,9 @@
 <?php 
 // ต้องวางตรงนี้! บรรทัดแรกของไฟล์
-$CURRENT_MAIN = "train";     
-$CURRENT_SUB  = "ฝึกอบรม";           // ถ้าไม่มีหมวดย่อย ให้เว้นว่าง
+$CURRENT_MAIN = "internal";     
+$CURRENT_SUB  = "ขออนุมัติตัวบุคคลเป็นวิทยากร";           // ถ้าไม่มีหมวดย่อย ให้เว้นว่าง
 ?>
+<!-- ขออนุมัติตัวบุคคลเป็นวิทยากร (ของอาจารย์) -->
 <?php
 session_start();
 require_once __DIR__ . '/../functions.php';
@@ -235,6 +236,7 @@ if (!isset($_SESSION['user_id'])) {
 
       <!-- หมวดหมู่ -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 rounded-[25px] border-2" style="
+
             background-color: #e3f9f8;
             border-color: #11c2b9;
             min-height: 170px;
@@ -295,7 +297,6 @@ if (!isset($_SESSION['user_id'])) {
           </div>
         </div>
 
-
         <div class="flex items-center gap-3">
           <label class="lbl text-gray-800 w-28 text-right">คณะ:</label>
           <div class="relative w-full">
@@ -313,6 +314,7 @@ if (!isset($_SESSION['user_id'])) {
           </div>
         </div>
       </div>
+
 
       <!-- ข้อ 1 -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 items-end">
@@ -340,35 +342,26 @@ if (!isset($_SESSION['user_id'])) {
         </div>
       </div>
 
+
       <!-- ข้อ 3 -->
-      <div class="mb-4">
-        <div class="flex items-start gap-2">
-          <label class="lbl text-gray-800 whitespace-nowrap mt-1" id="purposeLabel">3.ขออนุมัติไปเข้าร่วม</label>
-          <div class="space-y-1 text-gray-800" id="purposeGroup" role="radiogroup" aria-labelledby="purposeLabel">
-            <label class="flex items-center gap-2"><input type="radio" name="purpose" value="academic"
-                class="accent-black" />
-              นำเสนอผลงานทางวิชาการ</label>
-            <label class="flex items-center gap-2"><input type="radio" name="purpose" value="training"
-                class="accent-black" />
-              เข้ารับการฝึกอบรมหลักสูตร</label>
-            <label class="flex items-center gap-2"><input type="radio" name="purpose" value="meeting"
-                class="accent-black" />
-              เข้าร่วมประชุมวิชาการในงาน</label>
-            <label class="flex items-center gap-2"><input type="radio" name="purpose" value="other"
-                class="accent-black" />
-              อื่นๆ</label>
-          </div>
+      <div class="mb-4 flex items-start gap-4">
+        <label class="lbl text-gray-800 whitespace-nowrap pt-2" for="eventTitle">
+          3.ชื่อโครงการอบรม / หลักสูตร :
+        </label>
+        <div class="w-full">
+          <textarea name="event_title" rows="2" class="w-full border rounded-md p-2 shadow-sm"
+            id="eventTitle"></textarea>
         </div>
       </div>
 
       <!-- ข้อ 4 -->
       <div class="mb-4 flex items-start gap-4">
-        <label class="lbl text-gray-800 whitespace-nowrap pt-2" for="eventTitle">
-          4.ชื่อของงานประชุมวิชาการ /<br />ชื่อหลักสูตรอบรม :
+        <label class="lbl text-gray-800 whitespace-nowrap pt-2" for="researchTitle">
+          4. ชื่อหัวข้อหลักสูตร :
         </label>
         <div class="w-full">
-          <textarea name="event_title" rows="2" class="w-full border rounded-md p-2 shadow-sm"
-            id="eventTitle"></textarea>
+          <textarea name="research_title" rows="2" class="w-full border rounded-md p-2 shadow-sm"
+            id="researchTitle"></textarea>
         </div>
       </div>
 
@@ -432,32 +425,62 @@ if (!isset($_SESSION['user_id'])) {
       </div>
 
       <!-- ข้อ 6 -->
-      <div class="mb-6">
-        <!-- หัวข้อหลัก -->
-        <label class="lbl text-gray-800 block mb-2" for="onlineCheckbox">
-          6. ชื่อสถานที่จัดประชุมวิชาการ / สถานที่จัดอบรม /
-          เข้าร่วมรูปแบบออนไลน์
+      <div class="mb-4">
+        <!-- บรรทัดคำถาม -->
+        <label class="lbl text-gray-800 block mb-2">
+          6. ชื่อสถานที่จัดประชุมวิชาการ / สถานที่จัดอบรม / เข้าร่วมรูปแบบออนไลน์
         </label>
 
-        <!-- 🔹 ตัวเลือกออนไลน์ -->
-        <div class="flex items-center ml-6 gap-2 mb-3">
-          <input type="checkbox" name="is_online" value="1" class="accent-black" id="onlineCheckbox" />
-          <span>เข้าร่วมในรูปแบบออนไลน์</span>
-        </div>
+        <div class="ml-7 space-y-2">
 
-        <!-- 🔹 ระบุสถานที่ไป + ออนไซต์ -->
-        <div class="flex items-center ml-6 gap-2">
-          <!-- ✅ เพิ่มช่องติ๊ก "ออนไซต์" -->
-          <input type="checkbox" id="onsiteCheckbox" class="accent-black" />
-          <span>เข้าร่วมในรูปแบบออนไซต์</span>
+          <!-- ออนไลน์ -->
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="onlineCheckbox" name="is_online" value="1" class="accent-black">
+            เข้าร่วมรูปแบบออนไลน์
+          </label>
 
-          <label class="lbl text-gray-800 mr-2" for="placeInput">ระบุสถานที่ไป :</label>
+          <!-- ออนไซต์ + ช่องกรอก (ต่อท้ายในบรรทัดเดียว) -->
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="onsiteCheckbox" class="accent-black">
+            ออนไซต์ ณ
+            <input type="text" name="place" id="placeInput" class="border rounded-md p-2 w-[350px] shadow-sm"
+              placeholder="เช่น โรงแรม Best Western PLUS จังหวัดนนทบุรี" disabled>
+          </label>
 
-          <!-- ช่องกรอกสถานที่ -->
-          <input type="text" name="place" class="border rounded-md p-2 w-[400px]" id="placeInput"
-            placeholder="เช่น โรงแรม Best Western PLUS ถนนแจ้งวัฒนะ จังหวัดนนทบุรี" disabled />
         </div>
       </div>
+
+      <!-- ข้อ 7 -->
+      <div class="mb-6">
+        <div class="flex items-center gap-2 mb-2">
+          <label class="lbl text-gray-800" for="amountInput">7.รวมยอดประมาณการค่าใช้จ่าย :</label>
+          <div class="flex flex-col">
+            <div class="flex items-center gap-2">
+              <input type="text" name="amount" class="border rounded-md p-2 w-36" id="amountInput" value="0.00" />
+              <span>บาท</span>
+            </div>
+          </div>
+        </div>
+        <label class="flex items-center gap-2 ml-6 mt-2">
+          <input type="checkbox" name="no_cost" value="1" class="accent-black" id="noCostCheckbox" />
+          โดยไม่เบิกค่าใช้จ่ายใดๆทั้งสิ้น
+        </label>
+      </div>
+
+
+      <!-- ข้อ 8 -->
+      <div class="mb-6">
+        <label class="lbl block text-gray-800 mb-2" id="carLabel">8.กรณีไปรถยนต์ส่วนตัว</label>
+        <div class="flex items-center gap-2 ml-6">
+          <input type="checkbox" name="car_used" value="1" class="accent-black" id="carCheckbox" />
+          <label for="carPlateInput" class="lbl">ระบุหมายเลขทะเบียนรถยนต์ :</label>
+          <div class="flex flex-col">
+            <input type="text" name="car_plate" class="border rounded-md p-2 w-[250px]" id="carPlateInput"
+              placeholder="เช่น กร 1906 พัทลุง" disabled />
+          </div>
+        </div>
+      </div>
+
 
       <script>
       // ✅ ดึง element ที่เกี่ยวข้อง
@@ -494,36 +517,6 @@ if (!isset($_SESSION['user_id'])) {
       // ✅ ตั้งค่าเริ่มต้น
       selectOnly();
       </script>
-
-      <!-- ข้อ 7 -->
-      <div class="mb-6">
-        <div class="flex items-center gap-2 mb-2">
-          <label class="lbl text-gray-800" for="amountInput">7.รวมยอดประมาณการค่าใช้จ่าย :</label>
-          <div class="flex flex-col">
-            <div class="flex items-center gap-2">
-              <input type="text" name="amount" class="border rounded-md p-2 w-36" id="amountInput" value="0.00" />
-              <span>บาท</span>
-            </div>
-          </div>
-        </div>
-        <label class="flex items-center gap-2 ml-6 mt-2">
-          <input type="checkbox" name="no_cost" value="1" class="accent-black" id="noCostCheckbox" />
-          โดยไม่เบิกค่าใช้จ่ายใดๆทั้งสิ้น
-        </label>
-      </div>
-
-      <!-- ข้อ 8 -->
-      <div class="mb-6">
-        <label class="lbl block text-gray-800 mb-2" id="carLabel">8.กรณีไปรถยนต์ส่วนบุคคล</label>
-        <div class="flex items-center gap-2 ml-6">
-          <input type="checkbox" name="car_used" value="1" class="accent-black" id="carCheckbox" />
-          <label for="carPlateInput" class="lbl">ระบุหมายเลขทะเบียนรถยนต์ :</label>
-          <div class="flex flex-col">
-            <input type="text" name="car_plate" class="border rounded-md p-2 w-[250px]" id="carPlateInput"
-              placeholder="เช่น กร 1906 พัทลุง" disabled />
-          </div>
-        </div>
-      </div>
 
       <!-- ปุ่ม -->
       <div class="relative mt-20">
@@ -899,6 +892,7 @@ if (!isset($_SESSION['user_id'])) {
     profileMenu.classList.add("hidden");
   }
   </script>
+
   <script>
   const main = document.getElementById("mainCategory");
   const sub = document.getElementById("subCategory");
@@ -971,8 +965,6 @@ if (!isset($_SESSION['user_id'])) {
     }
   });
   </script>
-
-
 </body>
 
 </html>

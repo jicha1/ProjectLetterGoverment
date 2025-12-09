@@ -1,6 +1,12 @@
-<?php  //การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์ 
+<?php 
+// ต้องวางตรงนี้! บรรทัดแรกของไฟล์
+$CURRENT_MAIN = "academic";     
+$CURRENT_SUB  = "ประชุมวิชาการ/ศึกษาดูงาน/สัมมนาวิชาการ";           // ถ้าไม่มีหมวดย่อย ให้เว้นว่าง
+?>
+<!--2.ประชุมวิชาการ/ศึกษาดูงาน/สัมมนาวิชาการ -->
+<?php
 session_start();
-require_once __DIR__ . '../functions.php';
+require_once __DIR__ . '/../functions.php';
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.html");
     exit;
@@ -238,18 +244,60 @@ if (!isset($_SESSION['user_id'])) {
           <label class="lbl text-gray-800 w-28 text-right">หมวดหลัก:</label>
           <div class="relative w-full">
             <select name="main_category" class="custom-select w-full" id="mainCategory">
-              <option selected>ฝึกอบรม</option>
+              <option value="">-- เลือกหมวดหลัก --</option>
+              <option value="train" <?= ($CURRENT_MAIN=="train"?"selected":"") ?>>ฝึกอบรม</option>
+              <option value="academic" <?= ($CURRENT_MAIN=="academic"?"selected":"") ?>>
+                ประชุมวิชาการ/ศึกษาดูงาน/สัมมนาวิชาการ</option>
+              <option value="external" <?= ($CURRENT_MAIN=="external"?"selected":"") ?>>ภายนอก</option>
+              <option value="internal" <?= ($CURRENT_MAIN=="internal"?"selected":"") ?>>ภายใน(บันทึกข้อความ)
+              </option>
             </select>
+
+
           </div>
         </div>
+
         <div class="flex items-center gap-3">
           <label class="lbl text-gray-800 w-28 text-right">หมวดย่อย:</label>
           <div class="relative w-full">
-            <select name="sub_category" class="custom-select w-full" id="subCategory">
-              <option>ฝึกอบรม</option>
+            <select name="sub_category" class="custom-select w-full" id="subCategory"
+              <?= ($CURRENT_MAIN!="internal"?"disabled":"") ?>>
+              <option value="">-- เลือกหมวดย่อย --</option>
+
+              <?php if ($CURRENT_MAIN == "internal"): ?>
+              <option value="ขอใช้อาคารวันหยุดราชการ" <?= ($CURRENT_SUB=="ขอใช้อาคารวันหยุดราชการ"?"selected":"") ?>>
+                ขอใช้อาคารวันหยุดราชการ
+              </option>
+
+              <option value="ขอห้องพักรับรอง" <?= ($CURRENT_SUB=="ขอห้องพักรับรอง"?"selected":"") ?>>
+                ขอห้องพักรับรอง
+              </option>
+
+              <option value="ขออนุมัติตัวบุคคลเป็นวิทยากร"
+                <?= ($CURRENT_SUB=="ขออนุมัติตัวบุคคลเป็นวิทยากร"?"selected":"") ?>>
+                ขออนุมัติตัวบุคคลเป็นวิทยากร
+              </option>
+
+              <option value="ขออนุมัติไม่เข้าร่วมโครงการ"
+                <?= ($CURRENT_SUB=="ขออนุมัติไม่เข้าร่วมโครงการ"?"selected":"") ?>>
+                ขออนุมัติไม่เข้าร่วมโครงการ
+              </option>
+
+              <option value="การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์"
+                <?= ($CURRENT_SUB=="การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์"?"selected":"") ?>>
+                การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์
+              </option>
+
+              <option value="ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย"
+                <?= ($CURRENT_SUB=="ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย"?"selected":"") ?>>
+                ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย
+              </option>
+              <?php endif; ?>
             </select>
+
           </div>
         </div>
+
         <div class="flex items-center gap-3">
           <label class="lbl text-gray-800 w-28 text-right">คณะ:</label>
           <div class="relative w-full">
@@ -267,6 +315,7 @@ if (!isset($_SESSION['user_id'])) {
           </div>
         </div>
       </div>
+
 
       <!-- ข้อ 1 -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 items-end">
@@ -295,29 +344,106 @@ if (!isset($_SESSION['user_id'])) {
       </div>
 
       <!-- ข้อ 3 -->
-      <div class="mb-4 flex items-start gap-4">
-        <label class="lbl text-gray-800 whitespace-nowrap pt-2">
-          3. ชื่อโครงการสัมมนา / โครงการอบรม :
-        </label>
-        <div class="w-full">
-          <input type="text" name="project_name" class="w-full border rounded-md p-2 shadow-sm">
+      <div class="mb-4">
+        <div class="flex items-start gap-4">
+
+          <label class="lbl text-gray-800 whitespace-nowrap pt-1" id="purposeLabel">
+            3. ขออนุมัติไปเข้าร่วม :
+          </label>
+
+          <div class="text-gray-800 space-y-1 mt-2" id="purposeGroup" role="radiogroup" aria-labelledby="purposeLabel">
+
+            <label class="flex items-center gap-2">
+              <input type="radio" name="purpose" value="ประชุมวิชาการ" class="accent-black" />
+              เข้าร่วมประชุมวิชาการ
+            </label>
+
+            <label class="flex items-center gap-2">
+              <input type="radio" name="purpose" value="ศึกษาดูงาน" class="accent-black" />
+              เข้าร่วมศึกษาดูงาน
+            </label>
+
+            <label class="flex items-center gap-2">
+              <input type="radio" name="purpose" value="สัมมนาวิชาการ" class="accent-black" />
+              เข้าร่วมสัมมนาวิชาการ
+            </label>
+
+            <!-- 🔹 อื่น ๆ (ระบุ) แบบเดียวกับข้อ 6 -->
+            <div class="flex items-center gap-2">
+              <label class="flex items-center gap-2">
+                <input type="radio" name="purpose" value="อื่นๆ" class="accent-black" id="purposeOtherRadio">
+                อื่น ๆ (ระบุ)
+              </label>
+
+              <input type="text" name="purpose_other_detail" id="purposeOtherInput"
+                class="border rounded-md p-2 w-[260px] ml-3 bg-gray-100 text-gray-400" placeholder="โปรดระบุ" disabled>
+            </div>
+
+          </div>
         </div>
       </div>
+
+
 
       <!-- ข้อ 4 -->
       <div class="mb-4 flex items-start gap-4">
-        <label class="lbl text-gray-800 whitespace-nowrap pt-2">
-          4. หัวข้อสัมมนา :
+        <label class="lbl text-gray-800 whitespace-nowrap pt-2" for="eventTitle">
+          4.ชื่อของงานประชุมวิชาการ /<br />ชื่อหลักสูตรอบรม :
         </label>
         <div class="w-full">
-          <textarea name="seminar_topic" rows="2" class="w-full border rounded-md p-2 shadow-sm"></textarea>
+          <textarea name="event_title" rows="2" class="w-full border rounded-md p-2 shadow-sm"
+            id="eventTitle"></textarea>
+        </div>
+      </div>
+
+      <!-- ข้อ 5 -->
+      <div class="mb-4 flex items-start gap-4">
+        <label class="lbl text-gray-800 whitespace-nowrap pt-2" for="researchTitle">
+          5. ชื่อบทความวิจัยที่จะนำเสนอ :
+        </label>
+        <div class="w-full">
+          <textarea name="research_title" rows="2" class="w-full border rounded-md p-2 shadow-sm"
+            id="researchTitle"></textarea>
+        </div>
+      </div>
+
+      <!-- ข้อ 6 -->
+      <div class="mb-4 flex items-start gap-4">
+        <label class="lbl text-gray-800 whitespace-nowrap pt-1" for="presentationType">
+          6. ประเภทการนำเสนอ :
+        </label>
+
+        <div class="w-full ml-1 space-y-1 mt-2" id="presentationType">
+
+          <label class="flex items-center gap-2">
+            <input type="radio" name="presentation_type" value="oral" class="accent-black option-radio">
+            Oral
+          </label>
+
+          <label class="flex items-center gap-2">
+            <input type="radio" name="presentation_type" value="poster" class="accent-black option-radio">
+            Poster
+          </label>
+
+          <!-- ลดช่องว่างของบรรทัดนี้ -->
+          <div class="flex items-center gap-2">
+            <label class="flex items-center gap-2">
+              <input type="radio" name="presentation_type" value="other" class="accent-black" id="otherTypeRadio">
+              อื่น ๆ (ระบุ)
+            </label>
+
+            <input type="text" name="presentation_other_detail" id="otherTypeInput"
+              class="border rounded-md p-2 w-[260px] ml-3 bg-gray-100 text-gray-400" placeholder="โปรดระบุ" disabled>
+          </div>
+
         </div>
       </div>
 
 
-      <!-- ข้อ 5 -->
+
+
       <div class="mb-6">
-        <label class="lbl text-gray-800 block mb-2" id="dateLabel">5. วันที่เข้าร่วม</label>
+        <label class="lbl text-gray-800 block mb-2" id="dateLabel">7. วันที่เข้าร่วม</label>
 
         <div class="space-y-4 ml-6 text-gray-800">
           <!-- 🔹 วันเดียว -->
@@ -374,33 +500,135 @@ if (!isset($_SESSION['user_id'])) {
         </div>
       </div>
 
-      <!-- ข้อ 6 -->
-      <div class="mb-6">
-        <!-- หัวข้อหลัก -->
-        <label class="lbl text-gray-800 block mb-2" for="onlineCheckbox">
-          6. ชื่อสถานที่จัดประชุมวิชาการ / สถานที่จัดอบรม /
-          เข้าร่วมรูปแบบออนไลน์
+      <!-- ข้อ 8 -->
+      <div class="mb-4">
+        <!-- บรรทัดคำถาม -->
+        <label class="lbl text-gray-800 block mb-2">
+          8. ชื่อสถานที่จัดประชุมวิชาการ / สถานที่จัดอบรม / เข้าร่วมรูปแบบออนไลน์
         </label>
 
-        <!-- 🔹 ตัวเลือกออนไลน์ -->
-        <div class="flex items-center ml-6 gap-2 mb-3">
-          <input type="checkbox" name="is_online" value="1" class="accent-black" id="onlineCheckbox" />
-          <span>เข้าร่วมในรูปแบบออนไลน์</span>
-        </div>
+        <div class="ml-7 space-y-2">
 
-        <!-- 🔹 ระบุสถานที่ไป + ออนไซต์ -->
-        <div class="flex items-center ml-6 gap-2">
-          <!-- ✅ เพิ่มช่องติ๊ก "ออนไซต์" -->
-          <input type="checkbox" id="onsiteCheckbox" class="accent-black" />
-          <span>เข้าร่วมในรูปแบบออนไซต์</span>
+          <!-- ออนไลน์ -->
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="onlineCheckbox" name="is_online" value="1" class="accent-black">
+            เข้าร่วมรูปแบบออนไลน์
+          </label>
 
-          <label class="lbl text-gray-800 mr-2" for="placeInput">ระบุสถานที่ไป :</label>
+          <!-- ออนไซต์ + ช่องกรอก (ต่อท้ายในบรรทัดเดียว) -->
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="onsiteCheckbox" class="accent-black">
+            ออนไซต์ ณ
+            <input type="text" name="place" id="placeInput" class="border rounded-md p-2 w-[350px] shadow-sm"
+              placeholder="เช่น โรงแรม Best Western PLUS จังหวัดนนทบุรี" disabled>
+          </label>
 
-          <!-- ช่องกรอกสถานที่ -->
-          <input type="text" name="place" class="border rounded-md p-2 w-[400px]" id="placeInput"
-            placeholder="เช่น โรงแรม Best Western PLUS ถนนแจ้งวัฒนะ จังหวัดนนทบุรี" disabled />
         </div>
       </div>
+
+
+      <!-- ข้อ 9 -->
+      <div class="mb-4 flex items-start gap-4">
+        <label class="lbl text-gray-800 whitespace-nowrap pt-2">
+          9. ฐานข้อมูลที่ตีพิมพ์ (เช่น Scopus) :
+        </label>
+
+        <div class="w-full">
+          <input type="text" name="database" class="border rounded-md p-2 w-[350px] shadow-sm"
+            placeholder="เช่น Scopus, TCI, IEEE">
+        </div>
+      </div>
+
+
+      <!-- ข้อ 10 -->
+      <div class="mb-6">
+        <div class="flex items-center gap-2 mb-2">
+          <label class="lbl text-gray-800" for="amountInput">10.รวมยอดประมาณการค่าใช้จ่าย :</label>
+          <div class="flex flex-col">
+            <div class="flex items-center gap-2">
+              <input type="text" name="amount" class="border rounded-md p-2 w-36" id="amountInput" value="0.00" />
+              <span>บาท</span>
+            </div>
+          </div>
+        </div>
+        <label class="flex items-center gap-2 ml-6 mt-2">
+          <input type="checkbox" name="no_cost" value="1" class="accent-black" id="noCostCheckbox" />
+          โดยไม่เบิกค่าใช้จ่ายใดๆทั้งสิ้น
+        </label>
+      </div>
+
+
+      <!-- ข้อ 11 -->
+      <div class="mb-6">
+        <label class="lbl block text-gray-800 mb-2" id="carLabel">11.กรณีไปรถยนต์ส่วนตัว</label>
+        <div class="flex items-center gap-2 ml-6">
+          <input type="checkbox" name="car_used" value="1" class="accent-black" id="carCheckbox" />
+          <label for="carPlateInput" class="lbl">ระบุหมายเลขทะเบียนรถยนต์ :</label>
+          <div class="flex flex-col">
+            <input type="text" name="car_plate" class="border rounded-md p-2 w-[250px]" id="carPlateInput"
+              placeholder="เช่น กร 1906 พัทลุง" disabled />
+          </div>
+        </div>
+      </div>
+      <script>
+      const purposeOtherRadio = document.getElementById("purposeOtherRadio");
+      const purposeOtherInput = document.getElementById("purposeOtherInput");
+      const purposeRadios = document.querySelectorAll('input[name="purpose"]');
+
+      purposeRadios.forEach(radio => {
+        radio.addEventListener("change", () => {
+          if (purposeOtherRadio.checked) {
+            purposeOtherInput.disabled = false;
+            purposeOtherInput.classList.remove("bg-gray-100", "text-gray-400");
+            purposeOtherInput.focus();
+          } else {
+            purposeOtherInput.disabled = true;
+            purposeOtherInput.classList.add("bg-gray-100", "text-gray-400");
+            purposeOtherInput.value = "";
+          }
+        });
+      });
+      </script>
+      <script>
+      const otherRadio = document.getElementById("otherTypeRadio");
+      const otherInput = document.getElementById("otherTypeInput");
+      const typeRadios = document.querySelectorAll('input[name="presentation_type"]');
+
+      typeRadios.forEach(radio => {
+        radio.addEventListener("change", () => {
+          if (otherRadio.checked) {
+            otherInput.disabled = false;
+            otherInput.classList.remove("bg-gray-100", "text-gray-400");
+            otherInput.focus();
+          } else {
+            otherInput.disabled = true;
+            otherInput.classList.add("bg-gray-100", "text-gray-400");
+            otherInput.value = "";
+          }
+        });
+      });
+      </script>
+
+
+      <script>
+      const otherRadio = document.getElementById("otherTypeRadio");
+      const otherInput = document.getElementById("otherTypeInput");
+      const typeRadios = document.querySelectorAll('input[name="presentation_type"]');
+
+      typeRadios.forEach(radio => {
+        radio.addEventListener("change", () => {
+          if (otherRadio.checked) {
+            otherInput.disabled = false;
+            otherInput.classList.remove("bg-gray-100", "text-gray-400");
+            otherInput.focus();
+          } else {
+            otherInput.disabled = true;
+            otherInput.classList.add("bg-gray-100", "text-gray-400");
+            otherInput.value = "";
+          }
+        });
+      });
+      </script>
 
       <script>
       // ✅ ดึง element ที่เกี่ยวข้อง
@@ -437,45 +665,6 @@ if (!isset($_SESSION['user_id'])) {
       // ✅ ตั้งค่าเริ่มต้น
       selectOnly();
       </script>
-      <!-- ข้อ 7 -->
-      <div class="mb-4">
-        <label class="lbl text-gray-800 block mb-2 pt-1">
-          7. เหตุผลหลัก :
-        </label>
-
-        <div class="space-y-2 ml-6 text-gray-800">
-
-          <label class="flex items-center gap-2">
-            <input type="radio" name="reason" value="งานสอน" class="accent-black">
-            ติดภารกิจงานสอน
-          </label>
-
-          <label class="flex items-center gap-2">
-            <input type="radio" name="reason" value="ธุระส่วนตัว" class="accent-black">
-            ติดธุระส่วนตัว
-          </label>
-
-          <label class="flex items-center gap-2">
-            <input type="radio" name="reason" value="ดูแลครอบครัว" class="accent-black">
-            ดูแลบุคคลในครอบครัว
-          </label>
-
-          <label class="flex items-center gap-2">
-            <input type="radio" name="reason" value="งานด่วนหน่วยงาน" class="accent-black">
-            งานด่วนของหน่วยงาน
-          </label>
-
-          <label class="flex items-center gap-2">
-            <input type="radio" name="reason" value="อื่นๆ" class="accent-black">
-            อื่น ๆ :
-            <input type="text" name="reason_other" class="border rounded-md p-2 w-[350px]" placeholder="โปรดระบุ">
-          </label>
-
-        </div>
-      </div>
-
-
-
 
       <!-- ปุ่ม -->
       <div class="relative mt-20">
@@ -850,6 +1039,78 @@ if (!isset($_SESSION['user_id'])) {
   function closeMenu() {
     profileMenu.classList.add("hidden");
   }
+  </script>
+  <script>
+  const main = document.getElementById("mainCategory");
+  const sub = document.getElementById("subCategory");
+
+  // Mapping ไฟล์สำหรับ redirect
+  const redirectMain = {
+    train: "form_Memo.php",
+    academic: "Request_1.php",
+    external: null, // ไม่มีฟอร์มโดยตรง
+    internal: null // ต้องเลือกหมวดย่อย
+  };
+
+  const redirectSub = {
+    "ขอใช้อาคารวันหยุดราชการ": "Request_2.php",
+    "ขอห้องพักรับรอง": "Request_3.php",
+    "ขออนุมัติตัวบุคคลเป็นวิทยากร": "Request_4.php",
+    "ขออนุมัติไม่เข้าร่วมโครงการ": "Request_5.php",
+    "การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์": "Request_6.php",
+    "ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย": "Request_7.php"
+  };
+
+  const subInternal = Object.keys(redirectSub);
+
+  // ป้องกัน redirect ซ้ำ (ถ้าอยู่หน้าเดียวกัน)
+  function redirectIfDifferent(file) {
+    if (!file) return;
+    const currentPage = window.location.pathname.split("/").pop();
+    if (currentPage !== file) {
+      window.location.href = file;
+    }
+  }
+
+  // เมื่อเลือกหมวดหลัก
+  main.addEventListener("change", () => {
+    const value = main.value;
+
+    // เคลียร์หมวดย่อยก่อน
+    sub.innerHTML = `<option value="">-- เลือกหมวดย่อย --</option>`;
+    sub.disabled = true;
+
+    // ถ้าเลือกหมวดที่มี redirect แบบหน้าเดียว เช่น "ฝึกอบรม"
+    if (redirectMain[value]) {
+      redirectIfDifferent(redirectMain[value]);
+      return;
+    }
+
+    // ถ้าเป็นหมวดภายนอก → ไม่มีฟอร์มในระบบ
+    if (value === "external") {
+      return;
+    }
+
+    // หมวดภายใน → เปิดหมวดย่อย
+    if (value === "internal") {
+      sub.disabled = false;
+
+      subInternal.forEach(text => {
+        const opt = document.createElement("option");
+        opt.value = text;
+        opt.textContent = text;
+        sub.appendChild(opt);
+      });
+    }
+  });
+
+  // เมื่อเลือกหมวดย่อย → redirect
+  sub.addEventListener("change", () => {
+    const value = sub.value;
+    if (redirectSub[value]) {
+      redirectIfDifferent(redirectSub[value]);
+    }
+  });
   </script>
 
 </body>
