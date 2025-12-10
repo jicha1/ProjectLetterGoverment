@@ -1,4 +1,4 @@
-<!-- ขอแจ้งเรียนการเป็นผู้ร่วมมือในโครงการบริการวิชาการ -->
+<!-- ขอแจ้งเรียนการเป็นผู้ร่วมวิจัยโครงการบริการวิชาการ -->
 <?php
 session_start();
 require_once __DIR__ . '/functions.php';
@@ -734,7 +734,7 @@ $len = max(20, $len);
                 <div class="doc-label" style="font-size:20pt; font-weight:bold;">เรื่อง</div>
                 <div class="dot-line">
                     <span class="chip" contenteditable="true">
-                        ขอแจ้งเรียนการเป็นผู้ร่วมมือในโครงการบริการวิชาการ
+                        ขอแจ้งเรียนการเป็นผู้ร่วมวิจัยโครงการบริการวิชาการ
                     </span>
                 </div>
             </div>
