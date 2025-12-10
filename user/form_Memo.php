@@ -354,9 +354,12 @@ if (!isset($_SESSION['user_id'])) {
             <label class="flex items-center gap-2"><input type="radio" name="purpose" value="meeting"
                 class="accent-black" />
               เข้าร่วมประชุมวิชาการในงาน</label>
-            <label class="flex items-center gap-2"><input type="radio" name="purpose" value="other"
-                class="accent-black" />
-              อื่นๆ</label>
+            <label class="flex items-center gap-2">
+              <input type="radio" name="purpose" value="อื่นๆ" class="accent-black" id="purposeOtherRadio">
+              อื่น ๆ (ระบุ)
+              <input type="text" name="purpose_other_detail" id="purposeOtherInput"
+                class="border rounded-md p-2 w-[260px] ml-3 bg-gray-100 text-gray-400" placeholder="โปรดระบุ" disabled>
+            </label>
           </div>
         </div>
       </div>
@@ -536,7 +539,25 @@ if (!isset($_SESSION['user_id'])) {
       </div>
     </div>
   </form>
+  <script>
+  const purposeOtherRadio = document.getElementById("purposeOtherRadio");
+  const purposeOtherInput = document.getElementById("purposeOtherInput");
+  const purposeRadios = document.querySelectorAll('input[name="purpose"]');
 
+  purposeRadios.forEach(radio => {
+    radio.addEventListener("change", () => {
+      if (purposeOtherRadio.checked) {
+        purposeOtherInput.disabled = false;
+        purposeOtherInput.classList.remove("bg-gray-100", "text-gray-400");
+        purposeOtherInput.focus();
+      } else {
+        purposeOtherInput.disabled = true;
+        purposeOtherInput.classList.add("bg-gray-100", "text-gray-400");
+        purposeOtherInput.value = "";
+      }
+    });
+  });
+  </script>
   <script>
   /* ====== Helpers ====== */
   const $ = (s) => document.querySelector(s);

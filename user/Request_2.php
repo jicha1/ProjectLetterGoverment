@@ -318,10 +318,12 @@ if (!isset($_SESSION['user_id'])) {
       <!-- ข้อ 1 -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 items-end">
         <div class="flex items-center gap-3">
-          <label class="lbl text-gray-800 whitespace-nowrap" for="docDate">1. วัน เดือน ปี :</label>
+          <label class="lbl text-gray-800 whitespace-nowrap" for="docDate">1.วัน เดือน ปี :</label>
           <div class="flex-1">
             <input type="date" name="doc_date" class="w-full border rounded-md p-2" id="docDate" />
+
           </div>
+          <label class="lbl text-gray-800 whitespace-nowrap">ที่ต้องการให้ปรากฎบนบันทึกข้อความ</label>
         </div>
       </div>
 
