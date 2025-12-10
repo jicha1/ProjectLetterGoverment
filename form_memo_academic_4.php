@@ -1,5 +1,4 @@
-<!-- ขออนุมัติตัวบุคคลเดินทางไปเข้าร่วมการแลกเปลี่ยนทางวิชาการ ณ Vietnam – Korea University of
-Information and Communication Technology สาธารณรัฐสังคมนิยมเวียดนาม -->
+<!-- ขออนุมัติตัวบุคคลเดินทางไปเข้าร่วมการแลกเปลี่ยนทางวิชาการ ณ Vietnam – Korea University... -->
 <?php
 session_start();
 require_once __DIR__ . '/functions.php';
@@ -731,8 +730,8 @@ $len = max(20, $len);
             <div class="doc-row">
                 <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
                 <div class="dot-line">
-                    <span class="chip" contenteditable="true" data-target="subject">
-                        <?= h($subject ?: 'ขออนุมัติเดินทางไปเข้าร่วมโครงการแลกเปลี่ยนทางวิชาการ') ?>
+                    <span class="chip" contenteditable="true">
+                        ขออนุมัติตัวบุคคลเดินทางไปเข้าร่วมการแลกเปลี่ยนทางวิชาการ ณ Vietnam – Korea University...
                     </span>
                 </div>
             </div>
@@ -747,33 +746,25 @@ $len = max(20, $len);
                 ตามบันทึกข้อตกลงทางวิชาการ ระหว่าง มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ (KMUTNB)
                 และ Vietnam – Korea University of Information and Communication Technology (VKU)
                 เพื่อเสริมสร้างและขยายเครือข่ายการฝึกอบรม การวิจัยวิทยาศาสตร์ การแลกเปลี่ยนอาจารย์และนักศึกษา
-                สาขาวิชาเทคโนโลยีสารสนเทศและเศรษฐกิจดิจิทัล โดยได้รับเชิญเข้าพบ
-                <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'ผู้ช่วยศาสตราจารย์สุฏิ กุลจันทร์') ?>
-                </span>
+                สาขาวิชาเทคโนโลยีสารสนเทศและเศรษฐกิจดิจิทัล โดยได้รับเชิญข้าพเจ้า
+                <span class="chip" contenteditable="true">ผู้ช่วยศาสตราจารย์สุปีติ กุลจันทร์</span>
                 เดินทางไปเข้าร่วมการแลกเปลี่ยนทางวิชาการในโครงการช่วยเหลือการจัดกิจกรรมการสอนอย่างมีประสิทธิภาพ
-                ณ Vietnam – Korea University of Information and Communication Technology
-                สาธารณรัฐสังคมนิยมเวียดนาม ในระหว่างวันที่
-                <span class="chip" contenteditable="true" data-target="joinDates">
-                    <?= h($joinDates ?: '20 – 24 พฤศจิกายน 2566') ?>
-                </span>
+                ณ Vietnam – Korea University of Information and Communication Technology สาธารณรัฐสังคมนิยมเวียดนาม
+                ในระหว่างวันที่
+                <span class="chip" contenteditable="true">20 – 24 พฤศจิกายน 2566</span>
                 นั้น
             </div>
 
             <!-- ย่อหน้า 2 -->
             <div class="content-block paragraph">
                 ในการนี้ ข้าพเจ้า
-                <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'ผู้ช่วยศาสตราจารย์สุฏิ กุลจันทร์') ?>
-                </span>
+                <span class="chip" contenteditable="true">ผู้ช่วยศาสตราจารย์สุปีติ กุลจันทร์</span>
                 สังกัดภาควิชาเทคโนโลยีสารสนเทศ
                 คณะเทคโนโลยีและการจัดการอุตสาหกรรม มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ วิทยาเขตปราจีนบุรี
                 จึงมีความประสงค์ขออนุมัติเดินทางไปเข้าร่วมการแลกเปลี่ยนทางวิชาการในโครงการช่วยเหลือการจัดกิจกรรมการสอนอย่างมีประสิทธิภาพ
                 ณ Vietnam – Korea University of Information and Communication Technology สาธารณรัฐสังคมนิยมเวียดนาม
                 ในระหว่างวันที่
-                <span class="chip" contenteditable="true" data-target="duration">
-                    <?= h($valueMap['duration'] ?? '20 – 24 พฤศจิกายน 2566') ?>
-                </span>
+                <span class="chip" contenteditable="true">20 – 24 พฤศจิกายน 2566</span>
                 โดยทาง Vietnam – Korea University of Information and Communication Technology
                 เป็นผู้รับผิดชอบค่าใช้จ่ายตลอดระยะเวลาที่เข้าร่วมโครงการดังกล่าว
                 (รายละเอียดตามเอกสารแนบ)
@@ -787,7 +778,7 @@ $len = max(20, $len);
 
             <div class="signature-wrapper">
                 <div class="signature-block" id="signatureBlock">
-                    <div class="sig-name">(<?= h($ownerName ?: '') ?>)</div>
+                    <div class="sig-name">(ผู้ช่วยศาสตราจารย์สุปีติ กุลจันทร์)</div>
                     <div class="sig-position"><?= h($position ?: '') ?></div>
                 </div>
             </div>

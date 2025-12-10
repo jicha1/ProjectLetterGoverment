@@ -1,5 +1,4 @@
-<!-- ขออนุมัติใช้ห้องปฏิบัติการระบบเครือข่าย B4-15 อาคารคณะเทคโนโลยีและการจัดการอุตสาหกรรม
- ในวันหยุดราชการ -->
+<!-- ขออนุมัติใช้ห้องปฏิบัติการระบบเครือข่าย B4-15 อาคารคณะเทคโนโลยีและการจัดการอุตสาหกรรม... -->
 <?php
 session_start();
 require_once __DIR__ . '/functions.php';
@@ -727,13 +726,13 @@ $len = max(20, $len);
             </div>
 
 
-
             <!-- เรื่อง -->
             <div class="doc-row">
-                <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
+                <div class="doc-label" style="font-size:20pt; font-weight:bold;">เรื่อง</div>
                 <div class="dot-line">
-                    <span class="chip" contenteditable="true" data-target="subject">
-                        <?= h($subject ?: 'ขออนุมัติ...') ?>
+                    <span class="chip" contenteditable="true">
+                        ขออนุมัติใช้ห้องปฏิบัติการระบบเครือข่าย B4-15 อาคารคณะเทคโนโลยีและการจัดการอุตสาหกรรม
+                        ...
                     </span>
                 </div>
             </div>
@@ -746,59 +745,38 @@ $len = max(20, $len);
 
             <!-- ย่อหน้า 1 -->
             <div class="content-block paragraph">
-                ตามที่ ข้าพเจ้า
-                <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'อาจารย์ ดร.วัชรชัย คงศิริวัฒนา') ?>
-                </span>
-                สังกัดภาควิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีและการจัดการอุตสาหกรรม
-                มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ วิทยาเขตปราจีนบุรี
-                อาจารย์ผู้สอนในรายวิชา
-                <span class="chip" contenteditable="true" data-target="courseName">
-                    <?= h($courseName ?: '060233204 Computer Network Design and Implementation') ?>
-                </span>
+                ตามที่ข้าพเจ้า อาจารย์
+                <span class="chip" contenteditable="true">ดร.วัชรชัย คงศิริวัฒนา</span>
+                สังกัดภาควิชาเทคโนโลยีสารสนเทศ
+                คณะเทคโนโลยีและการจัดการอุตสาหกรรม มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ
+                วิทยาเขตปราจีนบุรี อาจารย์ผู้สอนในรายวิชา
+                <span class="chip" contenteditable="true">060233204 Computer Network Design and Implementation</span>
                 โดยในรายวิชาได้กำหนดให้นักศึกษาทดลองออกแบบและติดตั้งระบบเครือข่าย
                 จำเป็นต้องใช้อุปกรณ์ทางด้านเครือข่ายในห้องปฏิบัติการระบบเครือข่าย
-                <span class="chip" contenteditable="true" data-target="labRoom">
-                    <?= h($valueMap['labRoom'] ?? 'B4-15') ?>
-                </span>
-                โดยมอบหมายให้นักศึกษาได้เข้าทำการทดลองปฏิบัติการเป็น 3 ช่วง คือ
-
+                <span class="chip" contenteditable="true">B4-15</span>
+                โดยมอบหมายให้นักศึกษาได้เข้าทำการทดลองปฏิบัติการเป็น 3 ช่วง ได้แก่
                 ช่วงที่ 1 ระหว่างวันที่
-                <span class="chip" contenteditable="true" data-target="phase1">
-                    <?= h($valueMap['phase1'] ?? '30 กันยายน 2566 – 1 ตุลาคม 2566') ?>
-                </span>
-
+                <span class="chip" contenteditable="true">30 กันยายน 2566 ถึงวันที่ 1 ตุลาคม 2566</span>
                 ช่วงที่ 2 ระหว่างวันที่
-                <span class="chip" contenteditable="true" data-target="phase2">
-                    <?= h($valueMap['phase2'] ?? '7 – 8 ตุลาคม 2566') ?>
-                </span>
-
+                <span class="chip" contenteditable="true">7 – 8 ตุลาคม 2566</span>
                 และช่วงที่ 3 ระหว่างวันที่
-                <span class="chip" contenteditable="true" data-target="phase3">
-                    <?= h($valueMap['phase3'] ?? '14 – 15 ตุลาคม 2566') ?>
-                </span>
+                <span class="chip" contenteditable="true">14 – 15 ตุลาคม 2566</span>
                 ตั้งแต่เวลา
-                <span class="chip" contenteditable="true" data-target="timeRange">
-                    <?= h($valueMap['timeRange'] ?? '08.00 – 24.00 น.') ?>
-                </span>
+                <span class="chip" contenteditable="true">08.00 – 24.00 น.</span>
                 (รายชื่อนักศึกษาตามเอกสารแนบ)
             </div>
 
+
             <!-- ย่อหน้า 2 -->
             <div class="content-block paragraph">
-                ในการนี้ ข้าพเจ้า
-                <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'อาจารย์ ดร.วัชรชัย คงศิริวัฒนา') ?>
-                </span>
-                จึงมีความประสงค์ขออนุมัติใช้ห้องระบบปฏิบัติการระบบเครือข่าย
-                <span class="chip" contenteditable="true" data-target="labRoom">
-                    <?= h($valueMap['labRoom'] ?? 'B4-15') ?>
-                </span>
+                ในการนี้ ข้าพเจ้าจึงมีความประสงค์ขออนุมัติใช้ห้องระบบปฏิบัติการระบบเครือข่าย
+                <span class="chip" contenteditable="true">B4-15</span>
                 อาคารคณะเทคโนโลยีและการจัดการอุตสาหกรรม
                 มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ วิทยาเขตปราจีนบุรี
-                ในวันและเวลาตามที่กล่าวข้างต้น ทั้งนี้เพื่อให้การดำเนินการทดลองออกแบบและติดตั้งระบบเครือข่ายดังกล่าว
-                สำเร็จลุล่วงตามวัตถุประสงค์ของรายวิชาที่ตั้งไว้ทุกประการ
+                ในวันหยุดราชการ ตามวัน เวลา และสถานที่ดังกล่าว
+                ทั้งนี้เพื่อให้การดำเนินการทดลองออกแบบและติดตั้งระบบเครือข่ายดังกล่าวสำเร็จลุล่วงตามวัตถุประสงค์ของรายวิชาที่ตั้งไว้ทุกประการ
             </div>
+
 
             <!-- ย่อหน้า 3 -->
             <div class="content-block paragraph">
@@ -809,16 +787,24 @@ $len = max(20, $len);
 
             <div class="signature-wrapper">
                 <div class="signature-block" id="signatureBlock">
-                    <div class="sig-name">(<?= h($ownerName ?: '') ?>)</div>
+                    <div class="sig-name">(อาจารย์ ดร.วัชรชัย คงศิริวัฒนา)</div>
                     <div class="sig-position"><?= h($position ?: '') ?></div>
                 </div>
             </div>
 
             <div style="font-family:'TH SarabunPSK'; font-size:16pt; line-height:1.2;"> เรียน <?= h($hdr_to) ?> </div>
-            <div class="content-block single align-to-dean"> เพื่อโปรดพิจารณาอนุมัติ </div>
-            <div class="content-block single align-to-dean" style="margin-top:50px;;"> (ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา
+            <div style="
+    font-family:'TH SarabunPSK';
+    font-size:16pt;
+    line-height:1.2;
+    margin-left:30px;   /* ← ปรับค่าตรงนี้เพื่อเลื่อนขวา */
+">
+                เพื่อโปรดพิจารณาอนุมัติ
+            </div>
+            <div class="content-block single align-to-dean" style="margin-top:50px;;"> (ผู้ช่วยศาสตราจารย์ดร.ขนิษฐา
                 นามี)<br /> หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ </div>
             <div class="footer-actions">
+
 
                 <!-- 🔵 ปุ่มแรก: พิมพ์/ดูตัวอย่าง (ทุก role ต้องมี และอยู่ลำดับแรก) -->
                 <button type="button" onclick="window.print()"

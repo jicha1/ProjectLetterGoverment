@@ -1,4 +1,4 @@
-<!-- ขออนุมัติไมเขารวมโครงการสัมมนาเชิงปฏิบัติการฯ เนื่องจากติดภารกิจ -->
+<!-- ขออนุมัติไม่เข้าร่วมโครงการสัมมนาเชิงปฏิบัติการฯ เนื่องจากติดภารกิจ -->
 <?php
 session_start();
 require_once __DIR__ . '/functions.php';
@@ -729,14 +729,12 @@ $len = max(20, $len);
                 </div>
             </div>
 
-
-
             <!-- เรื่อง -->
             <div class="doc-row">
                 <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
                 <div class="dot-line">
-                    <span class="chip" contenteditable="true" data-target="subject">
-                        <?= h($subject ?: 'ขออนุมัติ...') ?>
+                    <span class="chip" contenteditable="true">
+                        ขออนุมัติไม่เข้าร่วมโครงการสัมมนาเชิงปฏิบัติการฯ เนื่องจากติดภารกิจ
                     </span>
                 </div>
             </div>
@@ -749,34 +747,26 @@ $len = max(20, $len);
             <!-- ย่อหน้า 1 -->
             <div class="content-block paragraph">
                 ตามที่ คณะเทคโนโลยีและการจัดการอุตสาหกรรม มหาวิทยาลัยเทคโนโลยีพระจอมเกล้า
-                พระนครเหนือ วิทยาเขตปราจีนบุรี ได้รับมอบให้ดำเนินการจัดโครงการสัมมนาเชิงปฏิบัติการ
+                พระนครเหนือ วิทยาเขตปราจีนบุรี ได้รับมอบหมายให้ดำเนินการจัดโครงการสัมมนาเชิงปฏิบัติการ
                 หัวข้อ มหาวิทยาลัยกับชุมชนและการเตรียมพร้อม รับมือวิกฤตด้วยกัลยาณการทำงานอย่างมีความสุข
                 ในระหว่างวันที่
-                <span class="chip" contenteditable="true" data-target="eventRange">
-                    <?= h($eventRange ?: '1 – 3 พฤษภาคม 2567') ?>
-                </span>
+                <span class="chip" contenteditable="true">1 – 3 พฤษภาคม 2567</span>
                 ณ
-                <span class="chip" contenteditable="true" data-target="eventPlace">
-                    <?= h($eventPlace ?: 'โรงแรมแชนด์คูนส์ เจ้าภาพ จังหวัดราชบุรี') ?>
-                </span>
+                <span class="chip" contenteditable="true">โรงแรมแชนด์ดูนส์ เจ้าหลาว บีช รีสอร์ท จ.จันทบุรี</span>
                 นั้น
             </div>
 
             <!-- ย่อหน้า 2 -->
             <div class="content-block paragraph">
-                การนี้ ข้าพเจ้า ผู้ช่วยศาสตราจารย์
-                <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'ดร.วนานี ประจวบศุกดิ์') ?>
-                </span>
-                สังกัดภาควิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีและการจัดการอุตสาหกรรม
-                มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ วิทยาเขตปราจีนบุรี
-                ขออนุญาตไม่เข้าร่วมโครงการสัมมนาเชิงปฏิบัติการ หัวข้อ มหาวิทยาลัยกับชุมชนและการเตรียมพร้อม
-                รับมือวิกฤตด้วยกัลยาณการทำงานอย่างมีความสุข ตามวัน เวลา และสถานที่ดังกล่าว
-                เนื่องจากข้าพเจ้าติดภารกิจกับการดูแลบิดาที่เจ็บป่วย และเตรียมงานสอนในภาคเรียนที่
-                <span class="chip" contenteditable="true" data-target="semester">
-                    <?= h($semester ?: '1/2567') ?>
-                </span>
+                การนี้ ข้าพเจ้า
+                <span class="chip" contenteditable="true">ผู้ช่วยศาสตราจารย์ดร.วันทนี ประจวบศุภกิจ</span>
+                ขออนุมัติไม่เข้าร่วมโครงการสัมมนาเชิงปฏิบัติการ หัวข้อ
+                มหาวิทยาลัยกับชุมชนและการเตรียมพร้อม รับมือวิกฤตวัยกลางคนกับการทำงานอย่างมีความสุข
+                ตามวัน เวลา และสถานที่ดังกล่าว เนื่องจากข้าพเจ้าติดภารกิจกับการดูแลบิดาที่เจ็บป่วยและ
+                เตรียมงานสอนในภาคเรียนที่
+                <span class="chip" contenteditable="true">1/2567</span>
             </div>
+
 
             <!-- ย่อหน้า 3 -->
             <div class="content-block paragraph">
@@ -784,18 +774,24 @@ $len = max(20, $len);
             </div>
 
 
-
             <div class="signature-wrapper">
                 <div class="signature-block" id="signatureBlock">
-                    <div class="sig-name">(<?= h($ownerName ?: '') ?>)</div>
+                    <div class="sig-name">(ผู้ช่วยศาสตราจารย์ดร.วันทนี ประจวบศุภกิจ)</div>
                     <div class="sig-position"><?= h($position ?: '') ?></div>
                 </div>
             </div>
 
             <div style="font-family:'TH SarabunPSK'; font-size:16pt; line-height:1.2;"> เรียน <?= h($hdr_to) ?> </div>
-            <div class="content-block single align-to-dean"> เพื่อโปรดพิจารณาอนุมัติ </div>
-            <div class="content-block single align-to-dean" style="margin-top:50px;;"> (ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา
-                นามี)<br /> หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ </div>vx dcsz
+            <div style="
+    font-family:'TH SarabunPSK';
+    font-size:16pt;
+    line-height:1.2;
+    margin-left:30px;   /* ← ปรับค่าตรงนี้เพื่อเลื่อนขวา */
+">
+                เพื่อโปรดพิจารณาอนุมัติ
+            </div>
+            <div class="content-block single align-to-dean" style="margin-top:50px;;"> (ผู้ช่วยศาสตราจารย์ ดร.ขนิษฐา
+                นามี)<br /> หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ </div>
             <div class="footer-actions">
 
                 <!-- 🔵 ปุ่มแรก: พิมพ์/ดูตัวอย่าง (ทุก role ต้องมี และอยู่ลำดับแรก) -->

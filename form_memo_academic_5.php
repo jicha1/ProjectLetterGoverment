@@ -1,4 +1,4 @@
-<!-- ขอส่งข้อเสนอโครงการวิจัยเพื่อขอรับทุนสนับสนุนนักวิจัยรุ่นใหม่ ประจ าปีงบประมาณ พ.ศ. 2568 -->
+<!-- ขอนำส่งข้อเสนอโครงการวิจัยเพื่อขอรับทุนสนับสนุนนักวิจัยรุ่นใหม่ ประจำปีงบประมาณ พ.ศ. 2568 -->
 <?php
 session_start();
 require_once __DIR__ . '/functions.php';
@@ -733,8 +733,8 @@ $len = max(20, $len);
             <div class="doc-row">
                 <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
                 <div class="dot-line">
-                    <span class="chip" contenteditable="true" data-target="subject">
-                        <?= h($subject ?: 'ขออนุมัติเดินทางไปเข้าร่วมโครงการแลกเปลี่ยนทางวิชาการ') ?>
+                    <span class="chip" contenteditable="true">
+                        ขอนำส่งข้อเสนอโครงการวิจัยเพื่อขอรับทุนสนับสนุนนักวิจัยรุ่นใหม่ ประจำปีงบประมาณ พ.ศ. 2568
                     </span>
                 </div>
             </div>
@@ -753,22 +753,19 @@ $len = max(20, $len);
 
             <!-- ย่อหน้า 2 -->
             <div class="content-block paragraph">
-                ในการนี้ข้าพเจ้า อาจารย์
-                <span class="chip" contenteditable="true" data-target="ownerName">
-                    <?= h($ownerName ?: 'ดร.ทิพย์พิมล ชูรอด') ?>
-                </span>
+                ในการนี้ ข้าพเจ้า
+                <span class="chip" contenteditable="true">อาจารย์ ดร.พิทย์พิมล ชูรอด</span>
                 บุคลากรสังกัดภาควิชาเทคโนโลยีสารสนเทศ
                 คณะเทคโนโลยีและการจัดการอุตสาหกรรม มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ
                 วิทยาเขตปราจีนบุรี มีความประสงค์ยื่นข้อเสนอโครงการวิจัยดังกล่าว โดยมีชื่อโครงการวิจัย
-                <span class="chip" contenteditable="true" data-target="project_name">
-                    <?= h($projectName ?: 'การวิเคราะห์และตรวจจับทราฟฟิกจากเว็บมืดด้วย AI เพื่อลดปัญหาอาชญากรรมทางไซเบอร์') ?>
-                </span>
-                (DarkNetDetector: An AI Innovative Framework for Monitoring and Mitigating Cybercrime through Dark Web
-                Traffic Analysis)
+                <span class="chip" contenteditable="true">การวิเคราะห์และตรวจจับทราฟฟิกจากเว็บมืดด้วย AI
+                    เพื่อลดปัญหาอาชญากรรมทางไซเบอร์ (DarkNetDetector: </span>
+                <span class="chip" contenteditable="true">An AI Innovative Framework for Monitoring and
+                    Mitigating Cybercrime through Dark Web
+                    Traffic </span>
+                <span class="chip" contenteditable="true">Analysis) </span>
                 เพื่อขอรับทุนสนับสนุนการวิจัยสำหรับนักวิจัยรุ่นใหม่ ประจำปีงบประมาณ 2568 ในวงเงิน
-                <span class="chip" contenteditable="true" data-target="budget">
-                    <?= h($budget ?: '100,000.00 บาท') ?>
-                </span>
+                <span class="chip" contenteditable="true">100,000.00 บาท</span>
                 (หนึ่งแสนบาทถ้วน) พร้อมกับยื่นข้อเสนอโครงการวิจัย จำนวน 1 ชุด มาเพื่อประกอบการพิจารณาด้วยแล้ว
             </div>
 
@@ -776,7 +773,6 @@ $len = max(20, $len);
             <div class="content-block paragraph">
                 จึงเรียนมาเพื่อโปรดพิจารณา
             </div>
-
 
 
             <div class="signature-wrapper">

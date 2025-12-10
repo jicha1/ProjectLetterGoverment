@@ -249,7 +249,8 @@ if (!isset($_SESSION['user_id'])) {
               <option value="academic" <?= ($CURRENT_MAIN=="academic"?"selected":"") ?>>
                 ประชุมวิชาการ/ศึกษาดูงาน/สัมมนาวิชาการ</option>
               <option value="external" <?= ($CURRENT_MAIN=="external"?"selected":"") ?>>ภายนอก</option>
-              <option value="internal" <?= ($CURRENT_MAIN=="internal"?"selected":"") ?>>ภายใน(บันทึกข้อความ)</option>
+              <option value="internal" <?= ($CURRENT_MAIN=="internal"?"selected":"") ?>>
+                ภายใน(บันทึกข้อความ)</option>
             </select>
 
           </div>
@@ -672,7 +673,9 @@ if (!isset($_SESSION['user_id'])) {
             ดำเนินการ
           </a>
         </div>
+
       </div>
+    </div>
   </form>
 
   <script>
