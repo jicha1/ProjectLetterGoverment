@@ -672,9 +672,7 @@ if (!isset($_SESSION['user_id'])) {
             ดำเนินการ
           </a>
         </div>
-
       </div>
-    </div>
   </form>
 
   <script>
