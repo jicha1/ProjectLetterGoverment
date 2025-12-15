@@ -1,4 +1,4 @@
-<?php
+<?php  //pro_letter/officer/home.php
 session_start();
 require_once __DIR__ . '/../functions.php';
 
@@ -314,7 +314,7 @@ if (!isset($_SESSION['user_id'])) {
         }
 
         if (res.allowed === true) {
-          window.location.href = "../edit_document.php?id=" + docId;
+          window.location.href = "../documents/view_memo.php?id=" + docId;
           return;
         }
 

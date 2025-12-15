@@ -188,7 +188,7 @@ if (!isset($_SESSION['user_id'])) {
                 }
             ?>
 
-      <a href="form_Memo.php">
+      <a href="documents/form_Memo.php">
         <div class="px-4 py-2 rounded-[11px] font-bold transition bg-white text-teal-500 shadow">
           แบบฟอร์มบันทึกข้อความ
         </div>
@@ -521,7 +521,7 @@ if (!isset($_SESSION['user_id'])) {
       <!-- ปุ่ม -->
       <div class="relative mt-20">
         <div class="absolute right-0 bottom-0">
-          <a href="../form_memo_room_request_1.php"
+          <a href="../documents/form_memo_room_request_1.php"
             class="bg-[#11C2B9] hover:bg-[#0fa39c] text-white font-bold w-[130px] h-[35px] rounded-md flex items-center justify-center transition">
             ดำเนินการ
           </a>

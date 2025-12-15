@@ -1,4 +1,4 @@
-<?php
+<?php   //pro_letter/user/home.php
 session_start();
 require_once __DIR__ . '/../functions.php'; 
 
@@ -74,7 +74,7 @@ if (!isset($_SESSION['user_id'])) {
                 }
             ?>
 
-      <a href="form_Memo.php">
+      <a href="../documents/form_Memo.php">
         <div class="px-4 py-2 rounded-[11px] font-bold transition text-white">แบบฟอร์มบันทึกข้อความ</div>
       </a>
       <div class="relative">
@@ -155,27 +155,32 @@ if (!isset($_SESSION['user_id'])) {
   </main>
 
   <script>
-  let dataAll = []; // เก็บข้อมูลที่ fetch มา
+  let dataAll = [];
 
   async function loadRequests() {
-    const res = await fetch("get_requests.php");
+    const res = await fetch("../documents/get_requests.php");
+
     const data = await res.json();
 
     dataAll = data.map(d => {
+
+      // ====== สถานะสำหรับแสดงผล ======
       let statusTh = "";
-      switch (d.status) {
-        case "submitted":
-        case "pending":
-          statusTh = "รอตรวจสอบ";
-          break;
-        case "approved":
-          statusTh = "อนุมัติแล้ว";
-          break;
-        case "rejected":
-          statusTh = "รอการแก้ไข";
-          break;
-        default:
-          statusTh = d.status;
+      let userViewStatus = "";
+
+      if (d.status === "draft") {
+        // ⚠️ ยังไม่ส่งจริง แต่ให้ user เห็นเหมือนอยู่รอตรวจสอบ
+        statusTh = "รอตรวจสอบ";
+        userViewStatus = "pending_view";
+      } else if (d.status === "submitted") {
+        statusTh = "รอตรวจสอบ";
+        userViewStatus = "pending_view";
+      } else if (d.status === "approved") {
+        statusTh = "อนุมัติแล้ว";
+        userViewStatus = "approved";
+      } else if (d.status === "rejected") {
+        statusTh = "รอการแก้ไข";
+        userViewStatus = "rejected";
       }
 
       return {
@@ -183,7 +188,11 @@ if (!isset($_SESSION['user_id'])) {
         title: d.join_type || "(ไม่มีชื่อเรื่อง)",
         detail: d.course_name || "(ไม่มีรายละเอียด)",
         date: d.doc_date,
-        status: statusTh, // 🟢 เก็บเป็นภาษาไทย
+
+        raw_status: d.status, // ⭐ สถานะจริง DB
+        view_status: userViewStatus, // ⭐ สถานะใช้จัดแท็บ user
+        status: statusTh, // แสดงผลภาษาไทย
+
         word: d.word_file,
         pdf: d.pdf_file
       };
@@ -191,8 +200,6 @@ if (!isset($_SESSION['user_id'])) {
 
     renderList();
   }
-
-
 
   loadRequests();
 
@@ -220,66 +227,141 @@ if (!isset($_SESSION['user_id'])) {
   }
 
   function renderList() {
-    const dataFiltered = dataAll.filter((d) => d.status === activeTab);
+    const dataFiltered = dataAll.filter(d => d.view_status === activeTab);
+
     const sorted = dataFiltered.sort((a, b) =>
-      sortAsc ? new Date(a.date) - new Date(b.date) : new Date(b.date) - new Date(a.date)
+      sortAsc ?
+      new Date(a.date) - new Date(b.date) :
+      new Date(b.date) - new Date(a.date)
     );
 
     const start = (currentPage - 1) * itemsPerPage;
     const shown = sorted.slice(start, start + itemsPerPage);
 
     requestList.innerHTML = shown.map(req => {
-      // 🟢 ตั้งสีตามสถานะ
+
+      /* ===== สถานะ ===== */
       let statusClass = "";
       if (req.status === "รอตรวจสอบ") {
-        statusClass = "bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-semibold";
+        statusClass = "bg-yellow-100 text-yellow-700";
       } else if (req.status === "อนุมัติแล้ว") {
-        statusClass = "bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold";
+        statusClass = "bg-green-100 text-green-700";
       } else if (req.status === "รอการแก้ไข") {
-        statusClass = "bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold";
+        statusClass = "bg-red-100 text-red-700";
+      }
+
+      /* ===== ปุ่ม / ข้อความด้านล่าง ===== */
+      let actionHtml = "";
+
+      // 🟡 ยังเป็น draft → แสดงปุ่ม
+      if (req.raw_status === "draft") {
+        actionHtml = `
+        <button onclick="submitDocument(${req.document_id})"
+          class="mt-3 px-6 py-2 bg-teal-500 hover:bg-teal-600
+                 text-white text-sm font-semibold rounded-xl shadow">
+          ยืนยันการส่ง
+        </button>
+      `;
+      }
+
+      // ⏳ ส่งแล้ว → แสดงข้อความ (ไม่ใช่ปุ่ม)
+      else if (req.raw_status === "submitted") {
+        actionHtml = `
+        <div class="mt-3 px-4 py-2 rounded-xl
+                    bg-yellow-50 text-yellow-700
+                    text-sm font-semibold border border-yellow-300">
+          ⏳ กำลังรอตรวจสอบ
+        </div>
+      `;
       }
 
       return `
-    <div class="bg-gray-50 p-4 rounded-xl shadow flex justify-between items-start">
-      <div>
-        <!-- 🟢 ชื่อเอกสารเป็นลิงก์ -->
-        <a href="#" onclick="openDocument(${req.document_id})" 
-        class="font-semibold text-teal-600 hover:underline">${req.title}
-        </a>
+      <div class="bg-gray-50 p-4 rounded-xl shadow flex justify-between items-start">
 
-        
-        <!-- รายละเอียด + สถานะ -->
-        <div class="text-sm text-gray-500 mt-1 flex items-center space-x-2">
-            <span>${req.detail ? req.detail : "(ไม่มีรายละเอียด)"}</span>
+        <!-- ซ้าย -->
+        <div>
+          <a href="#" onclick="openDocument(${req.document_id})"
+             class="font-semibold text-teal-600 hover:underline text-lg">
+            ${req.title}
+          </a>
+
+          <div class="text-sm text-gray-500 mt-1 flex items-center space-x-2">
+            <span>${req.detail}</span>
             <span>| สถานะ:</span>
-            <span class="${statusClass}">${req.status}</span>
+            <span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">
+              ${req.status}
+            </span>
+          </div>
         </div>
 
-      </div>
-      <div class="text-right text-sm text-gray-600">
-        <!-- วันที่ -->
-        <div>${formatDate(req.date)}</div>
-        <!-- ไอคอน Word / PDF -->
-        <div class="mt-2 flex justify-end space-x-2">
-          <span class="text-blue-500 flex items-center space-x-1">
-            <img src="https://cdn-icons-png.flaticon.com/16/281/281760.png" alt="Word"> <span>Word</span>
-          </span>
-          <span class="text-red-500 flex items-center space-x-1">
-            <img src="https://cdn-icons-png.flaticon.com/16/337/337946.png" alt="PDF"> <span>PDF</span>
-          </span>
+        <!-- ขวา -->
+        <div class="text-right flex flex-col items-end text-sm text-gray-600 min-w-[200px]">
+
+          <!-- วันที่ -->
+          <div class="font-medium mb-2">
+            ${formatDate(req.date)}
+          </div>
+
+          <!-- PDF / Word -->
+          <div class="flex items-center space-x-4">
+
+            ${
+              req.word
+                ? `
+                  <a href="${req.word}" target="_blank"
+                     class="flex items-center space-x-1 text-blue-500 hover:underline">
+                    <img src="https://cdn-icons-png.flaticon.com/16/281/281760.png">
+                    <span>Word</span>
+                  </a>
+                `
+                : `
+                  <div class="flex items-center space-x-1 text-blue-500">
+                    <img src="https://cdn-icons-png.flaticon.com/16/281/281760.png">
+                    <span>Word</span>
+                  </div>
+                `
+            }
+
+            ${
+              req.pdf
+                ? `
+                  <a href="${req.pdf}" target="_blank"
+                     class="flex items-center space-x-1 text-red-500 hover:underline">
+                    <img src="https://cdn-icons-png.flaticon.com/16/337/337946.png">
+                    <span>PDF</span>
+                  </a>
+                `
+                : `
+                  <div class="flex items-center space-x-1 text-red-500">
+                    <img src="https://cdn-icons-png.flaticon.com/16/337/337946.png">
+                    <span>PDF</span>
+                  </div>
+                `
+            }
+
+          </div>
+
+          <!-- ปุ่ม / ข้อความ -->
+          ${actionHtml}
+
         </div>
       </div>
-    </div>
     `;
     }).join("");
 
+    /* ===== Pagination ===== */
     const totalPages = Math.ceil(dataFiltered.length / itemsPerPage);
     pagination.innerHTML = Array.from({
         length: totalPages
       }, (_, i) => i + 1)
       .map(i => `
-      <button onclick="goToPage(${i})" class="px-3 py-1 rounded border ${i === currentPage ? "bg-teal-500 text-white" : "text-teal-500 border-teal-500"
-                    }">${i}</button>
+      <button onclick="goToPage(${i})"
+        class="px-3 py-1 rounded border
+        ${i === currentPage
+          ? "bg-teal-500 text-white"
+          : "text-teal-500 border-teal-500"}">
+        ${i}
+      </button>
     `).join("");
   }
 
@@ -305,10 +387,10 @@ if (!isset($_SESSION['user_id'])) {
     renderList();
   };
 
-  let activeTab = "รอตรวจสอบ";
+  let activeTab = "pending_view";
 
   tabPending.onclick = () => {
-    activeTab = "รอตรวจสอบ";
+    activeTab = "pending_view"; // รวม draft + submitted
     tabPending.classList.add("bg-teal-500", "text-white");
     tabDone.classList.remove("bg-teal-500", "text-white");
     tabEdit.classList.remove("bg-teal-500", "text-white");
@@ -317,7 +399,7 @@ if (!isset($_SESSION['user_id'])) {
   };
 
   tabDone.onclick = () => {
-    activeTab = "อนุมัติแล้ว";
+    activeTab = "approved";
     tabDone.classList.add("bg-teal-500", "text-white");
     tabPending.classList.remove("bg-teal-500", "text-white");
     tabEdit.classList.remove("bg-teal-500", "text-white");
@@ -326,7 +408,7 @@ if (!isset($_SESSION['user_id'])) {
   };
 
   tabEdit.onclick = () => {
-    activeTab = "รอการแก้ไข";
+    activeTab = "rejected";
     tabEdit.classList.add("bg-teal-500", "text-white");
     tabDone.classList.remove("bg-teal-500", "text-white");
     tabPending.classList.remove("bg-teal-500", "text-white");
@@ -390,7 +472,7 @@ if (!isset($_SESSION['user_id'])) {
         }
 
         if (res.allowed === true) {
-          window.location.href = "../edit_document.php?id=" + docId;
+          window.location.href = "../documents/view_memo.php?id=" + docId;
           return;
         }
 
@@ -415,6 +497,51 @@ if (!isset($_SESSION['user_id'])) {
         console.log("Fetch error:", err); // ⭐ Debug
         Swal.fire("Error", "ไม่สามารถตรวจสอบสิทธิ์ได้", "error");
       });
+  }
+
+  function submitDocument(id) {
+    Swal.fire({
+      title: "ยืนยันการส่งเอกสาร?",
+      text: "เอกสารจะถูกส่งให้เจ้าหน้าที่ตรวจสอบ",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "ยืนยัน",
+      cancelButtonText: "ยกเลิก"
+    }).then(result => {
+      if (!result.isConfirmed) return;
+
+      fetch("../documents/submit_document.php", {
+
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            document_id: id
+          })
+        })
+        .then(r => r.json())
+        .then(res => {
+          if (res.success) {
+
+
+            Swal.fire({
+              icon: "success",
+              title: "ส่งเรียบร้อย",
+              text: "เอกสารอยู่ระหว่างรอการตรวจสอบ",
+              timer: 1500,
+              showConfirmButton: false
+            });
+
+            // ✅ โหลดข้อมูลใหม่จาก DB
+            loadRequests();
+
+
+          } else {
+            Swal.fire("ผิดพลาด", res.message || "ไม่สามารถส่งได้", "error");
+          }
+        });
+    });
   }
   </script>
 

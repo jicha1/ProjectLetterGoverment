@@ -13,7 +13,7 @@ require_once __DIR__ . '/functions.php';
 
 try {
   if (empty($_SESSION['user_id'])) {
-    header('Location: /form_Memo.html?err=unauthorized', true, 302);
+    header('Location: /documents/form_Memo.html?err=unauthorized', true, 302);
     exit;
   }
   $userId = (int) $_SESSION['user_id'];
@@ -22,7 +22,7 @@ try {
   $templateId = (int) ($_POST['template_id'] ?? 1);
 
   if ($documentId <= 0) {
-    header('Location: /form_Memo.html?err=nodoc', true, 302);
+    header('Location: /documents/form_Memo.html?err=nodoc', true, 302);
     exit;
   }
 
@@ -32,7 +32,7 @@ try {
   $chk->execute([':id' => $documentId]);
   $owner = (int) $chk->fetchColumn();
   if ($owner !== $userId) {
-    header('Location: /form_Memo.html?err=forbidden', true, 302);
+    header('Location: /documents/form_Memo.html?err=forbidden', true, 302);
     
     exit;
   }
@@ -87,7 +87,7 @@ try {
 
   // ตรวจขั้นต่ำ
   if (!empty($errors)) {
-    header('Location: /Pro_letter/edit_document.php?id=' . $documentId . '&err=validate');
+    header('Location: /Pro_letter/documents/view_memo.php?id=' . $documentId . '&err=validate');
     exit;
   }
 
@@ -122,7 +122,7 @@ $stmt->execute([':uid'=>$userId]);
 $canEdit = (int)$stmt->fetchColumn() > 0;
 
 if (!$canEdit) {
-    header("Location: /Pro_letter/edit_document.php?id={$documentId}&err=no_permission");
+    header("Location: /Pro_letter/documents/view_memo.php?id={$documentId}&err=no_permission");
     exit;
 }
 
@@ -206,7 +206,7 @@ $redirectBack = trim($redirectBack);
 
 /* ถ้ามี referer ที่ส่งมา → กลับไปหน้านั้น */
 if ($redirectBack !== '') {
-    header("Location: /Pro_letter/edit_document.php?id={$documentId}&saved=1&from=update");
+    header("Location: /Pro_letter/documents/view_memo.php?id={$documentId}&saved=1&from=update");
     exit;
 }
 
@@ -236,6 +236,6 @@ exit;
   if ($DEBUG_ERRORS) {
     echo 'server error: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
   } else {
-    header('Location: /Pro_letter/edit_document.php?id=' . $documentId . '&err=server', true, 302);
+    header('Location: /Pro_letter/documents/view_memo.php?id=' . $documentId . '&err=server', true, 302);
   }
 }
