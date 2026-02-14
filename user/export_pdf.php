@@ -74,7 +74,7 @@ $dompdf->getFontMetrics()->registerFont(
 // โหลด HTML จาก template
 // -------------------------------
 ob_start();
-include __DIR__ . '/edit_document_template.php';
+include __DIR__ . '/documents/view_memo.php';
 $html = ob_get_clean();
 
 // -------------------------------

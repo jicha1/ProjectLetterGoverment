@@ -1,4 +1,8 @@
-<?php  //functions.php
+<?php  //pro_letter/functions.php
+function h($string) {
+    return htmlspecialchars((string)$string, ENT_QUOTES, 'UTF-8');
+}
+
 function getPDO() {
     static $pdo = null;
     if ($pdo === null) {

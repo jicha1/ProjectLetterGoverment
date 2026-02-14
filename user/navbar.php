@@ -30,7 +30,7 @@
                     renderAdminExtraMenus(); 
                 }
             ?>
-      <a href="user/form_Memo.php">
+      <a href="documents/form_Memo.php">
         <div class="px-4 py-2 rounded-[11px] font-bold transition text-white">แบบฟอร์มบันทึกข้อความ</div>
       </a>
       <div class="relative">

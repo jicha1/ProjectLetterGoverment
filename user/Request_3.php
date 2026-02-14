@@ -188,7 +188,7 @@ if (!isset($_SESSION['user_id'])) {
                 }
             ?>
 
-            <a href="form_Memo.php">
+            <a href="documents/form_Memo.php">
                 <div class="px-4 py-2 rounded-[11px] font-bold transition bg-white text-teal-500 shadow">
                     แบบฟอร์มบันทึกข้อความ
                 </div>
@@ -324,10 +324,12 @@ if (!isset($_SESSION['user_id'])) {
             <!-- ข้อ 1 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 items-end">
                 <div class="flex items-center gap-3">
-                    <label class="lbl text-gray-800 whitespace-nowrap" for="docDate">1. วัน เดือน ปี :</label>
+                    <label class="lbl text-gray-800 whitespace-nowrap" for="docDate">1.วัน เดือน ปี :</label>
                     <div class="flex-1">
                         <input type="date" name="doc_date" class="w-full border rounded-md p-2" id="docDate" />
+
                     </div>
+                    <label class="lbl text-gray-800 whitespace-nowrap">ที่ต้องการให้ปรากฎบนบันทึกข้อความ</label>
                 </div>
             </div>
 
@@ -396,16 +398,16 @@ if (!isset($_SESSION['user_id'])) {
                         แขกของมหาวิทยาลัย
                     </label>
 
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-3">
                         <label class="flex items-center gap-2">
-                            <input type="radio" name="person_type" value="อื่นๆ" class="accent-black"
-                                id="personTypeOtherRadio">
+                            <input type="radio" name="person_type" value="อื่น ๆ" class="accent-black"
+                                id="otherTypeRadio">
                             อื่น ๆ (ระบุ)
                         </label>
 
-                        <input type="text" name="person_type_other_detail" id="personTypeOtherInput"
-                            class="border rounded-md p-2 w-[260px] ml-3 bg-gray-100 text-gray-400"
-                            placeholder="โปรดระบุ" disabled>
+                        <input type="text" name="person_type_other" id="otherTypeInput"
+                            class="border rounded-md p-2 w-[260px] bg-gray-100 text-gray-400" placeholder="โปรดระบุ"
+                            disabled>
                     </div>
 
                 </div>
@@ -441,15 +443,15 @@ if (!isset($_SESSION['user_id'])) {
                         มารับรองแขก
                     </label>
 
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-3">
                         <label class="flex items-center gap-2">
-                            <input type="radio" name="reason" value="อื่นๆ" class="accent-black" id="reasonOtherRadio">
+                            <input type="radio" name="reason" value="อื่น ๆ" id="reasonOtherRadio" class="accent-black">
                             อื่น ๆ (ระบุ)
                         </label>
 
-                        <input type="text" name="reason_other_detail" id="reasonOtherInput"
-                            class="border rounded-md p-2 w-[260px] ml-3 bg-gray-100 text-gray-400"
-                            placeholder="โปรดระบุ" disabled>
+                        <input type="text" name="reason_other" id="reasonOtherInput"
+                            class="border rounded-md p-2 w-[260px] bg-gray-100 text-gray-400" placeholder="โปรดระบุ"
+                            disabled>
                     </div>
                 </div>
             </div>
@@ -534,7 +536,7 @@ if (!isset($_SESSION['user_id'])) {
             <!-- ปุ่ม -->
             <div class="relative mt-20">
                 <div class="absolute right-0 bottom-0">
-                    <a href="../form_memo_room_request_1.php"
+                    <a href="../documents/form_memo_room_request_1.php"
                         class="bg-[#11C2B9] hover:bg-[#0fa39c] text-white font-bold w-[130px] h-[35px] rounded-md flex items-center justify-center transition">
                         ดำเนินการ
                     </a>
@@ -659,8 +661,6 @@ if (!isset($_SESSION['user_id'])) {
             setStar(purposeLabel, false);
         });
     });
-
-
 
     /* ====== Validate (ใส่กรอบแดง + ดอกจันเท่านั้น) ====== */
     function scrollFocus(el) {
@@ -824,7 +824,11 @@ if (!isset($_SESSION['user_id'])) {
                 "กันยายน",
                 "ตุลาคม",
                 "พฤศจิกายน",
-                "ธันวาคม",
+                "ธันวาคม", <<
+                <<
+                <<
+                <
+                HEAD
             ];
 
             const startDay = start.getDate();
@@ -906,7 +910,9 @@ if (!isset($_SESSION['user_id'])) {
     function closeMenu() {
         profileMenu.classList.add("hidden");
     }
+    </script>
 
+    <script>
     const main = document.getElementById("mainCategory");
     const sub = document.getElementById("subCategory");
 
@@ -914,8 +920,8 @@ if (!isset($_SESSION['user_id'])) {
     const redirectMain = {
         train: "form_Memo.php",
         academic: "Request_1.php",
-        external: null, // ยังไม่มีฟอร์ม
-        internal: null // ให้เลือกหมวดย่อยแทน
+        external: null, // ไม่มีฟอร์มโดยตรง
+        internal: null // ต้องเลือกหมวดย่อย
     };
 
     const redirectSub = {
@@ -927,10 +933,18 @@ if (!isset($_SESSION['user_id'])) {
         "ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย": "Request_7.php"
     };
 
-    // หมวดย่อยของ "ภายใน"
     const subInternal = Object.keys(redirectSub);
 
-    // เมื่อเลือก "หมวดหลัก"
+    // ป้องกัน redirect ซ้ำ (ถ้าอยู่หน้าเดียวกัน)
+    function redirectIfDifferent(file) {
+        if (!file) return;
+        const currentPage = window.location.pathname.split("/").pop();
+        if (currentPage !== file) {
+            window.location.href = file;
+        }
+    }
+
+    // เมื่อเลือกหมวดหลัก
     main.addEventListener("change", () => {
         const value = main.value;
 
@@ -938,20 +952,21 @@ if (!isset($_SESSION['user_id'])) {
         sub.innerHTML = `<option value="">-- เลือกหมวดย่อย --</option>`;
         sub.disabled = true;
 
-        // ถ้าเลือกหมวดที่มี redirect ทันที เช่น ฝึกอบรม, ประชุมฯ
+        // ถ้าเลือกหมวดที่มี redirect แบบหน้าเดียว เช่น "ฝึกอบรม"
         if (redirectMain[value]) {
-            window.location.href = redirectMain[value];
+            redirectIfDifferent(redirectMain[value]);
             return;
         }
 
-        // ถ้าเลือก "ภายนอก" → ไม่ redirect, ไม่เปิดหมวดย่อย
+        // ถ้าเป็นหมวดภายนอก → ไม่มีฟอร์มในระบบ
         if (value === "external") {
             return;
         }
 
-        // ถ้าเลือก "ภายใน" → เปิดหมวดย่อย
+        // หมวดภายใน → เปิดหมวดย่อย
         if (value === "internal") {
             sub.disabled = false;
+
             subInternal.forEach(text => {
                 const opt = document.createElement("option");
                 opt.value = text;
@@ -961,57 +976,14 @@ if (!isset($_SESSION['user_id'])) {
         }
     });
 
-    // เมื่อเลือกหมวดย่อยของภายใน → redirect
+    // เมื่อเลือกหมวดย่อย → redirect
     sub.addEventListener("change", () => {
         const value = sub.value;
         if (redirectSub[value]) {
-            window.location.href = redirectSub[value];
+            redirectIfDifferent(redirectSub[value]);
         }
     });
     </script>
-
-    <script>
-    const personTypeOtherRadio = document.getElementById("personTypeOtherRadio");
-    const personTypeOtherInput = document.getElementById("personTypeOtherInput");
-    const personTypeRadios = document.querySelectorAll('input[name="person_type"]');
-
-    personTypeRadios.forEach(radio => {
-        radio.addEventListener("change", () => {
-            if (personTypeOtherRadio.checked) {
-                personTypeOtherInput.disabled = false;
-                personTypeOtherInput.classList.remove("bg-gray-100", "text-gray-400");
-                personTypeOtherInput.focus();
-            } else {
-                personTypeOtherInput.disabled = true;
-                personTypeOtherInput.classList.add("bg-gray-100", "text-gray-400");
-                personTypeOtherInput.value = "";
-            }
-        });
-    });
-    </script>
-
-    <script>
-    // ========== ระบบ "อื่น ๆ (ระบุ)" ของข้อ 6 ==========
-    const reasonOtherRadio = document.getElementById("reasonOtherRadio");
-    const reasonOtherInput = document.getElementById("reasonOtherInput");
-    const reasonRadios = document.querySelectorAll('input[name="reason"]');
-
-    reasonRadios.forEach(radio => {
-        radio.addEventListener("change", () => {
-            if (reasonOtherRadio.checked) {
-                reasonOtherInput.disabled = false;
-                reasonOtherInput.classList.remove("bg-gray-100", "text-gray-400");
-                reasonOtherInput.focus();
-            } else {
-                reasonOtherInput.disabled = true;
-                reasonOtherInput.classList.add("bg-gray-100", "text-gray-400");
-                reasonOtherInput.value = "";
-            }
-        });
-    });
-    </script>
-
-
 
 </body>
 

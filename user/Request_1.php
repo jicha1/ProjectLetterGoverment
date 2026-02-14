@@ -189,7 +189,7 @@ if (!isset($_SESSION['user_id'])) {
                 }
             ?>
 
-            <a href="form_Memo.php">
+            <a href="documents/form_Memo.php">
                 <div class="px-4 py-2 rounded-[11px] font-bold transition bg-white text-teal-500 shadow">
                     แบบฟอร์มบันทึกข้อความ
                 </div>
@@ -448,6 +448,8 @@ if (!isset($_SESSION['user_id'])) {
             </div>
 
 
+
+
             <div class="mb-6">
                 <label class="lbl text-gray-800 block mb-2" id="dateLabel">7. วันที่เข้าร่วม</label>
 
@@ -685,7 +687,7 @@ if (!isset($_SESSION['user_id'])) {
             <!-- ปุ่ม -->
             <div class="relative mt-20">
                 <div class="absolute right-0 bottom-0">
-                    <a href="../form_memo_academic_1.php"
+                    <a href="../documents/form_memo_academic_1.php"
                         class="bg-[#11C2B9] hover:bg-[#0fa39c] text-white font-bold w-[130px] h-[35px] rounded-md flex items-center justify-center transition">
                         ดำเนินการ
                     </a>
@@ -974,9 +976,8 @@ if (!isset($_SESSION['user_id'])) {
                 "กันยายน",
                 "ตุลาคม",
                 "พฤศจิกายน",
-                "ธันวาคม"
+                "ธันวาคม",
             ];
-
 
             const startDay = start.getDate();
             const endDay = end.getDate();
@@ -1063,7 +1064,7 @@ if (!isset($_SESSION['user_id'])) {
 
     // Mapping ไฟล์สำหรับ redirect
     const redirectMain = {
-        train: "form_Memo.php",
+        train: "documents/form_Memo.php",
         academic: "Request_1.php",
         external: null, // ยังไม่มีฟอร์ม
         internal: null // ให้เลือกหมวดย่อยแทน

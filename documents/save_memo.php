@@ -1,5 +1,5 @@
 <?php
-// user/save_memo.php
+// documents/save_memo.php
 session_start();
 
 /** ==== DEV FLAGS ==== */
@@ -14,17 +14,11 @@ require_once __DIR__ . '/../functions.php';
 
 try {
     // ต้องมี user_id ใน session (ถ้า DEV_AUTO_LOGIN=false ต้องล็อกอินจริง)
-    if (empty($_SESSION['user_id'])) {
-        // ถ้าส่งฟอร์มปกติ -> เด้งกลับหน้าเดิมพร้อม error, ถ้า AJAX -> ส่ง JSON
-        $wantsJson = isset($_POST['_ajax']) && $_POST['_ajax'] === '1';
-        if ($wantsJson) {
-            header('Content-Type: application/json; charset=utf-8', true, 401);
-            echo json_encode(['ok' => false, 'error' => 'unauthorized']);
-        } else {
-            header('Location: form_Memo.html?err=unauthorized', true, 302);
-        }
-        exit;
-    }
+  if (empty($_SESSION['user_id'])) {
+    header('Location: /Pro_letter/documents/form_Memo.php?err=unauthorized');
+    exit;
+}
+
     $userId = (int) $_SESSION['user_id'];
 
     /** ===== รับค่า POST ===== */
@@ -37,11 +31,11 @@ try {
     $purpose = $_POST['purpose'] ?? '';    // academic|training|meeting|other
     $eventTitle = trim($_POST['event_title'] ?? '');
 
-    $dateOption = $_POST['date_option'] ?? '';    // single|range
-    $singleDate = trim($_POST['single_date'] ?? '');
-    $rangeDate = trim($_POST['range_date'] ?? '');
+   $joinDates = trim($_POST['join_date'] ?? ''); // วันเดียว หรือ หลายวัน (ข้อความไทย)
 
-    $isOnline = isset($_POST['is_online']) ? 1 : 0;
+
+    $isOnline = ($_POST['is_online'] ?? '1') === '1' ? 1 : 0;
+
     $place = trim($_POST['place'] ?? '');
 
     $noCost = isset($_POST['no_cost']) ? 1 : 0;
@@ -55,38 +49,47 @@ try {
     $faculty = trim($_POST['faculty'] ?? '');
     $department = trim($_POST['department'] ?? '');
 
+    $mode = $_POST['mode'] ?? 'create';   // create | update
+$documentId = isset($_POST['document_id']) ? (int)$_POST['document_id'] : 0;
+
     /** ===== ตรวจฝั่งเซิร์ฟเวอร์ ===== */
     $errors = [];
-    if ($docDate === '')
-        $errors['doc_date'] = 'required';
-    if ($purpose === '')
-        $errors['purpose'] = 'required';
-    if ($eventTitle === '')
-        $errors['event_title'] = 'required';
-    if ($dateOption === 'single' && $singleDate === '')
-        $errors['single_date'] = 'required';
-    if ($dateOption === 'range' && $rangeDate === '')
-        $errors['range_date'] = 'required';
-    if (!$isOnline && $place === '')
-        $errors['place'] = 'required';
-    if (!$noCost && !is_numeric($amountRaw))
-        $errors['amount'] = 'number';
-    if ($carUsed && $carPlate === '')
-        $errors['car_plate'] = 'required';
+    if ($docDate === '') {
+    $errors['doc_date'] = 'required';
+}
 
-    $wantsJson = (isset($_POST['_ajax']) && $_POST['_ajax'] === '1')
-        || (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
+if ($purpose === '') {
+    $errors['purpose'] = 'required';
+}
+
+if ($eventTitle === '') {
+    $errors['event_title'] = 'required';
+}
+
+if ($joinDates === '') {
+    $errors['join_date'] = 'required';
+}
+
+if (!$isOnline && $place === '') {
+    $errors['place'] = 'required';
+}
+
+if (!$noCost && !is_numeric($amountRaw)) {
+    $errors['amount'] = 'number';
+}
+
+if ($carUsed && $carPlate === '') {
+    $errors['car_plate'] = 'required';
+}
+
+
+    
 
     if (!empty($errors)) {
-        if ($wantsJson) {
-            header('Content-Type: application/json; charset=utf-8', true, 422);
-            echo json_encode(['ok' => false, 'errors' => $errors]);
-        } else {
-            // ส่งกลับหน้าเดิม
-            header('Location: form_Memo.html?err=validate', true, 302);
-        }
-        exit;
-    }
+    header('Location: /Pro_letter/documents/form_Memo.php?err=validate');
+    exit;
+}
+
 
     /** ===== เขียนฐานข้อมูล ===== */
     $pdo = db();
@@ -112,11 +115,79 @@ try {
         $hdrAgency = $row['faculty_name'] . ' ภาค' . $row['department_name'] . ' โทร. ' . $row['phone'];
     }
 
-    // 2) สร้างเอกสาร พร้อม header_text
+
+    if ($mode === 'update' && $documentId <= 0) {
+    throw new Exception("Invalid document id for update");
+}
+
+   if ($mode === 'update') {
+
+    // ตรวจว่าเป็นเจ้าของ + สถานะแก้ได้
+    $chk = $pdo->prepare("
+        SELECT owner_id, status
+        FROM documents
+        WHERE document_id = :id
+        LIMIT 1
+    ");
+    $chk->execute([':id' => $documentId]);
+    $doc = $chk->fetch(PDO::FETCH_ASSOC);
+
+    if (!$doc) {
+        throw new Exception("Document not found");
+    }
+    $roleId = (int)($_SESSION['role_id'] ?? 0);
+    $isAdmin   = ($roleId === 1);
+    $isOfficer = ($roleId === 2);
+
+    // 🔒 ถ้าเอกสารถูกตรวจแล้วหรืออนุมัติแล้ว → ใครก็แก้ไม่ได้
+    if (in_array($doc['status'], ['checked', 'approved'])) {
+        throw new Exception("Document locked");
+    }
+
+        // 👤 User ธรรมดา (ไม่ใช่ Admin / Officer)
+    if (!$isAdmin && !$isOfficer) {
+
+        // ต้องเป็นเจ้าของเอกสาร
+        if ($doc['owner_id'] != $userId) {
+            throw new Exception("No permission");
+        }
+
+        // User แก้ได้เฉพาะ draft / rejected
+        if (!in_array($doc['status'], ['draft', 'rejected'])) {
+            throw new Exception("Document locked");
+        }
+    }
+
+
+    // 🔄 UPDATE documents
     $stmt = $pdo->prepare("
-    INSERT INTO documents (template_id, owner_id, department_id, doc_no, doc_date, subject, header_text, status, remark)
-    VALUES (:template_id, :owner_id, :department_id, NULL, :doc_date, :subject, :header_text, 'submitted', NULL)
-");
+        UPDATE documents
+        SET
+            template_id   = :template_id,
+            department_id = :department_id,
+            doc_date      = :doc_date,
+            subject       = :subject,
+            header_text   = :header_text,
+            updated_at    = NOW()
+        WHERE document_id = :id
+    ");
+    $stmt->execute([
+        ':template_id' => $templateId,
+        ':department_id' => $departmentId,
+        ':doc_date' => $docDate,
+        ':subject' => $subject,
+        ':header_text' => $hdrAgency,
+        ':id' => $documentId
+    ]);
+
+} else {
+    // 🆕 CREATE
+    $stmt = $pdo->prepare("
+        INSERT INTO documents
+        (template_id, owner_id, department_id, doc_no, doc_date, subject, header_text, status, remark)
+        VALUES
+        (:template_id, :owner_id, :department_id, NULL, :doc_date, :subject, :header_text, 'draft', NULL)
+    ");
     $stmt->execute([
         ':template_id' => $templateId,
         ':owner_id' => $userId,
@@ -126,8 +197,7 @@ try {
         ':header_text' => $hdrAgency
     ]);
     $documentId = (int) $pdo->lastInsertId();
-
-
+}
 
 
     $values = [
@@ -136,7 +206,7 @@ try {
         3 => $position,
         4 => $joinType,
         5 => $eventTitle,
-        6 => ($dateOption === 'single') ? $singleDate : $rangeDate,
+        6 => $joinDates,
         7 => $isOnline ? 'เข้าร่วมรูปแบบออนไลน์' : $place,
         8 => number_format($amount, 2, '.', ''),
         9 => $carUsed ? $carPlate : '',
@@ -167,26 +237,29 @@ try {
 
     $pdo->commit();
 
-    // ----- สำคัญ: ถ้า submit ฟอร์มปกติ -> เด้งไปหน้าแก้ไข พร้อม id -----
-    if (!$wantsJson) {
-        header('Location: ../edit_document.php?id=' . $documentId, true, 302);
+header(
+  'Location: /Pro_letter/documents/view_memo.php?id='
+  . $documentId
+  . '&saved=1&from='
+  . $mode
+);
+exit;
+
+
+
+
+} catch (Throwable $e) {
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
+    if ($DEBUG_ERRORS) {
+        echo "<pre>";
+        echo htmlspecialchars($e->getMessage());
+        echo "</pre>";
         exit;
     }
 
-    // ถ้าเรียกแบบ AJAX -> ส่ง JSON
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['ok' => true, 'document_id' => $documentId]);
-
-} catch (Throwable $e) {
-    if (isset($pdo) && $pdo->inTransaction())
-        $pdo->rollBack();
-    if ($wantsJson ?? false) {
-        header('Content-Type: application/json; charset=utf-8', true, 500);
-        $res = ['ok' => false, 'error' => 'server'];
-        if ($DEBUG_ERRORS)
-            $res['message'] = $e->getMessage();
-        echo json_encode($res);
-    } else {
-        header('Location: form_Memo.html?err=server', true, 302);
-    }
+    header('Location: /Pro_letter/documents/form_Memo.php?err=server');
+    exit;
 }

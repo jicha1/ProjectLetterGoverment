@@ -1,0 +1,989 @@
+<?php
+// pro_letter/documents/form_Memo.php
+
+$CURRENT_MAIN = "train";
+$CURRENT_SUB  = "ฝึกอบรม";
+
+
+session_start();
+require_once __DIR__ . '/../functions.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.html");
+    exit;
+}
+
+
+$docId  = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$isEdit = $docId > 0;
+$formData = [];
+
+// ===============================
+// LOAD DATA (เฉพาะโหมดแก้ไข)
+// ===============================
+if ($isEdit) {
+    $pdo = db();
+
+    // ตรวจเอกสาร
+    $stmt = $pdo->prepare("
+        SELECT document_id, owner_id, status
+        FROM documents
+        WHERE document_id = :id
+        LIMIT 1
+    ");
+    $stmt->execute([':id' => $docId]);
+    $doc = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$doc) exit("ไม่พบเอกสาร");
+   $roleId = (int)($_SESSION['role_id'] ?? 0);
+    $isAdmin   = ($roleId === 1);
+    $isOfficer = ($roleId === 2);
+
+    // ✅ อนุญาต Admin / Officer แก้ไขได้
+    if (!$isAdmin && !$isOfficer) {
+        if ($doc['owner_id'] != $_SESSION['user_id']) {
+            header("Location: view_memo.php?id={$docId}&err=no_permission");
+            exit;
+
+        }
+
+        if (!in_array($doc['status'], ['draft','rejected'])) {
+           header("Location: view_memo.php?id={$docId}&err=no_permission");
+          exit;
+
+        }
+    }
+
+
+    // โหลดค่า document_values
+    $q = $pdo->prepare("
+        SELECT field_id, value_text
+        FROM document_values
+        WHERE document_id = :id
+    ");
+    $q->execute([':id' => $docId]);
+
+    foreach ($q->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $formData[(int)$row['field_id']] = $row['value_text'];
+    }
+}
+
+// ===============================
+// MAP VARIABLES (ต้องอยู่หลัง load DB เท่านั้น)
+// ===============================
+$docDate     = $formData[1]  ?? '';
+$ownerName   = $formData[2]  ?? '';
+$position    = $formData[3]  ?? '';
+$joinType    = $formData[4]  ?? '';   // purpose (ข้อความไทย)
+$courseName  = $formData[5]  ?? '';
+$joinDates   = $formData[6]  ?? '';
+$location    = $formData[7]  ?? '';
+$amountStr   = $formData[8]  ?? '';
+$vehicle     = $formData[9]  ?? '';
+$faculty     = $formData[10] ?? '';
+$department  = $formData[11] ?? '';
+
+
+// ===============================
+// EXPENSE JSON (field_id = 20)
+// ===============================
+$expenseJson = $formData[20] ?? ''; // <<<<< ใช้ field_id 20 เก็บ JSON
+
+$expenseData = [];
+if ($expenseJson) {
+  $tmp = json_decode($expenseJson, true);
+  if (is_array($tmp)) $expenseData = $tmp;
+}
+
+// ค่าเริ่มต้น (กันหน้าแตกตอน create)
+$expenseData = $expenseData ?: [
+  "compensation" => [], // หมวด 1
+  "allowance" => [      // หมวด 2
+    "registration" => ["enabled"=>false, "price"=>0, "people"=>1],
+    "lodging"      => ["enabled"=>false, "date_text"=>"", "unit_price"=>0, "nights"=>1, "people"=>1],
+    "perdiem"      => ["enabled"=>false, "unit_price"=>0, "meals"=>1, "people"=>1],
+    "transport"    => ["enabled"=>false, "items"=>[]],
+    "others"       => []
+  ],
+  "materials" => []     // หมวด 3
+];
+
+
+// ===============================
+// FIX BUG ❌ ข้อ 5 : วันที่ (radio)
+// ===============================
+$isRangeDate = preg_match('/\d+\s*-\s*\d+/', $joinDates);
+
+
+// ===============================
+// FIX BUG ❌ ข้อ 6 : ออนไลน์ / ออนไซต์
+// ===============================
+$isOnline = ($location === 'เข้าร่วมรูปแบบออนไลน์');
+
+// ===============================
+// PURPOSE (map เป็น code สำหรับ radio)
+// ===============================
+$purpose = 'other';
+if ($joinType === 'นำเสนอผลงานทางวิชาการ') {
+    $purpose = 'academic';
+} elseif ($joinType === 'เข้าร่วมประชุมวิชาการในงาน') {
+    $purpose = 'meeting';
+} elseif ($joinType === 'เข้ารับการฝึกอบรมหลักสูตร') {
+    $purpose = 'training';
+}
+
+// กรณีอื่น ๆ
+$purposeOther = ($purpose === 'other') ? $joinType : '';
+
+
+?>
+
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แบบฟอร์มบันทึกข้อความ</title>
+
+  <!-- ✅ เพิ่มส่วนนี้ -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css" />
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
+  <!-- ✅ จบส่วนที่เพิ่ม -->
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+  @import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap");
+
+  html,
+  :root {
+    --base-fs: 16px;
+  }
+
+  body,
+  label,
+  input,
+  textarea,
+  select,
+  option,
+  button,
+  span,
+  div {
+    font-size: var(--base-fs);
+  }
+
+  select,
+  input,
+  textarea {
+    line-height: 1.4;
+  }
+
+  select option {
+    font-size: var(--base-fs);
+  }
+
+  #requestListContainer {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .custom-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: white;
+    border: 2px solid #11c2b9;
+    border-radius: 1rem;
+    padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23000000" height="16" viewBox="0 0 20 20" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M5.516 7.548l4.486 4.448 4.486-4.448L15.56 9l-5.558 5.5L4.444 9z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+  }
+
+  .custom-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(17, 194, 185, 0.35);
+  }
+
+  /* error styles */
+  .error {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15);
+  }
+
+  .lbl.asterisk::after {
+    content: " *";
+    color: #ef4444;
+    font-weight: 700;
+    margin-left: 4px;
+  }
+
+  /* floating hint bubble */
+  .hint {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fee2e2;
+    border: 1px solid #ef4444;
+    color: #991b1b;
+    padding: 4px 8px;
+    border-radius: 8px;
+    margin-top: 6px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+  }
+
+  .hint svg {
+    min-width: 16px;
+    min-height: 16px;
+  }
+
+  .hint:before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 16px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent transparent #ef4444 transparent;
+  }
+
+  .hint:after {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: 16px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #fee2e2 transparent;
+  }
+
+  .shake {
+    animation: shake 0.2s linear 0s 2;
+  }
+
+  @keyframes shake {
+
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+
+    25% {
+      transform: translateX(-3px);
+    }
+
+    75% {
+      transform: translateX(3px);
+    }
+  }
+  </style>
+</head>
+
+<body class="bg-gray-100">
+  <header class="bg-teal-500 text-white p-4 flex justify-between items-center shadow-md"
+    style="font-family: Arial, Helvetica, sans-serif">
+    <div class="flex items-center space-x-3">
+      <div class="w-[56px] h-[56px] flex items-center justify-center relative overflow-visible">
+        <svg xmlns="http://www.w3.org/2000/svg" class="absolute scale-[1.4] text-white"
+          style="width: 60px; height: 60px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m0 0a2 2 0 00-2-2H5a2 2 0 00-2 2m18 0v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8" />
+        </svg>
+      </div>
+      <div class="leading-tight">
+        <div class="text-[16px] font-bold">Smart</div>
+        <div class="text-[16px] font-bold -mt-[2px]">Government</div>
+        <div class="text-[13px] mt-[0px]">Letter Management System</div>
+      </div>
+    </div>
+    <div class="flex items-center space-x-4">
+      <a href="home.php">
+        <div class="px-4 py-2 rounded-[11px] font-bold transition text-white">
+          หน้าหลัก
+        </div>
+      </a>
+
+      <?php 
+                if (isset($_SESSION['permissions']) && in_array(3, $_SESSION['permissions'])) {
+                    renderAdminExtraMenus(); 
+                }
+            ?>
+
+      <a href="documents/form_Memo.php">
+        <div class="px-4 py-2 rounded-[11px] font-bold transition bg-white text-teal-500 shadow">
+          แบบฟอร์มบันทึกข้อความ
+        </div>
+      </a>
+
+      <div class="relative">
+        <!-- ปุ่ม Profile -->
+        <button id="profileBtn"
+          class="bg-white text-teal-500 px-4 py-2 rounded-[11px] shadow flex items-center space-x-2 hover:bg-gray-100">
+          <div class="text-right leading-tight">
+            <div class="font-bold text-[14px]">
+              <?= htmlspecialchars($_SESSION['fullname'] ?? 'Guest') ?>
+            </div>
+            <div class="text-[12px]">
+              <?= htmlspecialchars($_SESSION['role_name'] ?? '') ?>
+            </div>
+
+          </div>
+          <div class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M5.121 17.804A13.937 13.937 0 0112 15c2.33 0 4.487.577 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+        </button>
+
+        <!-- เมนู Dropdown -->
+        <div id="profileMenu" class="hidden absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-50">
+          <a href="../logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">ออกจากระบบ</a>
+          <button onclick="closeMenu()"
+            class="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">อยู่ต่อ</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <form method="post" action="save_calcu.php" id="memoForm">
+
+    <?php if ($isEdit): ?>
+    <input type="hidden" name="document_id" value="<?= (int)$docId ?>">
+    <input type="hidden" name="mode" value="update">
+    <?php else: ?>
+    <input type="hidden" name="mode" value="create">
+    <?php endif; ?>
+    <input type="hidden" name="expense_json" id="expenseJsonInput" value="<?= h($expenseJson) ?>">
+    <input type="hidden" name="amount" id="amountHidden" value="<?= h($formData[8] ?? '0.00') ?>">
+
+
+    <!-- กล่องเนื้อหา -->
+    <div class="w-[900px] mx-auto mt-16 mb-6 bg-white shadow-md rounded-md p-8" style="min-height: 1122px">
+
+
+      <h1 class="text-center font-bold mb-6 text-black">แบบฟอร์มประมาณการค่าใช้จ่าย</h1>
+
+      <!-- ====== SUMMARY ====== -->
+      <div class="mb-8 p-6 rounded-[25px] border-2" style="background-color:#e3f9f8;border-color:#11c2b9;">
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+          <div class="text-gray-800 font-bold">สรุปยอดรวมรายจ่าย</div>
+          <div class="flex items-center gap-2">
+            <input id="totalAmount" type="text" class="border rounded-md p-2 w-40 bg-gray-50 text-gray-700" value="0.00"
+              readonly>
+            <span class="text-gray-800 font-bold">บาท</span>
+          </div>
+        </div>
+        <div class="text-gray-600 text-sm mt-2">* ระบบคำนวณให้อัตโนมัติ (บันทึกยอดรวมลงเอกสารให้)</div>
+      </div>
+
+      <!-- =========================
+  1) ค่าตอบแทน
+========================= -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between">
+          <div class="font-bold text-gray-800">1. ค่าตอบแทน</div>
+          <button type="button" id="addCompBtn"
+            class="bg-[#11C2B9] hover:bg-[#0fa39c] text-white font-bold px-4 py-2 rounded-md transition">
+            + เพิ่มรายการ
+          </button>
+        </div>
+
+        <div id="compList" class="mt-3 space-y-3"></div>
+
+        <!-- placeholder ถ้าไม่มี -->
+        <div id="compEmpty" class="mt-3 text-gray-500">
+          1.1 <span class="italic">ไม่มีรายการ</span> — 0.00 บาท
+        </div>
+      </div>
+
+      <!-- =========================
+  2) ค่าใช้สอย
+========================= -->
+      <div class="mb-8">
+        <div class="font-bold text-gray-800 mb-3">2. ค่าใช้สอย</div>
+
+        <!-- 2.1 ค่าลงทะเบียน -->
+        <div class="p-4 rounded-[20px] border-2 mb-4" style="border-color:#11c2b9;background:#f7fffe;">
+          <div class="flex items-center justify-between">
+            <label class="font-bold text-gray-800 flex items-center gap-2">
+              <input type="checkbox" id="regEnabled" class="accent-black">
+              2.1 ค่าลงทะเบียน
+            </label>
+            <div class="text-gray-800 font-bold">
+              <span id="regTotal">0.00</span> บาท
+            </div>
+          </div>
+
+          <div id="regForm" class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="text-gray-700">ราคา (บาท)</label>
+              <input type="number" id="regPrice" class="w-full border rounded-md p-2" min="0" step="0.01" value="0">
+            </div>
+            <div>
+              <label class="text-gray-700">จำนวนคน</label>
+              <input type="number" id="regPeople" class="w-full border rounded-md p-2" min="1" step="1" value="1">
+            </div>
+            <div class="text-gray-600 flex items-end">
+              <span>(ราคา × คน)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2.2 ค่าที่พัก -->
+        <div class="p-4 rounded-[20px] border-2 mb-4" style="border-color:#11c2b9;background:#f7fffe;">
+          <div class="flex items-center justify-between">
+            <label class="font-bold text-gray-800 flex items-center gap-2">
+              <input type="checkbox" id="lodEnabled" class="accent-black">
+              2.2 ค่าที่พักค้างคืน
+            </label>
+            <div class="text-gray-800 font-bold">
+              <span id="lodTotal">0.00</span> บาท
+            </div>
+          </div>
+
+          <div id="lodForm" class="mt-3 grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div class="md:col-span-2">
+              <label class="text-gray-700">ช่วงวันที่ (เช่น 2 – 3 ก.พ. 68)</label>
+              <input type="text" id="lodDateText" class="w-full border rounded-md p-2" placeholder="2 – 3 ก.พ. 68">
+            </div>
+            <div>
+              <label class="text-gray-700">ราคา/คืน</label>
+              <input type="number" id="lodUnit" class="w-full border rounded-md p-2" min="0" step="0.01" value="0">
+            </div>
+            <div>
+              <label class="text-gray-700">จำนวนคืน</label>
+              <input type="number" id="lodNights" class="w-full border rounded-md p-2" min="1" step="1" value="1">
+            </div>
+            <div>
+              <label class="text-gray-700">จำนวนคน</label>
+              <input type="number" id="lodPeople" class="w-full border rounded-md p-2" min="1" step="1" value="1">
+            </div>
+            <div class="text-gray-600 md:col-span-4">
+              <span>(ราคา/คืน × คืน × คน)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2.3 ค่าเบี้ยเลี้ยง -->
+        <div class="p-4 rounded-[20px] border-2 mb-4" style="border-color:#11c2b9;background:#f7fffe;">
+          <div class="flex items-center justify-between">
+            <label class="font-bold text-gray-800 flex items-center gap-2">
+              <input type="checkbox" id="perEnabled" class="accent-black">
+              2.3 ค่าเบี้ยเลี้ยง
+            </label>
+            <div class="text-gray-800 font-bold">
+              <span id="perTotal">0.00</span> บาท
+            </div>
+          </div>
+
+          <div id="perForm" class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="text-gray-700">ราคา/มื้อ</label>
+              <input type="number" id="perUnit" class="w-full border rounded-md p-2" min="0" step="0.01" value="0">
+            </div>
+            <div>
+              <label class="text-gray-700">จำนวนมื้อ</label>
+              <input type="number" id="perMeals" class="w-full border rounded-md p-2" min="1" step="1" value="1">
+            </div>
+            <div>
+              <label class="text-gray-700">จำนวนคน</label>
+              <input type="number" id="perPeople" class="w-full border rounded-md p-2" min="1" step="1" value="1">
+            </div>
+            <div class="text-gray-600 md:col-span-3">
+              <span>(ราคา/มื้อ × มื้อ × คน)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2.4 ค่าพาหนะ -->
+        <div class="p-4 rounded-[20px] border-2 mb-4" style="border-color:#11c2b9;background:#f7fffe;">
+          <div class="flex items-center justify-between">
+            <label class="font-bold text-gray-800 flex items-center gap-2">
+              <input type="checkbox" id="trEnabled" class="accent-black">
+              2.4 ค่าพาหนะ
+            </label>
+            <div class="text-gray-800 font-bold">
+              <span id="trTotal">0.00</span> บาท
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <button type="button" id="addTrItemBtn"
+              class="bg-white border-2 border-[#11C2B9] text-[#0f766e] font-bold px-4 py-2 rounded-md hover:bg-gray-50 transition">
+              + เพิ่มรายการย่อยพาหนะ
+            </button>
+          </div>
+
+          <div id="trList" class="mt-3 space-y-3"></div>
+
+          <div id="trEmpty" class="mt-3 text-gray-500">
+            - ไม่มีรายการพาหนะ — 0.00 บาท
+          </div>
+        </div>
+      </div>
+
+      <!-- =========================
+              3) ค่าวัสดุ
+          ========================= -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between">
+          <div class="font-bold text-gray-800">3. ค่าวัสดุ</div>
+          <button type="button" id="addMatBtn"
+            class="bg-[#11C2B9] hover:bg-[#0fa39c] text-white font-bold px-4 py-2 rounded-md transition">
+            + เพิ่มรายการ
+          </button>
+        </div>
+
+        <div id="matList" class="mt-3 space-y-3"></div>
+
+        <div id="matEmpty" class="mt-3 text-gray-500">
+          3.1 <span class="italic">ไม่มีรายการ</span> — 0.00 บาท
+        </div>
+      </div>
+
+      <!-- หมายเหตุ -->
+      <div class="mt-6 text-gray-800">
+        <span class="font-bold">หมายเหตุ</span> ขอถัวจ่ายทุกรายการ
+      </div>
+
+
+
+
+
+
+
+      <!-- ปุ่ม -->
+      <div class="relative mt-20">
+        <div class="absolute right-0 bottom-0">
+          <button type="submit" id="submitBtn"
+            class="bg-[#11C2B9] hover:bg-[#0fa39c] text-white font-bold w-[130px] h-[35px] rounded-md transition">
+            ดำเนินการ
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // ====== LOAD FROM PHP (expenseJsonInput) ======
+    const expenseJsonInput = document.getElementById("expenseJsonInput");
+    const amountHidden = document.getElementById("amountHidden");
+    const totalAmount = document.getElementById("totalAmount");
+
+    let state = {};
+    try {
+      state = expenseJsonInput?.value ? JSON.parse(expenseJsonInput.value) : {};
+    } catch (e) {
+      state = {};
+    }
+
+    // defaults
+    state = Object.keys(state).length ? state : {
+      compensation: [],
+      allowance: {
+        registration: {
+          enabled: false,
+          price: 0,
+          people: 1
+        },
+        lodging: {
+          enabled: false,
+          date_text: "",
+          unit_price: 0,
+          nights: 1,
+          people: 1
+        },
+        perdiem: {
+          enabled: false,
+          unit_price: 0,
+          meals: 1,
+          people: 1
+        },
+        transport: {
+          enabled: false,
+          items: []
+        },
+        others: []
+      },
+      materials: []
+    };
+
+    // ====== helpers ======
+    const fmt = (n) => (Number(n || 0)).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    const num = (v) => {
+      const x = Number(String(v ?? "").replace(/,/g, ""));
+      return Number.isFinite(x) ? x : 0;
+    };
+
+    function calc() {
+      // 1 compensation
+      const compSum = state.compensation.reduce((s, it) => s + num(it.amount), 0);
+
+      // 2 allowance
+      let reg = 0,
+        lod = 0,
+        per = 0,
+        tr = 0;
+
+      if (state.allowance.registration.enabled) {
+        reg = num(state.allowance.registration.price) * num(state.allowance.registration.people);
+      }
+      if (state.allowance.lodging.enabled) {
+        lod = num(state.allowance.lodging.unit_price) * num(state.allowance.lodging.nights) * num(state.allowance
+          .lodging.people);
+      }
+      if (state.allowance.perdiem.enabled) {
+        per = num(state.allowance.perdiem.unit_price) * num(state.allowance.perdiem.meals) * num(state.allowance
+          .perdiem.people);
+      }
+      if (state.allowance.transport.enabled) {
+        tr = (state.allowance.transport.items || []).reduce((s, it) => s + (num(it.unit_price) * num(it.trips) *
+          num(it.people)), 0);
+      }
+
+      const allowSum = reg + lod + per + tr;
+
+      // 3 materials
+      const matSum = state.materials.reduce((s, it) => s + num(it.amount), 0);
+
+      const total = compSum + allowSum + matSum;
+
+      // update UI totals
+      document.getElementById("regTotal").innerText = fmt(reg);
+      document.getElementById("lodTotal").innerText = fmt(lod);
+      document.getElementById("perTotal").innerText = fmt(per);
+      document.getElementById("trTotal").innerText = fmt(tr);
+
+      totalAmount.value = fmt(total);
+      amountHidden.value = String(total.toFixed(2));
+    }
+
+    // ====== render compensation list ======
+    const compList = document.getElementById("compList");
+    const compEmpty = document.getElementById("compEmpty");
+    document.getElementById("addCompBtn").addEventListener("click", () => {
+      state.compensation.push({
+        desc: "",
+        amount: 0
+      });
+      renderComp();
+      calc();
+    });
+
+    function renderComp() {
+      compList.innerHTML = "";
+      compEmpty.style.display = state.compensation.length ? "none" : "block";
+
+      state.compensation.forEach((it, idx) => {
+        const row = document.createElement("div");
+        row.className = "grid grid-cols-1 md:grid-cols-12 gap-3 items-end";
+
+        row.innerHTML = `
+        <div class="md:col-span-8">
+          <label class="text-gray-700">รายการ (1.${idx+1})</label>
+          <input type="text" class="w-full border rounded-md p-2" value="${it.desc ?? ""}" data-k="desc" data-i="${idx}">
+        </div>
+        <div class="md:col-span-3">
+          <label class="text-gray-700">จำนวนเงิน (บาท)</label>
+          <input type="number" class="w-full border rounded-md p-2" min="0" step="0.01" value="${num(it.amount)}" data-k="amount" data-i="${idx}">
+        </div>
+        <div class="md:col-span-1">
+          <button type="button" class="w-full bg-red-50 text-red-600 border border-red-200 rounded-md px-3 py-2 font-bold hover:bg-red-100"
+            data-del="${idx}">ลบ</button>
+        </div>
+      `;
+
+        row.addEventListener("input", (e) => {
+          const t = e.target;
+          if (!t.dataset || t.dataset.i === undefined) return;
+          const i = Number(t.dataset.i);
+          const k = t.dataset.k;
+          if (k === "amount") state.compensation[i][k] = num(t.value);
+          else state.compensation[i][k] = t.value;
+          calc();
+        });
+
+        row.querySelector(`[data-del="${idx}"]`).addEventListener("click", () => {
+          state.compensation.splice(idx, 1);
+          renderComp();
+          calc();
+        });
+
+        compList.appendChild(row);
+      });
+    }
+
+    // ====== materials ======
+    const matList = document.getElementById("matList");
+    const matEmpty = document.getElementById("matEmpty");
+    document.getElementById("addMatBtn").addEventListener("click", () => {
+      state.materials.push({
+        desc: "",
+        amount: 0
+      });
+      renderMat();
+      calc();
+    });
+
+    function renderMat() {
+      matList.innerHTML = "";
+      matEmpty.style.display = state.materials.length ? "none" : "block";
+
+      state.materials.forEach((it, idx) => {
+        const row = document.createElement("div");
+        row.className = "grid grid-cols-1 md:grid-cols-12 gap-3 items-end";
+        row.innerHTML = `
+        <div class="md:col-span-8">
+          <label class="text-gray-700">รายการ (3.${idx+1})</label>
+          <input type="text" class="w-full border rounded-md p-2" value="${it.desc ?? ""}" data-k="desc" data-i="${idx}">
+        </div>
+        <div class="md:col-span-3">
+          <label class="text-gray-700">จำนวนเงิน (บาท)</label>
+          <input type="number" class="w-full border rounded-md p-2" min="0" step="0.01" value="${num(it.amount)}" data-k="amount" data-i="${idx}">
+        </div>
+        <div class="md:col-span-1">
+          <button type="button" class="w-full bg-red-50 text-red-600 border border-red-200 rounded-md px-3 py-2 font-bold hover:bg-red-100"
+            data-del="${idx}">ลบ</button>
+        </div>
+      `;
+        row.addEventListener("input", (e) => {
+          const t = e.target;
+          if (!t.dataset || t.dataset.i === undefined) return;
+          const i = Number(t.dataset.i);
+          const k = t.dataset.k;
+          if (k === "amount") state.materials[i][k] = num(t.value);
+          else state.materials[i][k] = t.value;
+          calc();
+        });
+        row.querySelector(`[data-del="${idx}"]`).addEventListener("click", () => {
+          state.materials.splice(idx, 1);
+          renderMat();
+          calc();
+        });
+        matList.appendChild(row);
+      });
+    }
+
+    // ====== allowance bindings ======
+    const regEnabled = document.getElementById("regEnabled");
+    const regPrice = document.getElementById("regPrice");
+    const regPeople = document.getElementById("regPeople");
+    const regForm = document.getElementById("regForm");
+
+    const lodEnabled = document.getElementById("lodEnabled");
+    const lodDateText = document.getElementById("lodDateText");
+    const lodUnit = document.getElementById("lodUnit");
+    const lodNights = document.getElementById("lodNights");
+    const lodPeople = document.getElementById("lodPeople");
+    const lodForm = document.getElementById("lodForm");
+
+    const perEnabled = document.getElementById("perEnabled");
+    const perUnit = document.getElementById("perUnit");
+    const perMeals = document.getElementById("perMeals");
+    const perPeople = document.getElementById("perPeople");
+    const perForm = document.getElementById("perForm");
+
+    const trEnabled = document.getElementById("trEnabled");
+    const trList = document.getElementById("trList");
+    const trEmpty = document.getElementById("trEmpty");
+    const addTrItemBtn = document.getElementById("addTrItemBtn");
+
+    function syncAllowUI() {
+      regForm.style.opacity = regEnabled.checked ? "1" : "0.5";
+      regPrice.disabled = regPeople.disabled = !regEnabled.checked;
+
+      lodForm.style.opacity = lodEnabled.checked ? "1" : "0.5";
+      [lodDateText, lodUnit, lodNights, lodPeople].forEach(el => el.disabled = !lodEnabled.checked);
+
+      perForm.style.opacity = perEnabled.checked ? "1" : "0.5";
+      [perUnit, perMeals, perPeople].forEach(el => el.disabled = !perEnabled.checked);
+
+      trList.style.opacity = trEnabled.checked ? "1" : "0.5";
+      addTrItemBtn.disabled = !trEnabled.checked;
+      trEmpty.style.display = (trEnabled.checked && (state.allowance.transport.items || []).length === 0) ?
+        "block" : "none";
+    }
+
+    function renderTransport() {
+      trList.innerHTML = "";
+      const items = state.allowance.transport.items || [];
+      trEmpty.style.display = (trEnabled.checked && items.length === 0) ? "block" : "none";
+
+      items.forEach((it, idx) => {
+        const wrap = document.createElement("div");
+        wrap.className = "p-4 bg-white rounded-xl border";
+        wrap.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+          <div class="md:col-span-6">
+            <label class="text-gray-700">รายละเอียดเส้นทาง/รายการ</label>
+            <input type="text" class="w-full border rounded-md p-2" value="${it.desc ?? ""}" data-k="desc" data-i="${idx}">
+          </div>
+          <div class="md:col-span-2">
+            <label class="text-gray-700">ราคา/เที่ยว</label>
+            <input type="number" class="w-full border rounded-md p-2" min="0" step="0.01" value="${num(it.unit_price)}" data-k="unit_price" data-i="${idx}">
+          </div>
+          <div class="md:col-span-2">
+            <label class="text-gray-700">จำนวนเที่ยว</label>
+            <input type="number" class="w-full border rounded-md p-2" min="1" step="1" value="${num(it.trips)||1}" data-k="trips" data-i="${idx}">
+          </div>
+          <div class="md:col-span-1">
+            <label class="text-gray-700">คน</label>
+            <input type="number" class="w-full border rounded-md p-2" min="1" step="1" value="${num(it.people)||1}" data-k="people" data-i="${idx}">
+          </div>
+          <div class="md:col-span-1">
+            <button type="button" class="w-full bg-red-50 text-red-600 border border-red-200 rounded-md px-3 py-2 font-bold hover:bg-red-100"
+              data-del="${idx}">ลบ</button>
+          </div>
+          <div class="md:col-span-12 text-gray-600">
+            (ราคา/เที่ยว × เที่ยว × คน) = <span class="font-bold">${fmt(num(it.unit_price)*num(it.trips)*num(it.people))}</span> บาท
+          </div>
+        </div>
+      `;
+
+        wrap.addEventListener("input", (e) => {
+          const t = e.target;
+          if (!t.dataset || t.dataset.i === undefined) return;
+          const i = Number(t.dataset.i);
+          const k = t.dataset.k;
+          if (["unit_price", "trips", "people"].includes(k)) state.allowance.transport.items[i][k] = num(t
+            .value);
+          else state.allowance.transport.items[i][k] = t.value;
+
+          renderTransport(); // อัปเดตบรรทัด = ... บาท
+          calc();
+        });
+
+        wrap.querySelector(`[data-del="${idx}"]`).addEventListener("click", () => {
+          state.allowance.transport.items.splice(idx, 1);
+          renderTransport();
+          calc();
+        });
+
+        trList.appendChild(wrap);
+      });
+    }
+
+    // enable toggles
+    regEnabled.addEventListener("change", () => {
+      state.allowance.registration.enabled = regEnabled.checked;
+      syncAllowUI();
+      calc();
+    });
+    lodEnabled.addEventListener("change", () => {
+      state.allowance.lodging.enabled = lodEnabled.checked;
+      syncAllowUI();
+      calc();
+    });
+    perEnabled.addEventListener("change", () => {
+      state.allowance.perdiem.enabled = perEnabled.checked;
+      syncAllowUI();
+      calc();
+    });
+    trEnabled.addEventListener("change", () => {
+      state.allowance.transport.enabled = trEnabled.checked;
+      syncAllowUI();
+      calc();
+    });
+
+    // inputs
+    [regPrice, regPeople].forEach(el => el.addEventListener("input", () => {
+      state.allowance.registration.price = num(regPrice.value);
+      state.allowance.registration.people = num(regPeople.value) || 1;
+      calc();
+    }));
+
+    [lodDateText, lodUnit, lodNights, lodPeople].forEach(el => el.addEventListener("input", () => {
+      state.allowance.lodging.date_text = lodDateText.value;
+      state.allowance.lodging.unit_price = num(lodUnit.value);
+      state.allowance.lodging.nights = num(lodNights.value) || 1;
+      state.allowance.lodging.people = num(lodPeople.value) || 1;
+      calc();
+    }));
+
+    [perUnit, perMeals, perPeople].forEach(el => el.addEventListener("input", () => {
+      state.allowance.perdiem.unit_price = num(perUnit.value);
+      state.allowance.perdiem.meals = num(perMeals.value) || 1;
+      state.allowance.perdiem.people = num(perPeople.value) || 1;
+      calc();
+    }));
+
+    addTrItemBtn.addEventListener("click", () => {
+      state.allowance.transport.items = state.allowance.transport.items || [];
+      state.allowance.transport.items.push({
+        desc: "",
+        unit_price: 0,
+        trips: 1,
+        people: 1
+      });
+      renderTransport();
+      calc();
+    });
+
+    // ====== restore from state to UI ======
+    function hydrate() {
+      // allowance
+      regEnabled.checked = !!state.allowance.registration.enabled;
+      regPrice.value = num(state.allowance.registration.price);
+      regPeople.value = num(state.allowance.registration.people) || 1;
+
+      lodEnabled.checked = !!state.allowance.lodging.enabled;
+      lodDateText.value = state.allowance.lodging.date_text || "";
+      lodUnit.value = num(state.allowance.lodging.unit_price);
+      lodNights.value = num(state.allowance.lodging.nights) || 1;
+      lodPeople.value = num(state.allowance.lodging.people) || 1;
+
+      perEnabled.checked = !!state.allowance.perdiem.enabled;
+      perUnit.value = num(state.allowance.perdiem.unit_price);
+      perMeals.value = num(state.allowance.perdiem.meals) || 1;
+      perPeople.value = num(state.allowance.perdiem.people) || 1;
+
+      trEnabled.checked = !!state.allowance.transport.enabled;
+
+      syncAllowUI();
+      renderComp();
+      renderMat();
+      renderTransport();
+      calc();
+    }
+    hydrate();
+
+    // ====== submit => pack JSON ======
+    const memoForm = document.getElementById("memoForm");
+    memoForm.addEventListener("submit", (e) => {
+      // กัน submit โดยไม่ได้เปิด checkbox แต่มีค่าค้าง (เราไม่บังคับ แต่ทำให้สอดคล้อง)
+      if (!regEnabled.checked) {
+        state.allowance.registration.price = 0;
+      }
+      if (!lodEnabled.checked) {
+        state.allowance.lodging.unit_price = 0;
+      }
+      if (!perEnabled.checked) {
+        state.allowance.perdiem.unit_price = 0;
+      }
+      if (!trEnabled.checked) {
+        state.allowance.transport.items = [];
+      }
+
+      expenseJsonInput.value = JSON.stringify(state);
+    });
+  });
+  </script>
+
+
+
+
+
+
+</body>
+
+</html>
