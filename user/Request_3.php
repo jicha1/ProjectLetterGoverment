@@ -396,16 +396,16 @@ if (!isset($_SESSION['user_id'])) {
                         แขกของมหาวิทยาลัย
                     </label>
 
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2">
                         <label class="flex items-center gap-2">
-                            <input type="radio" name="person_type" value="อื่น ๆ" class="accent-black"
-                                id="otherTypeRadio">
+                            <input type="radio" name="person_type" value="อื่นๆ" class="accent-black"
+                                id="personTypeOtherRadio">
                             อื่น ๆ (ระบุ)
                         </label>
 
-                        <input type="text" name="person_type_other" id="otherTypeInput"
-                            class="border rounded-md p-2 w-[260px] bg-gray-100 text-gray-400" placeholder="โปรดระบุ"
-                            disabled>
+                        <input type="text" name="person_type_other_detail" id="personTypeOtherInput"
+                            class="border rounded-md p-2 w-[260px] ml-3 bg-gray-100 text-gray-400"
+                            placeholder="โปรดระบุ" disabled>
                     </div>
 
                 </div>
@@ -441,15 +441,15 @@ if (!isset($_SESSION['user_id'])) {
                         มารับรองแขก
                     </label>
 
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2">
                         <label class="flex items-center gap-2">
-                            <input type="radio" name="reason" value="อื่น ๆ" id="reasonOtherRadio" class="accent-black">
+                            <input type="radio" name="reason" value="อื่นๆ" class="accent-black" id="reasonOtherRadio">
                             อื่น ๆ (ระบุ)
                         </label>
 
-                        <input type="text" name="reason_other" id="reasonOtherInput"
-                            class="border rounded-md p-2 w-[260px] bg-gray-100 text-gray-400" placeholder="โปรดระบุ"
-                            disabled>
+                        <input type="text" name="reason_other_detail" id="reasonOtherInput"
+                            class="border rounded-md p-2 w-[260px] ml-3 bg-gray-100 text-gray-400"
+                            placeholder="โปรดระบุ" disabled>
                     </div>
                 </div>
             </div>
@@ -660,6 +660,8 @@ if (!isset($_SESSION['user_id'])) {
         });
     });
 
+
+
     /* ====== Validate (ใส่กรอบแดง + ดอกจันเท่านั้น) ====== */
     function scrollFocus(el) {
         if (!el) return;
@@ -822,11 +824,7 @@ if (!isset($_SESSION['user_id'])) {
                 "กันยายน",
                 "ตุลาคม",
                 "พฤศจิกายน",
-                "ธันวาคม", <<
-                <<
-                <<
-                <
-                HEAD
+                "ธันวาคม",
             ];
 
             const startDay = start.getDate();
@@ -908,9 +906,7 @@ if (!isset($_SESSION['user_id'])) {
     function closeMenu() {
         profileMenu.classList.add("hidden");
     }
-    </script>
 
-    <script>
     const main = document.getElementById("mainCategory");
     const sub = document.getElementById("subCategory");
 
@@ -918,8 +914,8 @@ if (!isset($_SESSION['user_id'])) {
     const redirectMain = {
         train: "form_Memo.php",
         academic: "Request_1.php",
-        external: null, // ไม่มีฟอร์มโดยตรง
-        internal: null // ต้องเลือกหมวดย่อย
+        external: null, // ยังไม่มีฟอร์ม
+        internal: null // ให้เลือกหมวดย่อยแทน
     };
 
     const redirectSub = {
@@ -931,18 +927,10 @@ if (!isset($_SESSION['user_id'])) {
         "ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย": "Request_7.php"
     };
 
+    // หมวดย่อยของ "ภายใน"
     const subInternal = Object.keys(redirectSub);
 
-    // ป้องกัน redirect ซ้ำ (ถ้าอยู่หน้าเดียวกัน)
-    function redirectIfDifferent(file) {
-        if (!file) return;
-        const currentPage = window.location.pathname.split("/").pop();
-        if (currentPage !== file) {
-            window.location.href = file;
-        }
-    }
-
-    // เมื่อเลือกหมวดหลัก
+    // เมื่อเลือก "หมวดหลัก"
     main.addEventListener("change", () => {
         const value = main.value;
 
@@ -950,21 +938,20 @@ if (!isset($_SESSION['user_id'])) {
         sub.innerHTML = `<option value="">-- เลือกหมวดย่อย --</option>`;
         sub.disabled = true;
 
-        // ถ้าเลือกหมวดที่มี redirect แบบหน้าเดียว เช่น "ฝึกอบรม"
+        // ถ้าเลือกหมวดที่มี redirect ทันที เช่น ฝึกอบรม, ประชุมฯ
         if (redirectMain[value]) {
-            redirectIfDifferent(redirectMain[value]);
+            window.location.href = redirectMain[value];
             return;
         }
 
-        // ถ้าเป็นหมวดภายนอก → ไม่มีฟอร์มในระบบ
+        // ถ้าเลือก "ภายนอก" → ไม่ redirect, ไม่เปิดหมวดย่อย
         if (value === "external") {
             return;
         }
 
-        // หมวดภายใน → เปิดหมวดย่อย
+        // ถ้าเลือก "ภายใน" → เปิดหมวดย่อย
         if (value === "internal") {
             sub.disabled = false;
-
             subInternal.forEach(text => {
                 const opt = document.createElement("option");
                 opt.value = text;
@@ -974,14 +961,57 @@ if (!isset($_SESSION['user_id'])) {
         }
     });
 
-    // เมื่อเลือกหมวดย่อย → redirect
+    // เมื่อเลือกหมวดย่อยของภายใน → redirect
     sub.addEventListener("change", () => {
         const value = sub.value;
         if (redirectSub[value]) {
-            redirectIfDifferent(redirectSub[value]);
+            window.location.href = redirectSub[value];
         }
     });
     </script>
+
+    <script>
+    const personTypeOtherRadio = document.getElementById("personTypeOtherRadio");
+    const personTypeOtherInput = document.getElementById("personTypeOtherInput");
+    const personTypeRadios = document.querySelectorAll('input[name="person_type"]');
+
+    personTypeRadios.forEach(radio => {
+        radio.addEventListener("change", () => {
+            if (personTypeOtherRadio.checked) {
+                personTypeOtherInput.disabled = false;
+                personTypeOtherInput.classList.remove("bg-gray-100", "text-gray-400");
+                personTypeOtherInput.focus();
+            } else {
+                personTypeOtherInput.disabled = true;
+                personTypeOtherInput.classList.add("bg-gray-100", "text-gray-400");
+                personTypeOtherInput.value = "";
+            }
+        });
+    });
+    </script>
+
+    <script>
+    // ========== ระบบ "อื่น ๆ (ระบุ)" ของข้อ 6 ==========
+    const reasonOtherRadio = document.getElementById("reasonOtherRadio");
+    const reasonOtherInput = document.getElementById("reasonOtherInput");
+    const reasonRadios = document.querySelectorAll('input[name="reason"]');
+
+    reasonRadios.forEach(radio => {
+        radio.addEventListener("change", () => {
+            if (reasonOtherRadio.checked) {
+                reasonOtherInput.disabled = false;
+                reasonOtherInput.classList.remove("bg-gray-100", "text-gray-400");
+                reasonOtherInput.focus();
+            } else {
+                reasonOtherInput.disabled = true;
+                reasonOtherInput.classList.add("bg-gray-100", "text-gray-400");
+                reasonOtherInput.value = "";
+            }
+        });
+    });
+    </script>
+
+
 
 </body>
 

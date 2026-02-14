@@ -3,10 +3,10 @@
 $CURRENT_MAIN = "academic";     
 $CURRENT_SUB  = "ประชุมวิชาการ/ศึกษาดูงาน/สัมมนาวิชาการ";           // ถ้าไม่มีหมวดย่อย ให้เว้นว่าง
 ?>
-<!--2.ประชุมวิชาการ/ศึกษาดูงาน/สัมมนาวิชาการ -->
+<!--ขออนุมัติตัวบุคคลเป็นวิทยากรบรรยายในโครงการอบรมเชิงปฏิบัติการ -->
 <?php
 session_start();
-require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../../functions.php';
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.html");
     exit;
@@ -319,25 +319,61 @@ if (!isset($_SESSION['user_id'])) {
                 </div>
             </div>
 
+            <!-- 1. เรื่อง -->
+            <div class="mb-4 flex items-center gap-3">
+                <label class="lbl whitespace-nowrap">
+                    1. เรื่อง :
+                </label>
+                <input type="text" name="subject" class="flex-1 border rounded-md p-2">
+            </div>
 
-            <!-- ข้อ 1 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 items-end">
-                <div class="flex items-center gap-3">
-                    <label class="lbl text-gray-800 whitespace-nowrap" for="docDate">1.วัน เดือน ปี :</label>
-                    <div class="flex-1">
-                        <input type="date" name="doc_date" class="w-full border rounded-md p-2" id="docDate" />
-                    </div>
-                    <label class="lbl text-gray-800 whitespace-nowrap">ที่ต้องการให้ปรากฎบนบันทึกข้อความ</label>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- หน่วยงานผู้ออกหนังสืออ้างอิง -->
+                <div>
+                    <label class="lbl block text-gray-800 mb-1">
+                        2. หน่วยงานผู้ออกหนังสืออ้างอิง :
+                    </label>
+                    <input type="text" name="reference_org" class="w-full border rounded-md p-2"
+                        placeholder="เช่น คณะเทคโนโลยีและการจัดการอุตสาหกรรม">
+                </div>
+
+                <!-- เลขที่หนังสืออ้างอิง -->
+                <div>
+                    <label class="lbl block text-gray-800 mb-1">
+                        เลขที่หนังสืออ้างอิง :
+                    </label>
+                    <input type="text" name="reference_no" class="w-full border rounded-md p-2"
+                        placeholder="เช่น อว.1234/2568">
                 </div>
             </div>
 
-            <!-- ข้อ 2 -->
+
+            <div class="mb-6 flex items-center gap-3">
+                <label class="lbl whitespace-nowrap">
+                    3. วันที่หนังสืออ้างอิง :
+                </label>
+
+                <div class="relative">
+                    <input type="text" name="doc_date" id="docDate"
+                        class="border rounded-md p-2 w-44 pr-10 cursor-pointer" placeholder="เลือกวันที่" readonly>
+
+                    <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
+                    </svg>
+                </div>
+            </div>
+
+
+            <!-- 2. ชื่อ–นามสกุล -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 items-end">
                 <div class="flex items-center gap-3">
-                    <label class="lbl text-gray-800 whitespace-nowrap" for="fullname">2.ชื่อ - นามสกุล :</label>
-                    <select name="fullname" class="flex-1 border rounded-md p-2" id="fullname">
-                        <option>อาจารย์ ดร.พิทย์พิมล ชูรอด</option>
-                    </select>
+                    <label class="lbl text-gray-800 whitespace-nowrap" for="fullname">4. ชื่อ–นามสกุล
+                        :</label>
+                    <input type="text" name="teacher_name" class="flex-1 border rounded-md p-2"
+                        placeholder="เช่น ผศ.ดร.สมชาย ใจดี">
                 </div>
                 <div class="flex items-center gap-3">
                     <label class="lbl text-gray-800 whitespace-nowrap" for="position">ตำแหน่ง :</label>
@@ -346,246 +382,341 @@ if (!isset($_SESSION['user_id'])) {
                 </div>
             </div>
 
-            <!-- ข้อ 3 -->
-            <div class="mb-4">
-                <div class="flex items-start gap-4">
 
-                    <label class="lbl text-gray-800 whitespace-nowrap pt-1" id="purposeLabel">
-                        3. ขออนุมัติไปเข้าร่วม :
-                    </label>
-
-                    <div class="text-gray-800 space-y-1 mt-2" id="purposeGroup" role="radiogroup"
-                        aria-labelledby="purposeLabel">
-
-                        <label class="flex items-center gap-2">
-                            <input type="radio" name="purpose" value="ประชุมวิชาการ" class="accent-black" />
-                            เข้าร่วมประชุมวิชาการ
-                        </label>
-
-                        <label class="flex items-center gap-2">
-                            <input type="radio" name="purpose" value="ศึกษาดูงาน" class="accent-black" />
-                            เข้าร่วมศึกษาดูงาน
-                        </label>
-
-                        <label class="flex items-center gap-2">
-                            <input type="radio" name="purpose" value="สัมมนาวิชาการ" class="accent-black" />
-                            เข้าร่วมสัมมนาวิชาการ
-                        </label>
-
-                        <!-- 🔹 อื่น ๆ (ระบุ) แบบเดียวกับข้อ 6 -->
-                        <div class="flex items-center gap-2">
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="purpose" value="อื่นๆ" class="accent-black"
-                                    id="purposeOtherRadio">
-                                อื่น ๆ (ระบุ)
-                            </label>
-
-                            <input type="text" name="purpose_other_detail" id="purposeOtherInput"
-                                class="border rounded-md p-2 w-[260px] ml-3 bg-gray-100 text-gray-400"
-                                placeholder="โปรดระบุ" disabled>
-                        </div>
-
-                    </div>
-                </div>
+            <div class="mb-4 flex items-start gap-4">
+                <label class="lbl whitespace-nowrap w-56 pt-2">
+                    5. ชื่อโครงการอบรม :
+                </label>
+                <textarea name="research_title" rows="2" class="flex-1 border rounded-md p-2"
+                    placeholder="ชื่อโครงการอบรม"></textarea>
             </div>
 
 
-
-            <!-- ข้อ 4 -->
-            <div class="mb-4 flex items-start gap-4">
-                <label class="lbl text-gray-800 whitespace-nowrap pt-2" for="eventTitle">
-                    4.ชื่อของงานประชุมวิชาการ /<br />ชื่อหลักสูตรอบรม :
+            <div class="mb-4 flex items-center gap-4">
+                <label class="lbl whitespace-nowrap w-56">
+                    6. บทบาทในโครงการ :
                 </label>
-                <div class="w-full">
-                    <textarea name="event_title" rows="2" class="w-full border rounded-md p-2 shadow-sm"
-                        id="eventTitle"></textarea>
-                </div>
-            </div>
-
-            <!-- ข้อ 5 -->
-            <div class="mb-4 flex items-start gap-4">
-                <label class="lbl text-gray-800 whitespace-nowrap pt-2" for="researchTitle">
-                    5. ชื่อบทความวิจัยที่จะนำเสนอ :
-                </label>
-                <div class="w-full">
-                    <textarea name="research_title" rows="2" class="w-full border rounded-md p-2 shadow-sm"
-                        id="researchTitle"></textarea>
-                </div>
-            </div>
-
-            <!-- ข้อ 6 -->
-            <div class="mb-4 flex items-start gap-4">
-                <label class="lbl text-gray-800 whitespace-nowrap pt-1" for="presentationType">
-                    6. ประเภทการนำเสนอ :
-                </label>
-
-                <div class="w-full ml-1 space-y-1 mt-2" id="presentationType">
-
+                <div class="flex gap-6">
                     <label class="flex items-center gap-2">
-                        <input type="radio" name="presentation_type" value="oral" class="accent-black option-radio">
-                        Oral
+                        <input type="radio" name="conference_level" value="international">
+                        วิทยากรบรรยาย
                     </label>
-
                     <label class="flex items-center gap-2">
-                        <input type="radio" name="presentation_type" value="poster" class="accent-black option-radio">
-                        Poster
+                        <input type="radio" name="conference_level" value="national">
+                        วิทยากรเชิงปฏิบัติการ
                     </label>
-
-                    <!-- ลดช่องว่างของบรรทัดนี้ -->
-                    <div class="flex items-center gap-2">
-                        <label class="flex items-center gap-2">
-                            <input type="radio" name="presentation_type" value="other" class="accent-black"
-                                id="otherTypeRadio">
-                            อื่น ๆ (ระบุ)
-                        </label>
-
-                        <input type="text" name="presentation_other_detail" id="otherTypeInput"
-                            class="border rounded-md p-2 w-[260px] ml-3 bg-gray-100 text-gray-400"
-                            placeholder="โปรดระบุ" disabled>
-                    </div>
-
                 </div>
+            </div>
+
+
+            <div class="mb-4 flex items-start gap-4">
+                <label class="lbl whitespace-nowrap w-56 pt-2">
+                    7. ชื่อหลักสูตร :
+                </label>
+                <textarea name="research_title" rows="2" class="flex-1 border rounded-md p-2"
+                    placeholder="ชื่อหลักสูตร"></textarea>
             </div>
 
 
             <div class="mb-6">
-                <label class="lbl text-gray-800 block mb-2" id="dateLabel">7. วันที่เข้าร่วม</label>
-
-                <div class="space-y-4 ml-6 text-gray-800">
-                    <!-- 🔹 วันเดียว -->
-                    <div class="flex items-center gap-2">
-                        <input type="radio" name="date_option" value="single" id="optSingle" class="accent-[#11C2B9]"
-                            checked />
-                        <span>วันเดียว :</span>
-                        <div class="relative">
-                            <input type="text" name="single_date" id="singleDate"
-                                class="border rounded-md p-2 shadow-sm w-48 pr-10 cursor-pointer"
-                                placeholder="เลือกวันที่" readonly />
-                            <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-                    </div>
-
-                    <!-- 🔹 หลายวัน -->
-                    <div class="flex flex-wrap items-center gap-2">
-                        <input type="radio" name="date_option" value="range" id="optRange" class="accent-[#11C2B9]" />
-                        <span>หลายวัน :</span>
-
-                        <!-- วันที่เริ่มต้น -->
-                        <div class="relative">
-                            <input type="text" id="startDate"
-                                class="border rounded-md p-2 shadow-sm w-44 pr-10 cursor-pointer" placeholder="เริ่มต้น"
-                                readonly />
-                            <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-
-                        <span>ถึง</span>
-
-                        <!-- วันที่สิ้นสุด -->
-                        <div class="relative">
-                            <input type="text" id="endDate"
-                                class="border rounded-md p-2 shadow-sm w-44 pr-10 cursor-pointer" placeholder="สิ้นสุด"
-                                readonly />
-                            <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-
-                        <!-- 🔹 แสดงผลรูปแบบวันที่ -->
-                        <input type="text" id="rangeDisplay"
-                            class="border rounded-md p-2 shadow-sm w-64 bg-gray-50 text-gray-600"
-                            placeholder="10 - 11 กรกฎาคม 2568" readonly />
-
-                        <!-- ซ่อนค่ารวมเพื่อส่งข้อมูล -->
-                        <input type="hidden" name="range_date" id="rangeDate" value="" />
-                    </div>
-                </div>
-            </div>
-
-            <!-- ข้อ 8 -->
-            <div class="mb-4">
-                <!-- บรรทัดคำถาม -->
-                <label class="lbl text-gray-800 block mb-2">
-                    8. ชื่อสถานที่จัดประชุมวิชาการ / สถานที่จัดอบรม / เข้าร่วมรูปแบบออนไลน์
+                <!-- บรรทัดที่ 1 : label -->
+                <label class="lbl block mb-2">
+                    8. วันที่เริ่ม - วันที่สิ้นสุดโครงการ :
                 </label>
 
-                <div class="ml-7 space-y-2">
+                <!-- บรรทัดที่ 2 : วันที่ -->
+                <div class="flex items-center gap-3 ml-6 flex-wrap">
+                    <!-- วันที่เริ่ม -->
+                    <div class="relative">
+                        <input type="text" id="internStart" class="border rounded-md p-2 w-44 pr-10 cursor-pointer"
+                            placeholder="เริ่มต้น" readonly>
+                        <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
+                        </svg>
+                    </div>
 
-                    <!-- ออนไลน์ -->
-                    <label class="flex items-center gap-2">
-                        <input type="checkbox" id="onlineCheckbox" name="is_online" value="1" class="accent-black">
-                        เข้าร่วมรูปแบบออนไลน์
-                    </label>
+                    <span>ถึง</span>
 
-                    <!-- ออนไซต์ + ช่องกรอก (ต่อท้ายในบรรทัดเดียว) -->
-                    <label class="flex items-center gap-2">
-                        <input type="checkbox" id="onsiteCheckbox" class="accent-black">
-                        ออนไซต์ ณ
-                        <input type="text" name="place" id="placeInput"
-                            class="border rounded-md p-2 w-[350px] shadow-sm"
-                            placeholder="เช่น โรงแรม Best Western PLUS จังหวัดนนทบุรี" disabled>
-                    </label>
+                    <!-- วันที่สิ้นสุด -->
+                    <div class="relative">
+                        <input type="text" id="internEnd" class="border rounded-md p-2 w-44 pr-10 cursor-pointer"
+                            placeholder="สิ้นสุด" readonly>
+                        <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
+                        </svg>
+                    </div>
 
+                    <!-- แสดงผลรวม -->
+                    <input type="text" id="internRangeDisplay"
+                        class="border rounded-md p-2 w-64 bg-gray-50 text-gray-600" placeholder="10 - 11 กรกฎาคม 2568"
+                        readonly>
+
+                    <!-- ค่าที่ส่งจริง -->
+                    <input type="hidden" name="intern_period" id="internPeriod">
                 </div>
             </div>
 
 
-            <!-- ข้อ 9 -->
-            <div class="mb-4 flex items-start gap-4">
-                <label class="lbl text-gray-800 whitespace-nowrap pt-2">
-                    9. ฐานข้อมูลที่ตีพิมพ์ (เช่น Scopus) :
+
+            <div class="mb-4 flex items-center gap-4">
+                <label class="lbl whitespace-nowrap w-56">
+                    9. สถานที่จัดงาน :
                 </label>
-
-                <div class="w-full">
-                    <input type="text" name="database" class="border rounded-md p-2 w-[350px] shadow-sm"
-                        placeholder="เช่น Scopus, TCI, IEEE">
-                </div>
+                <input type="text" name="location" class="flex-1 border rounded-md p-2"
+                    placeholder="เมือง / ประเทศ หรือ โรงแรม / สถานที่จัดงาน">
             </div>
 
 
-            <!-- ข้อ 10 -->
+
+            <!-- 9. วันที่เดินทางไป - วันที่เดินทางกลับ -->
             <div class="mb-6">
-                <div class="flex items-center gap-2 mb-2">
-                    <label class="lbl text-gray-800" for="amountInput">10.รวมยอดประมาณการค่าใช้จ่าย :</label>
-                    <div class="flex flex-col">
-                        <div class="flex items-center gap-2">
-                            <input type="text" name="amount" class="border rounded-md p-2 w-36" id="amountInput"
-                                value="0.00" />
-                            <span>บาท</span>
-                        </div>
-                    </div>
-                </div>
-                <label class="flex items-center gap-2 ml-6 mt-2">
-                    <input type="checkbox" name="no_cost" value="1" class="accent-black" id="noCostCheckbox" />
-                    โดยไม่เบิกค่าใช้จ่ายใดๆทั้งสิ้น
+                <!-- บรรทัดที่ 1 : label -->
+                <label class="lbl block mb-2">
+                    10. วันที่เดินทางไป - วันที่เดินทางกลับ :
                 </label>
-            </div>
 
-
-            <!-- ข้อ 11 -->
-            <div class="mb-6">
-                <label class="lbl block text-gray-800 mb-2" id="carLabel">11.กรณีไปรถยนต์ส่วนตัว</label>
-                <div class="flex items-center gap-2 ml-6">
-                    <input type="checkbox" name="car_used" value="1" class="accent-black" id="carCheckbox" />
-                    <label for="carPlateInput" class="lbl">ระบุหมายเลขทะเบียนรถยนต์ :</label>
-                    <div class="flex flex-col">
-                        <input type="text" name="car_plate" class="border rounded-md p-2 w-[250px]" id="carPlateInput"
-                            placeholder="เช่น กร 1906 พัทลุง" disabled />
+                <!-- บรรทัดที่ 2 : วันที่ทั้งหมด (เลื่อนลงมา) -->
+                <div class="flex items-center gap-3 ml-6 flex-wrap">
+                    <!-- วันที่เริ่ม -->
+                    <div class="relative">
+                        <input type="text" id="travelStart" class="border rounded-md p-2 w-44 pr-10 cursor-pointer"
+                            placeholder="วันที่เดินทางไป" readonly>
+                        <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
+                        </svg>
                     </div>
+
+                    <span>ถึง</span>
+
+                    <!-- วันที่สิ้นสุด -->
+                    <div class="relative">
+                        <input type="text" id="travelEnd" class="border rounded-md p-2 w-44 pr-10 cursor-pointer"
+                            placeholder="วันที่เดินทางกลับ" readonly>
+                        <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+
+                    <!-- แสดงผลรวม -->
+                    <input type="text" id="travelRangeDisplay"
+                        class="border rounded-md p-2 w-64 bg-gray-50 text-gray-600" placeholder="20 - 21 ธันวาคม 2568"
+                        readonly>
+
+                    <input type="hidden" name="travel_period" id="travelPeriod">
                 </div>
             </div>
+
+
+            <script>
+            flatpickr.localize(flatpickr.l10ns.th);
+
+            const monthsTH = [
+                "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+                "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+            ];
+
+            // ===== ฟังก์ชันกลาง =====
+            function formatRange(start, end) {
+                const sd = start.getDate();
+                const ed = end.getDate();
+                const sm = monthsTH[start.getMonth()];
+                const em = monthsTH[end.getMonth()];
+                const sy = start.getFullYear() + 543;
+                const ey = end.getFullYear() + 543;
+
+                if (
+                    start.getMonth() === end.getMonth() &&
+                    start.getFullYear() === end.getFullYear()
+                ) {
+                    return `${sd} - ${ed} ${em} ${ey}`;
+                }
+                return `${sd} ${sm} ${sy} - ${ed} ${em} ${ey}`;
+            }
+
+            // ===== ข้อ 9 =====
+            const internStartPicker = flatpickr("#internStart", {
+                dateFormat: "d/m/Y",
+                disableMobile: true,
+                onChange: updateIntern
+            });
+            const internEndPicker = flatpickr("#internEnd", {
+                dateFormat: "d/m/Y",
+                disableMobile: true,
+                onChange: updateIntern
+            });
+
+            function updateIntern() {
+                const s = internStartPicker.selectedDates[0];
+                const e = internEndPicker.selectedDates[0];
+                if (!s || !e) return;
+
+                const text = formatRange(s, e);
+                internRangeDisplay.value = text;
+                internPeriod.value = text;
+            }
+
+            // ===== ข้อ 10 =====
+            const travelStartPicker = flatpickr("#travelStart", {
+                dateFormat: "d/m/Y",
+                disableMobile: true,
+                onChange: updateTravel
+            });
+            const travelEndPicker = flatpickr("#travelEnd", {
+                dateFormat: "d/m/Y",
+                disableMobile: true,
+                onChange: updateTravel
+            });
+
+            function updateTravel() {
+                const s = travelStartPicker.selectedDates[0];
+                const e = travelEndPicker.selectedDates[0];
+                if (!s || !e) return;
+
+                const text = formatRange(s, e);
+                travelRangeDisplay.value = text;
+                travelPeriod.value = text;
+            }
+            </script>
+
+
+
+            <script>
+            const amountInput = document.getElementById("amountInput");
+            const noCostCheckbox = document.getElementById("noCostCheckbox");
+
+            function syncNoCostUI() {
+                if (noCostCheckbox.checked) {
+                    amountInput.value = "0.00";
+                    amountInput.disabled = true;
+                    amountInput.classList.add("bg-gray-100", "text-gray-400");
+                } else {
+                    amountInput.disabled = false;
+                    amountInput.classList.remove("bg-gray-100", "text-gray-400");
+                    amountInput.focus();
+                }
+            }
+
+            // เมื่อคลิก checkbox
+            noCostCheckbox.addEventListener("change", syncNoCostUI);
+
+            // ตั้งค่าสถานะเริ่มต้น (เผื่อโหลดข้อมูลเก่า)
+            syncNoCostUI();
+            </script>
+
+            <script>
+            flatpickr.localize(flatpickr.l10ns.th);
+
+            flatpickr("#docDate, #missedDate, #makeupDate", {
+                dateFormat: "d/m/Y",
+                disableMobile: true
+            });
+            </script>
+
+            <script>
+            flatpickr.localize(flatpickr.l10ns.th);
+
+            const monthsTH = [
+                "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+                "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+            ];
+
+            const startPicker = flatpickr("#internStart", {
+                dateFormat: "d/m/Y",
+                disableMobile: true,
+                onChange: updateInternRange
+            });
+
+            const endPicker = flatpickr("#internEnd", {
+                dateFormat: "d/m/Y",
+                disableMobile: true,
+                onChange: updateInternRange
+            });
+
+            function updateInternRange() {
+                const start = startPicker.selectedDates[0];
+                const end = endPicker.selectedDates[0];
+
+                if (!start || !end) return;
+
+                const sd = start.getDate();
+                const ed = end.getDate();
+                const sm = monthsTH[start.getMonth()];
+                const em = monthsTH[end.getMonth()];
+                const sy = start.getFullYear() + 543;
+                const ey = end.getFullYear() + 543;
+
+                let text = "";
+                if (start.getMonth() === end.getMonth() && sy === ey) {
+                    text = `${sd} - ${ed} ${em} ${ey}`;
+                } else {
+                    text = `${sd} ${sm} ${sy} - ${ed} ${em} ${ey}`;
+                }
+
+                document.getElementById("internRangeDisplay").value = text;
+                document.getElementById("internPeriod").value = text;
+            }
+            </script>
+
+
+
+            <script>
+            const studentCountInput = document.getElementById("studentCount");
+            const studentList = document.getElementById("studentList");
+
+            studentCountInput.addEventListener("input", () => {
+                const count = parseInt(studentCountInput.value);
+                studentList.innerHTML = "";
+
+                if (!count || count < 1) return;
+
+                for (let i = 1; i <= count; i++) {
+                    const row = document.createElement("div");
+                    row.className = "flex items-center gap-4";
+
+                    row.innerHTML = `
+            <span class="w-10 text-right">${i}.</span>
+            <input type="text" name="student_name[]"
+                class="flex-1 border rounded-md p-2"
+                placeholder="ชื่อ–นามสกุลนักศึกษา">
+            <input type="text" name="student_id[]"
+                class="w-40 border rounded-md p-2"
+                placeholder="รหัสนักศึกษา">
+        `;
+
+                    studentList.appendChild(row);
+                }
+            });
+            </script>
+
+            <script>
+            const otherRadio = document.getElementById("otherTypeRadio");
+            const otherInput = document.getElementById("otherTypeInput");
+            const supportRadios = document.querySelectorAll('input[name="support_type"]');
+
+            supportRadios.forEach(radio => {
+                radio.addEventListener("change", () => {
+                    if (otherRadio.checked) {
+                        otherInput.disabled = false;
+                        otherInput.classList.remove("bg-gray-100", "text-gray-400");
+                        otherInput.focus();
+                    } else {
+                        otherInput.disabled = true;
+                        otherInput.value = "";
+                        otherInput.classList.add("bg-gray-100", "text-gray-400");
+                    }
+                });
+            });
+            </script>
+
+
             <script>
             const purposeOtherRadio = document.getElementById("purposeOtherRadio");
             const purposeOtherInput = document.getElementById("purposeOtherInput");
@@ -625,26 +756,6 @@ if (!isset($_SESSION['user_id'])) {
             });
             </script>
 
-
-            <script>
-            const otherRadio = document.getElementById("otherTypeRadio");
-            const otherInput = document.getElementById("otherTypeInput");
-            const typeRadios = document.querySelectorAll('input[name="presentation_type"]');
-
-            typeRadios.forEach(radio => {
-                radio.addEventListener("change", () => {
-                    if (otherRadio.checked) {
-                        otherInput.disabled = false;
-                        otherInput.classList.remove("bg-gray-100", "text-gray-400");
-                        otherInput.focus();
-                    } else {
-                        otherInput.disabled = true;
-                        otherInput.classList.add("bg-gray-100", "text-gray-400");
-                        otherInput.value = "";
-                    }
-                });
-            });
-            </script>
 
             <script>
             // ✅ ดึง element ที่เกี่ยวข้อง
@@ -974,9 +1085,8 @@ if (!isset($_SESSION['user_id'])) {
                 "กันยายน",
                 "ตุลาคม",
                 "พฤศจิกายน",
-                "ธันวาคม"
+                "ธันวาคม",
             ];
-
 
             const startDay = start.getDate();
             const endDay = end.getDate();

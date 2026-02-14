@@ -536,8 +536,6 @@ if (!isset($_SESSION['user_id'])) {
             </div>
 
 
-
-
             <!-- ปุ่ม -->
             <div class="relative mt-20">
                 <div class="absolute right-0 bottom-0">

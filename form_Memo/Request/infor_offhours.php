@@ -3,10 +3,10 @@
 $CURRENT_MAIN = "academic";     
 $CURRENT_SUB  = "ประชุมวิชาการ/ศึกษาดูงาน/สัมมนาวิชาการ";           // ถ้าไม่มีหมวดย่อย ให้เว้นว่าง
 ?>
-<!--2.ประชุมวิชาการ/ศึกษาดูงาน/สัมมนาวิชาการ -->
+<!--ขอสอนชดเชย (ของอาจารย์) -->
 <?php
 session_start();
-require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../../functions.php';
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.html");
     exit;
@@ -320,272 +320,169 @@ if (!isset($_SESSION['user_id'])) {
             </div>
 
 
-            <!-- ข้อ 1 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 items-end">
-                <div class="flex items-center gap-3">
-                    <label class="lbl text-gray-800 whitespace-nowrap" for="docDate">1.วัน เดือน ปี :</label>
-                    <div class="flex-1">
-                        <input type="date" name="doc_date" class="w-full border rounded-md p-2" id="docDate" />
-                    </div>
-                    <label class="lbl text-gray-800 whitespace-nowrap">ที่ต้องการให้ปรากฎบนบันทึกข้อความ</label>
-                </div>
-            </div>
-
-            <!-- ข้อ 2 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 items-end">
-                <div class="flex items-center gap-3">
-                    <label class="lbl text-gray-800 whitespace-nowrap" for="fullname">2.ชื่อ - นามสกุล :</label>
-                    <select name="fullname" class="flex-1 border rounded-md p-2" id="fullname">
-                        <option>อาจารย์ ดร.พิทย์พิมล ชูรอด</option>
-                    </select>
-                </div>
-                <div class="flex items-center gap-3">
-                    <label class="lbl text-gray-800 whitespace-nowrap" for="position">ตำแหน่ง :</label>
-                    <input type="text" name="position" class="flex-1 border rounded-md p-2" id="position"
-                        value="อาจารย์ประจำภาควิชาเทคโนโลยีสารสนเทศ" />
-                </div>
-            </div>
-
-            <!-- ข้อ 3 -->
-            <div class="mb-4">
-                <div class="flex items-start gap-4">
-
-                    <label class="lbl text-gray-800 whitespace-nowrap pt-1" id="purposeLabel">
-                        3. ขออนุมัติไปเข้าร่วม :
-                    </label>
-
-                    <div class="text-gray-800 space-y-1 mt-2" id="purposeGroup" role="radiogroup"
-                        aria-labelledby="purposeLabel">
-
-                        <label class="flex items-center gap-2">
-                            <input type="radio" name="purpose" value="ประชุมวิชาการ" class="accent-black" />
-                            เข้าร่วมประชุมวิชาการ
-                        </label>
-
-                        <label class="flex items-center gap-2">
-                            <input type="radio" name="purpose" value="ศึกษาดูงาน" class="accent-black" />
-                            เข้าร่วมศึกษาดูงาน
-                        </label>
-
-                        <label class="flex items-center gap-2">
-                            <input type="radio" name="purpose" value="สัมมนาวิชาการ" class="accent-black" />
-                            เข้าร่วมสัมมนาวิชาการ
-                        </label>
-
-                        <!-- 🔹 อื่น ๆ (ระบุ) แบบเดียวกับข้อ 6 -->
-                        <div class="flex items-center gap-2">
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="purpose" value="อื่นๆ" class="accent-black"
-                                    id="purposeOtherRadio">
-                                อื่น ๆ (ระบุ)
-                            </label>
-
-                            <input type="text" name="purpose_other_detail" id="purposeOtherInput"
-                                class="border rounded-md p-2 w-[260px] ml-3 bg-gray-100 text-gray-400"
-                                placeholder="โปรดระบุ" disabled>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-
-
-            <!-- ข้อ 4 -->
-            <div class="mb-4 flex items-start gap-4">
-                <label class="lbl text-gray-800 whitespace-nowrap pt-2" for="eventTitle">
-                    4.ชื่อของงานประชุมวิชาการ /<br />ชื่อหลักสูตรอบรม :
-                </label>
-                <div class="w-full">
-                    <textarea name="event_title" rows="2" class="w-full border rounded-md p-2 shadow-sm"
-                        id="eventTitle"></textarea>
-                </div>
-            </div>
-
-            <!-- ข้อ 5 -->
-            <div class="mb-4 flex items-start gap-4">
-                <label class="lbl text-gray-800 whitespace-nowrap pt-2" for="researchTitle">
-                    5. ชื่อบทความวิจัยที่จะนำเสนอ :
-                </label>
-                <div class="w-full">
-                    <textarea name="research_title" rows="2" class="w-full border rounded-md p-2 shadow-sm"
-                        id="researchTitle"></textarea>
-                </div>
-            </div>
-
-            <!-- ข้อ 6 -->
-            <div class="mb-4 flex items-start gap-4">
-                <label class="lbl text-gray-800 whitespace-nowrap pt-1" for="presentationType">
-                    6. ประเภทการนำเสนอ :
+            <!-- 1. วัน/เดือน/ปี -->
+            <div class="mb-4 flex items-center gap-4">
+                <label class="lbl whitespace-nowrap w-56">
+                    1. วัน/เดือน/ปี :
                 </label>
 
-                <div class="w-full ml-1 space-y-1 mt-2" id="presentationType">
-
-                    <label class="flex items-center gap-2">
-                        <input type="radio" name="presentation_type" value="oral" class="accent-black option-radio">
-                        Oral
-                    </label>
-
-                    <label class="flex items-center gap-2">
-                        <input type="radio" name="presentation_type" value="poster" class="accent-black option-radio">
-                        Poster
-                    </label>
-
-                    <!-- ลดช่องว่างของบรรทัดนี้ -->
-                    <div class="flex items-center gap-2">
-                        <label class="flex items-center gap-2">
-                            <input type="radio" name="presentation_type" value="other" class="accent-black"
-                                id="otherTypeRadio">
-                            อื่น ๆ (ระบุ)
-                        </label>
-
-                        <input type="text" name="presentation_other_detail" id="otherTypeInput"
-                            class="border rounded-md p-2 w-[260px] ml-3 bg-gray-100 text-gray-400"
-                            placeholder="โปรดระบุ" disabled>
-                    </div>
-
-                </div>
+                <input type="text" name="doc_date" id="docDate" class="border rounded-md p-2 w-48 cursor-pointer"
+                    placeholder="เลือกวันที่" readonly>
             </div>
 
 
-            <div class="mb-6">
-                <label class="lbl text-gray-800 block mb-2" id="dateLabel">7. วันที่เข้าร่วม</label>
-
-                <div class="space-y-4 ml-6 text-gray-800">
-                    <!-- 🔹 วันเดียว -->
-                    <div class="flex items-center gap-2">
-                        <input type="radio" name="date_option" value="single" id="optSingle" class="accent-[#11C2B9]"
-                            checked />
-                        <span>วันเดียว :</span>
-                        <div class="relative">
-                            <input type="text" name="single_date" id="singleDate"
-                                class="border rounded-md p-2 shadow-sm w-48 pr-10 cursor-pointer"
-                                placeholder="เลือกวันที่" readonly />
-                            <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-                    </div>
-
-                    <!-- 🔹 หลายวัน -->
-                    <div class="flex flex-wrap items-center gap-2">
-                        <input type="radio" name="date_option" value="range" id="optRange" class="accent-[#11C2B9]" />
-                        <span>หลายวัน :</span>
-
-                        <!-- วันที่เริ่มต้น -->
-                        <div class="relative">
-                            <input type="text" id="startDate"
-                                class="border rounded-md p-2 shadow-sm w-44 pr-10 cursor-pointer" placeholder="เริ่มต้น"
-                                readonly />
-                            <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-
-                        <span>ถึง</span>
-
-                        <!-- วันที่สิ้นสุด -->
-                        <div class="relative">
-                            <input type="text" id="endDate"
-                                class="border rounded-md p-2 shadow-sm w-44 pr-10 cursor-pointer" placeholder="สิ้นสุด"
-                                readonly />
-                            <svg class="absolute right-3 top-2.5 w-5 h-5 text-[#11C2B9]"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-
-                        <!-- 🔹 แสดงผลรูปแบบวันที่ -->
-                        <input type="text" id="rangeDisplay"
-                            class="border rounded-md p-2 shadow-sm w-64 bg-gray-50 text-gray-600"
-                            placeholder="10 - 11 กรกฎาคม 2568" readonly />
-
-                        <!-- ซ่อนค่ารวมเพื่อส่งข้อมูล -->
-                        <input type="hidden" name="range_date" id="rangeDate" value="" />
-                    </div>
-                </div>
-            </div>
-
-            <!-- ข้อ 8 -->
-            <div class="mb-4">
-                <!-- บรรทัดคำถาม -->
-                <label class="lbl text-gray-800 block mb-2">
-                    8. ชื่อสถานที่จัดประชุมวิชาการ / สถานที่จัดอบรม / เข้าร่วมรูปแบบออนไลน์
-                </label>
-
-                <div class="ml-7 space-y-2">
-
-                    <!-- ออนไลน์ -->
-                    <label class="flex items-center gap-2">
-                        <input type="checkbox" id="onlineCheckbox" name="is_online" value="1" class="accent-black">
-                        เข้าร่วมรูปแบบออนไลน์
-                    </label>
-
-                    <!-- ออนไซต์ + ช่องกรอก (ต่อท้ายในบรรทัดเดียว) -->
-                    <label class="flex items-center gap-2">
-                        <input type="checkbox" id="onsiteCheckbox" class="accent-black">
-                        ออนไซต์ ณ
-                        <input type="text" name="place" id="placeInput"
-                            class="border rounded-md p-2 w-[350px] shadow-sm"
-                            placeholder="เช่น โรงแรม Best Western PLUS จังหวัดนนทบุรี" disabled>
-                    </label>
-
-                </div>
-            </div>
-
-
-            <!-- ข้อ 9 -->
+            <!-- 2. เหตุผลที่ไม่สามารถทำการสอนในวันเดิมได้ -->
             <div class="mb-4 flex items-start gap-4">
                 <label class="lbl text-gray-800 whitespace-nowrap pt-2">
-                    9. ฐานข้อมูลที่ตีพิมพ์ (เช่น Scopus) :
+                    2. เหตุผลที่ไม่สามารถทำการสอนในวันเดิมได้ :
                 </label>
-
                 <div class="w-full">
-                    <input type="text" name="database" class="border rounded-md p-2 w-[350px] shadow-sm"
-                        placeholder="เช่น Scopus, TCI, IEEE">
+                    <textarea name="project_detail" rows="3" class="w-full border rounded-md p-2 shadow-sm"></textarea>
                 </div>
             </div>
 
 
-            <!-- ข้อ 10 -->
+            <!-- 3. รายวิชาที่ได้รับผลกระทบ -->
             <div class="mb-6">
-                <div class="flex items-center gap-2 mb-2">
-                    <label class="lbl text-gray-800" for="amountInput">10.รวมยอดประมาณการค่าใช้จ่าย :</label>
-                    <div class="flex flex-col">
-                        <div class="flex items-center gap-2">
-                            <input type="text" name="amount" class="border rounded-md p-2 w-36" id="amountInput"
-                                value="0.00" />
-                            <span>บาท</span>
-                        </div>
-                    </div>
-                </div>
-                <label class="flex items-center gap-2 ml-6 mt-2">
-                    <input type="checkbox" name="no_cost" value="1" class="accent-black" id="noCostCheckbox" />
-                    โดยไม่เบิกค่าใช้จ่ายใดๆทั้งสิ้น
+                <label class="lbl block mb-2">
+                    3. รายวิชาที่ได้รับผลกระทบ :
                 </label>
-            </div>
 
+                <div class="grid grid-cols-12 gap-2 ml-6">
+                    <input type="text" name="subject_code" class="col-span-3 border rounded-md p-2"
+                        placeholder="รหัสวิชา">
 
-            <!-- ข้อ 11 -->
-            <div class="mb-6">
-                <label class="lbl block text-gray-800 mb-2" id="carLabel">11.กรณีไปรถยนต์ส่วนตัว</label>
-                <div class="flex items-center gap-2 ml-6">
-                    <input type="checkbox" name="car_used" value="1" class="accent-black" id="carCheckbox" />
-                    <label for="carPlateInput" class="lbl">ระบุหมายเลขทะเบียนรถยนต์ :</label>
-                    <div class="flex flex-col">
-                        <input type="text" name="car_plate" class="border rounded-md p-2 w-[250px]" id="carPlateInput"
-                            placeholder="เช่น กร 1906 พัทลุง" disabled />
-                    </div>
+                    <input type="text" name="subject_name" class="col-span-7 border rounded-md p-2"
+                        placeholder="ชื่อวิชา">
+
+                    <input type="text" name="section" class="col-span-2 border rounded-md p-2" placeholder="Section">
                 </div>
             </div>
+
+
+
+            <!-- 4. วันที่ไม่ได้ทำการสอน -->
+            <div class="mb-6 flex items-center gap-4">
+                <label class="lbl whitespace-nowrap w-56">
+                    4. วันที่ไม่ได้ทำการสอน :
+                </label>
+
+                <input type="text" name="missed_date" id="missedDate" class="border rounded-md p-2 w-44 cursor-pointer"
+                    placeholder="เลือกวันที่" readonly>
+
+                <span>เวลา</span>
+
+                <input type="text" name="missed_time" class="border rounded-md p-2 w-44"
+                    placeholder="เช่น 09:00 - 12:00">
+            </div>
+
+
+
+            <!-- 5. ห้องเรียนเดิมที่เคยสอน -->
+            <div class="mb-4 flex items-center gap-4">
+                <label class="lbl whitespace-nowrap w-56">
+                    5. ห้องเรียนเดิมที่เคยสอน :
+                </label>
+
+                <input type="text" name="old_room" class="flex-1 border rounded-md p-2"
+                    placeholder="เช่น ห้อง IT-301 อาคารเรียนรวม">
+            </div>
+
+            <!-- 6. วันที่ทำการสอนชดเชย -->
+            <div class="mb-6 flex items-center gap-4">
+                <label class="lbl whitespace-nowrap w-56">
+                    6. วันที่ทำการสอนชดเชย :
+                </label>
+
+                <input type="text" name="makeup_date" id="makeupDate" class="border rounded-md p-2 w-44 cursor-pointer"
+                    placeholder="เลือกวันที่" readonly>
+
+                <span>เวลา</span>
+
+                <input type="text" name="makeup_time" class="border rounded-md p-2 w-44"
+                    placeholder="เช่น 13:00 - 16:00">
+            </div>
+
+            <!-- 7. ห้องเรียนที่ใช้สอนชดเชย -->
+            <div class="mb-4 flex items-center gap-4">
+                <label class="lbl whitespace-nowrap w-56">
+                    7. ห้องเรียนที่ใช้สอนชดเชย :
+                </label>
+
+                <input type="text" name="new_room" class="flex-1 border rounded-md p-2"
+                    placeholder="เช่น ห้อง IT-402 อาคารนวัตกรรม">
+            </div>
+
+            <!-- 8. หมายเหตุเพิ่มเติม -->
+            <div class="mb-4 flex items-start gap-4">
+                <label class="lbl text-gray-800 whitespace-nowrap pt-2">
+                    8. หมายเหตุเพิ่มเติม :
+                </label>
+                <div class="w-full">
+                    <textarea name="project_detail" rows="3" class="w-full border rounded-md p-2 shadow-sm"></textarea>
+                </div>
+            </div>
+
+            <script>
+            flatpickr.localize(flatpickr.l10ns.th);
+
+            flatpickr("#docDate, #missedDate, #makeupDate", {
+                dateFormat: "d/m/Y",
+                disableMobile: true
+            });
+            </script>
+
+            <script>
+            const subjectCountInput = document.getElementById("subjectCount");
+            const subjectList = document.getElementById("subjectList");
+
+            subjectCountInput.addEventListener("change", () => {
+                const count = parseInt(subjectCountInput.value || 0);
+                subjectList.innerHTML = "";
+
+                for (let i = 1; i <= count; i++) {
+                    subjectList.innerHTML += `
+        <div class="grid grid-cols-12 gap-2 items-center">
+            <span class="col-span-1 text-right">${i}.</span>
+
+            <input type="text" name="subject_code[]"
+                class="col-span-3 border rounded-md p-2"
+                placeholder="รหัสวิชา">
+
+            <input type="text" name="subject_name[]"
+                class="col-span-6 border rounded-md p-2"
+                placeholder="ชื่อวิชา">
+
+            <input type="text" name="subject_section[]"
+                class="col-span-2 border rounded-md p-2"
+                placeholder="Section">
+        </div>
+        `;
+                }
+            });
+            </script>
+
+            <script>
+            const otherRadio = document.getElementById("otherTypeRadio");
+            const otherInput = document.getElementById("otherTypeInput");
+            const supportRadios = document.querySelectorAll('input[name="support_type"]');
+
+            supportRadios.forEach(radio => {
+                radio.addEventListener("change", () => {
+                    if (otherRadio.checked) {
+                        otherInput.disabled = false;
+                        otherInput.classList.remove("bg-gray-100", "text-gray-400");
+                        otherInput.focus();
+                    } else {
+                        otherInput.disabled = true;
+                        otherInput.value = "";
+                        otherInput.classList.add("bg-gray-100", "text-gray-400");
+                    }
+                });
+            });
+            </script>
+
+
             <script>
             const purposeOtherRadio = document.getElementById("purposeOtherRadio");
             const purposeOtherInput = document.getElementById("purposeOtherInput");
@@ -625,26 +522,6 @@ if (!isset($_SESSION['user_id'])) {
             });
             </script>
 
-
-            <script>
-            const otherRadio = document.getElementById("otherTypeRadio");
-            const otherInput = document.getElementById("otherTypeInput");
-            const typeRadios = document.querySelectorAll('input[name="presentation_type"]');
-
-            typeRadios.forEach(radio => {
-                radio.addEventListener("change", () => {
-                    if (otherRadio.checked) {
-                        otherInput.disabled = false;
-                        otherInput.classList.remove("bg-gray-100", "text-gray-400");
-                        otherInput.focus();
-                    } else {
-                        otherInput.disabled = true;
-                        otherInput.classList.add("bg-gray-100", "text-gray-400");
-                        otherInput.value = "";
-                    }
-                });
-            });
-            </script>
 
             <script>
             // ✅ ดึง element ที่เกี่ยวข้อง
@@ -974,9 +851,8 @@ if (!isset($_SESSION['user_id'])) {
                 "กันยายน",
                 "ตุลาคม",
                 "พฤศจิกายน",
-                "ธันวาคม"
+                "ธันวาคม",
             ];
-
 
             const startDay = start.getDate();
             const endDay = end.getDate();
