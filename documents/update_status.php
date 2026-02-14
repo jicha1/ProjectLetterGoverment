@@ -1,35 +1,38 @@
-<?php // <pro_letter>
+<?php // <pro_letter/documents/update_status.php>
 session_start();
-require_once __DIR__ . './functions.php';
+require_once __DIR__ . '/../functions.php';
+header('Content-Type: application/json');
+
 $pdo = getPDO();
 
-$docId = $_POST['document_id'] ?? 0;
-$status = $_POST['status'] ?? '';
+// ✅ รับ JSON
+$data = json_decode(file_get_contents("php://input"), true);
+
+$docId  = $data['id'] ?? 0;
+$status = $data['status'] ?? '';
 $roleId = $_SESSION['role_id'] ?? 0;
 
-
-// Admin = 1, Officer = 2 → อนุญาตทั้งคู่
+// Admin = 1, Officer = 2
 if (!in_array($roleId, [1, 2])) {
-  echo json_encode(['success' => false, 'message' => 'ไม่มีสิทธิ์เปลี่ยนสถานะ']);
-  exit;
+    echo json_encode(['success' => false, 'message' => 'ไม่มีสิทธิ์']);
+    exit;
 }
 
-
-// ✅ ใช้ชื่อสถานะตามฐานข้อมูลจริง
+// ตรวจข้อมูล
 if (!$docId || !in_array($status, ['approved', 'rejected'])) {
-  echo json_encode(['success' => false, 'message' => 'ข้อมูลไม่ถูกต้อง']);
-  exit;
+    echo json_encode(['success' => false, 'message' => 'ข้อมูลไม่ถูกต้อง']);
+    exit;
 }
 
-// ✅ อัปเดตสถานะ
-$stmt = $pdo->prepare("UPDATE documents SET status = :status, updated_at = NOW() WHERE document_id = :id");
-$stmt->execute([':status' => $status, ':id' => $docId]);
+// อัปเดต
+$stmt = $pdo->prepare("
+    UPDATE documents
+    SET status = :status, updated_at = NOW()
+    WHERE document_id = :id
+");
+$stmt->execute([
+    ':status' => $status,
+    ':id' => $docId
+]);
 
-$statusText = match($status) {
-  'approved' => 'อนุมัติแล้ว',
-  'rejected' => 'รอการแก้ไข',
-  default => 'ไม่ทราบสถานะ'
-};
-
-echo json_encode(['success' => true, 'status_text' => $statusText]);
-?>
+echo json_encode(['success' => true]);

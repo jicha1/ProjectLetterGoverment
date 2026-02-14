@@ -233,41 +233,148 @@ main {
 
   function renderList() {
     const dataFiltered = dataAll.filter(d => d.status === activeTab);
-    const sorted = dataFiltered.sort((a, b) => sortAsc ? new Date(a.date) - new Date(b.date) : new Date(b.date) -
-      new Date(a.date));
+
+    const sorted = dataFiltered.sort((a, b) =>
+      sortAsc ? new Date(a.date) - new Date(b.date) : new Date(b.date) - new Date(a.date)
+    );
+
     const start = (currentPage - 1) * itemsPerPage;
     const shown = sorted.slice(start, start + itemsPerPage);
 
-    requestList.innerHTML = shown.map(req => `
+    requestList.innerHTML = shown.map(req => {
+
+      /* ===== badge สถานะ (เหมือน user) ===== */
+      let statusBadge = "";
+      if (req.status === "pending") {
+        statusBadge = `
+        <span class="px-2 py-1 rounded-full text-xs font-semibold
+                     bg-yellow-100 text-yellow-700">
+          รอตรวจสอบ
+        </span>`;
+      } else if (req.status === "done") {
+        statusBadge = `
+        <span class="px-2 py-1 rounded-full text-xs font-semibold
+                     bg-green-100 text-green-700">
+          ตรวจสอบแล้ว
+        </span>`;
+      } else if (req.status === "edit") {
+        statusBadge = `
+        <span class="px-2 py-1 rounded-full text-xs font-semibold
+                     bg-red-100 text-red-700">
+          รอการแก้ไข
+        </span>`;
+      }
+
+      /* ===== action (เหมือน user เป๊ะ) ===== */
+      let actionHtml = "";
+
+      if (req.status === "pending") {
+        actionHtml = `
+        <div class="mt-3 flex gap-2">
+          <button onclick="approveDocument(${req.document_id})"
+            class="px-6 py-2 bg-teal-500 hover:bg-teal-600
+                   text-white text-sm font-semibold rounded-xl shadow">
+            ยืนยันการตรวจสอบ
+          </button>
+
+          <button onclick="rejectDocument(${req.document_id})"
+            class="px-6 py-2 bg-red-400 hover:bg-red-500
+                   text-white text-sm font-semibold rounded-xl shadow">
+            ไม่ผ่านการตรวจสอบ
+          </button>
+        </div>`;
+      } else if (req.status === "done") {
+        actionHtml = `
+        <div class="mt-3 px-4 py-2 rounded-xl
+                    bg-green-50 text-green-700
+                    text-sm font-semibold border border-green-300">
+          📄 เอกสารถูกตรวจสอบแล้ว
+        </div>`;
+      } else if (req.status === "edit") {
+        actionHtml = `
+        <div class="mt-3 px-4 py-2 rounded-xl
+                    bg-red-50 text-red-700
+                    text-sm font-semibold border border-red-300">
+          ✏️ รอผู้ยื่นแก้ไขเอกสาร
+        </div>`;
+      }
+
+      return `
     <div class="bg-gray-50 p-4 rounded-xl shadow flex justify-between items-start">
+
+      <!-- ซ้าย -->
       <div>
-        <a href="#" onclick="openDocument(${req.document_id})" 
-   class="font-semibold text-teal-600 hover:underline">${req.title}</a>
+        <a href="#" onclick="openDocument(${req.document_id})"
+           class="font-semibold text-teal-600 hover:underline text-lg">
+          ${req.title}
+        </a>
 
         <div class="text-sm text-gray-500 mt-1 flex items-center space-x-2">
           <span>${req.detail}</span>
-          <span> | สถานะ:</span> 
-          <span class="${req.statusClass}">${req.statusText}</span>
+          <span>| สถานะ:</span>
+          ${statusBadge}
         </div>
       </div>
-      <div class="text-right text-sm text-gray-600">
-        <div>${formatDate(req.date)}</div>
-        <div class="mt-2 flex justify-end space-x-2">
-          <span class="text-blue-500 flex items-center space-x-1"><img src="https://cdn-icons-png.flaticon.com/16/281/281760.png" alt="Word"><span>Word</span></span>
-          <span class="text-red-500 flex items-center space-x-1"><img src="https://cdn-icons-png.flaticon.com/16/337/337946.png" alt="PDF"><span>PDF</span></span>
+
+      <!-- ขวา (โครงเดียวกับ USER) -->
+      <div class="text-right flex flex-col items-end text-sm text-gray-600 min-w-[200px]">
+
+        <!-- วันที่ -->
+        <div class="font-medium mb-2">
+          ${formatDate(req.date)}
         </div>
+
+        <!-- PDF / WORD (เหมือน user เป๊ะ) -->
+        <div class="flex items-center space-x-4">
+          ${
+            req.word
+              ? `<a href="${req.word}" target="_blank"
+                   class="flex items-center space-x-1 text-blue-500 hover:underline">
+                   <img src="https://cdn-icons-png.flaticon.com/16/281/281760.png">
+                   <span>Word</span>
+                 </a>`
+              : `<div class="flex items-center space-x-1 text-blue-500">
+                   <img src="https://cdn-icons-png.flaticon.com/16/281/281760.png">
+                   <span>Word</span>
+                 </div>`
+          }
+
+          ${
+            req.pdf
+              ? `<a href="${req.pdf}" target="_blank"
+                   class="flex items-center space-x-1 text-red-500 hover:underline">
+                   <img src="https://cdn-icons-png.flaticon.com/16/337/337946.png">
+                   <span>PDF</span>
+                 </a>`
+              : `<div class="flex items-center space-x-1 text-red-500">
+                   <img src="https://cdn-icons-png.flaticon.com/16/337/337946.png">
+                   <span>PDF</span>
+                 </div>`
+          }
+        </div>
+
+        <!-- ปุ่ม / ข้อความ -->
+        ${actionHtml}
+
       </div>
-    </div>
-  `).join("");
+    </div>`;
+    }).join("");
 
     const totalPages = Math.ceil(dataFiltered.length / itemsPerPage);
     pagination.innerHTML = Array.from({
         length: totalPages
       }, (_, i) => i + 1)
-      .map(i =>
-        `<button onclick="goToPage(${i})" class="px-3 py-1 rounded border ${i === currentPage ? "bg-teal-500 text-white" : "text-teal-500 border-teal-500"}">${i}</button>`
-      ).join("");
+      .map(i => `
+      <button onclick="goToPage(${i})"
+        class="px-3 py-1 rounded border
+        ${i === currentPage
+          ? "bg-teal-500 text-white"
+          : "text-teal-500 border-teal-500"}">
+        ${i}
+      </button>
+    `).join("");
   }
+
 
   function goToPage(page) {
     currentPage = page;
@@ -395,6 +502,78 @@ main {
         console.log("Fetch error:", err); // ⭐ Debug
         Swal.fire("Error", "ไม่สามารถตรวจสอบสิทธิ์ได้", "error");
       });
+  }
+
+  function approveDocument(id) {
+    Swal.fire({
+      title: "ยืนยันการตรวจสอบเอกสาร?",
+      text: "เอกสารจะถูกระบุว่าตรวจสอบเรียบร้อยแล้ว",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "ยืนยัน",
+      cancelButtonText: "ยกเลิก"
+    }).then(result => {
+      if (!result.isConfirmed) return;
+
+      fetch("../documents/update_status.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            id,
+            status: "approved"
+          })
+        })
+        .then(r => r.json())
+        .then(res => {
+          if (res.success) {
+            Swal.fire({
+              icon: "success",
+              title: "ตรวจสอบเรียบร้อย",
+              timer: 1500,
+              showConfirmButton: false
+            });
+            loadRequests();
+          }
+        });
+    });
+  }
+
+  function rejectDocument(id) {
+    Swal.fire({
+      title: "เอกสารไม่ผ่านการตรวจสอบ?",
+      text: "เอกสารจะถูกส่งกลับให้ผู้ยื่นแก้ไข",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "ยืนยัน",
+      cancelButtonText: "ยกเลิก"
+    }).then(result => {
+      if (!result.isConfirmed) return;
+
+      fetch("../documents/update_status.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            id,
+            status: "rejected"
+          })
+        })
+        .then(r => r.json())
+        .then(res => {
+          if (res.success) {
+            Swal.fire({
+              icon: "success",
+              title: "ส่งกลับให้แก้ไขแล้ว",
+              timer: 1500,
+              showConfirmButton: false
+            });
+            loadRequests();
+          }
+        });
+    });
   }
   </script>
 </body>

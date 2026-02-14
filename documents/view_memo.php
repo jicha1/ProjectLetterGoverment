@@ -70,7 +70,6 @@ $stmt->execute([':id' => $docId]);
 $document = $stmt->fetch(PDO::FETCH_ASSOC);
 $docStatus = $document['status'];
 
-$allowEditByStatus = in_array($docStatus, ['draft', 'rejected']);
 
 
 
@@ -111,7 +110,16 @@ $st->execute([':uid' => $userId]);
 $hasEditPermission = $st->fetchColumn() > 0;   // สิทธิ์จาก permission
 $allowEditByStatus = in_array($docStatus, ['draft', 'rejected']);
 
-$canEdit = $hasEditPermission && $allowEditByStatus;
+// User
+if ($roleId === 3 || $roleId === 0) {
+    $canEdit = $hasEditPermission && in_array($docStatus, ['draft', 'rejected']);
+}
+
+// Officer / Admin
+elseif ($roleId === 1 || $roleId === 2) {
+    $canEdit = true;
+}
+
 $readonly = !$canEdit;
 
 
@@ -247,7 +255,7 @@ $len = max(20, $len);
 <body class="view-document">
 
 
-  <?php if ($readonly): ?>
+  <?php if ($readonly && !($isAdmin || $isOfficer)): ?>
   <script>
   document.addEventListener("DOMContentLoaded", () => {
 
@@ -344,14 +352,15 @@ $len = max(20, $len);
 
 
     <!-- เนื้อหา -->
-    <div class="content-block single ">
+    <div class="content-block single " style=" margin-left: 1.45cm;">
       เรียน คณบดีคณะเทคโนโลยีและการจัดการอุตสาหกรรม
     </div>
 
     <div class="content-block paragraph">
       ตามที่ สมาคมสหกิจศึกษาไทย กำหนดจัดอบรมหลักสูตร
       <span class="chip"><?= h($courseName ?: 'ชื่อหลักสูตร') ?></span>
-      ระหว่างวันที่ <span class="chip"><?= h($joinDates ?: '...') ?></span>
+      ระหว่างวันที่
+      <span class="chip keep"><?= h($joinDates ?: '...') ?></span>
       ณ <span class="chip"><?= h($location ?: '...') ?></span> นั้น
       ซึ่งหลักสูตรดังกล่าวเป็นประโยชน์ต่อการพัฒนาทั้งกระบวนการจัดการเรียนการสอนในรูปแบบสหกิจศึกษา
     </div>
@@ -360,20 +369,21 @@ $len = max(20, $len);
       การนี้ ข้าพเจ้า
       <span class="chip"><?= h($ownerName ?: 'ชื่อ-นามสกุล') ?></span>
       <span class="chip"><?= h($position ?: '') ?></span>
-      สังกัดภาควิชา <span class="chip"><?= h($department ?: '...') ?></span>
-      คณะ <span class="chip"><?= h($faculty ?: '...') ?></span>
+      สังกัดภาควิชา<span class="chip"><?= h($department ?: '...') ?></span>
+      <span class="chip"><?= h($faculty ?: '...') ?></span>
       มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ วิทยาเขตปราจีนบุรี
       จึงมีความประสงค์ที่จะขออนุมัติ เข้ารับการอบรมหลักสูตร
-      <span class="chip"><?= h($courseName ?: 'ชื่อหลักสูตร') ?></span>
+      <span class="chip keep"><?= h($courseName ?: 'ชื่อหลักสูตร') ?></span>
       ระหว่างวันที่ <span class="chip"><?= h($joinDates ?: '') ?></span>
       ณ <span class="chip"><?= h($location ?: '') ?></span>
-      วงเงินทั้งสิ้น <span class="chip"><?= h($prettyAmount ?: '') ?></span> บาท
+      <!-- วงเงินทั้งสิ้น <span class="chip"><?= h($prettyAmount ?: '') ?></span> บาท
       โดยขอใช้แหล่งเงินจัดสรรให้หน่วยงาน ประจำปีงบประมาณ
       <span class="chip">
         <?= h($thaiYear ? 'พ.ศ. ' . $thaiYear : 'พ.ศ. ....') ?>
       </span>
+      แผนงานจัดการศึกษาระดับอุดมศึกษา กองทุนพัฒนาบุคลากร หมวดค่าใช้สอย -->
+      <span class="keep">(รายละเอียดตามเอกสารแนบ)</span>
 
-      แผนงานจัดการศึกษาระดับอุดมศึกษา กองทุนพัฒนาบุคลากร หมวดค่าใช้สอย (รายละเอียดตามเอกสารแนบ)
     </div>
 
     <div class="content-block paragraph">
@@ -422,30 +432,30 @@ $len = max(20, $len);
 
 
   </main>
-  <<script>
-    /* ===============================
+  <script>
+  /* ===============================
     GLOBAL HELPERS
     =============================== */
-    function getQuery(name) {
+  function getQuery(name) {
     const url = new URL(window.location.href);
     return url.searchParams.get(name);
-    }
+  }
 
-    /* ===============================
-    DOM READY
-    =============================== */
-    document.addEventListener("DOMContentLoaded", () => {
+  /* ===============================
+  DOM READY
+  =============================== */
+  document.addEventListener("DOMContentLoaded", () => {
 
     /* ---------------------------------
     1) LOCK VIEW DOCUMENT (chip)
     --------------------------------- */
     document.querySelectorAll(".view-document .chip").forEach(el => {
-    el.removeAttribute("contenteditable");
-    el.removeAttribute("tabindex");
-    el.style.pointerEvents = "none";
-    el.style.userSelect = "none";
-    el.style.caretColor = "transparent";
-    el.blur();
+      el.removeAttribute("contenteditable");
+      el.removeAttribute("tabindex");
+      el.style.pointerEvents = "none";
+      el.style.userSelect = "none";
+      el.style.caretColor = "transparent";
+      el.blur();
     });
 
     /* ---------------------------------
@@ -454,18 +464,18 @@ $len = max(20, $len);
     --------------------------------- */
     <?php if ($readonly && !($isAdmin || $isOfficer)): ?>
     document.querySelectorAll("input, textarea, select").forEach(el => {
-    el.disabled = true;
-    el.style.background = "#f0f0f0";
+      el.disabled = true;
+      el.style.background = "#f0f0f0";
     });
 
     const submitBtn = document.querySelector("button[type=submit]");
     if (submitBtn) submitBtn.style.display = "none";
 
     Swal.fire({
-    title: "โหมดอ่านอย่างเดียว",
-    text: "คุณไม่มีสิทธิ์แก้ไขเอกสารนี้",
-    icon: "info",
-    confirmButtonText: "ตกลง"
+      title: "โหมดอ่านอย่างเดียว",
+      text: "คุณไม่มีสิทธิ์แก้ไขเอกสารนี้",
+      icon: "info",
+      confirmButtonText: "ตกลง"
     });
     <?php endif; ?>
 
@@ -474,11 +484,11 @@ $len = max(20, $len);
     --------------------------------- */
     const alertBox = document.getElementById("alertBox");
     if (alertBox) {
-    setTimeout(() => {
-    alertBox.style.transition = "opacity 0.5s ease";
-    alertBox.style.opacity = 0;
-    setTimeout(() => alertBox.remove(), 500);
-    }, 3000);
+      setTimeout(() => {
+        alertBox.style.transition = "opacity 0.5s ease";
+        alertBox.style.opacity = 0;
+        setTimeout(() => alertBox.remove(), 500);
+      }, 3000);
     }
 
     /* ---------------------------------
@@ -486,25 +496,25 @@ $len = max(20, $len);
     --------------------------------- */
     const errType = getQuery("err");
     if (errType === "no_permission") {
-    Swal.fire({
-    title: "ไม่มีสิทธิ์แก้ไขเอกสารนี้",
-    html: `
+      Swal.fire({
+        title: "ไม่มีสิทธิ์แก้ไขเอกสารนี้",
+        html: `
     <div style="font-size: 1.15rem; line-height: 1.6;">
       คุณไม่มีสิทธิ์ในการแก้ไขเอกสารนี้<br>
       ต้องการกลับหน้าหลักหรืออยู่ต่อ?
     </div>
     `,
-    icon: "error",
-    showCancelButton: true,
-    confirmButtonText: "กลับหน้าหลัก",
-    cancelButtonText: "อยู่หน้านี้ต่อ",
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#aaa",
-    }).then((result) => {
-    if (result.isConfirmed) {
-    window.location.href = "<?= $homePath ?>";
-    }
-    });
+        icon: "error",
+        showCancelButton: true,
+        confirmButtonText: "กลับหน้าหลัก",
+        cancelButtonText: "อยู่หน้านี้ต่อ",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#aaa",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "<?= $homePath ?>";
+        }
+      });
     }
 
     /* ---------------------------------
@@ -512,42 +522,42 @@ $len = max(20, $len);
     --------------------------------- */
     const editBtn = document.getElementById("editBtn");
     if (editBtn) {
-    editBtn.addEventListener("click", function (e) {
-    const canEdit = this.dataset.canEdit === "1";
-    if (!canEdit) {
-    e.preventDefault();
-    Swal.fire({
-    title: "ไม่สามารถแก้ไขได้",
-    text: "คุณไม่มีสิทธิ์แก้ไขเอกสารนี้",
-    icon: "warning",
-    confirmButtonText: "ตกลง"
-    });
-    }
-    });
+      editBtn.addEventListener("click", function(e) {
+        const canEdit = this.dataset.canEdit === "1";
+        if (!canEdit) {
+          e.preventDefault();
+          Swal.fire({
+            title: "ไม่สามารถแก้ไขได้",
+            text: "คุณไม่มีสิทธิ์แก้ไขเอกสารนี้",
+            icon: "warning",
+            confirmButtonText: "ตกลง"
+          });
+        }
+      });
     }
 
     /* ---------------------------------
     6) SAVED FROM UPDATE ALERT
     --------------------------------- */
     if (getQuery("saved") === "1" && getQuery("from") === "update") {
-    Swal.fire({
-    title: "บันทึกสำเร็จ",
-    text: "คุณต้องการกลับไปที่หน้าหลักหรือไม่?",
-    icon: "success",
-    showCancelButton: true,
-    confirmButtonText: "กลับหน้าหลัก",
-    cancelButtonText: "อยู่หน้านี้ต่อ",
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#aaa",
-    }).then((result) => {
-    if (result.isConfirmed) {
-    window.location.href = "<?= $homePath ?>";
-    }
-    });
+      Swal.fire({
+        title: "บันทึกสำเร็จ",
+        text: "คุณต้องการกลับไปที่หน้าหลักหรือไม่?",
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonText: "กลับหน้าหลัก",
+        cancelButtonText: "อยู่หน้านี้ต่อ",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#aaa",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "<?= $homePath ?>";
+        }
+      });
     }
 
-    });
-    </script>
+  });
+  </script>
 
 
 

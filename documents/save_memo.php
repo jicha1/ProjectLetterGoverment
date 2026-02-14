@@ -31,9 +31,8 @@ try {
     $purpose = $_POST['purpose'] ?? '';    // academic|training|meeting|other
     $eventTitle = trim($_POST['event_title'] ?? '');
 
-    $dateOption = $_POST['date_option'] ?? '';    // single|range
-    $singleDate = trim($_POST['single_date'] ?? '');
-    $rangeDate = trim($_POST['range_date'] ?? '');
+   $joinDates = trim($_POST['join_date'] ?? ''); // วันเดียว หรือ หลายวัน (ข้อความไทย)
+
 
     $isOnline = ($_POST['is_online'] ?? '1') === '1' ? 1 : 0;
 
@@ -55,22 +54,34 @@ $documentId = isset($_POST['document_id']) ? (int)$_POST['document_id'] : 0;
 
     /** ===== ตรวจฝั่งเซิร์ฟเวอร์ ===== */
     $errors = [];
-    if ($docDate === '')
-        $errors['doc_date'] = 'required';
-    if ($purpose === '')
-        $errors['purpose'] = 'required';
-    if ($eventTitle === '')
-        $errors['event_title'] = 'required';
-    if ($dateOption === 'single' && $singleDate === '')
-        $errors['single_date'] = 'required';
-    if ($dateOption === 'range' && $rangeDate === '')
-        $errors['range_date'] = 'required';
-    if (!$isOnline && $place === '')
-        $errors['place'] = 'required';
-    if (!$noCost && !is_numeric($amountRaw))
-        $errors['amount'] = 'number';
-    if ($carUsed && $carPlate === '')
-        $errors['car_plate'] = 'required';
+    if ($docDate === '') {
+    $errors['doc_date'] = 'required';
+}
+
+if ($purpose === '') {
+    $errors['purpose'] = 'required';
+}
+
+if ($eventTitle === '') {
+    $errors['event_title'] = 'required';
+}
+
+if ($joinDates === '') {
+    $errors['join_date'] = 'required';
+}
+
+if (!$isOnline && $place === '') {
+    $errors['place'] = 'required';
+}
+
+if (!$noCost && !is_numeric($amountRaw)) {
+    $errors['amount'] = 'number';
+}
+
+if ($carUsed && $carPlate === '') {
+    $errors['car_plate'] = 'required';
+}
+
 
     
 
@@ -124,12 +135,29 @@ $documentId = isset($_POST['document_id']) ? (int)$_POST['document_id'] : 0;
     if (!$doc) {
         throw new Exception("Document not found");
     }
-    if ($doc['owner_id'] != $userId) {
-        throw new Exception("No permission");
-    }
-    if (!in_array($doc['status'], ['draft','rejected'])) {
+    $roleId = (int)($_SESSION['role_id'] ?? 0);
+    $isAdmin   = ($roleId === 1);
+    $isOfficer = ($roleId === 2);
+
+    // 🔒 ถ้าเอกสารถูกตรวจแล้วหรืออนุมัติแล้ว → ใครก็แก้ไม่ได้
+    if (in_array($doc['status'], ['checked', 'approved'])) {
         throw new Exception("Document locked");
     }
+
+        // 👤 User ธรรมดา (ไม่ใช่ Admin / Officer)
+    if (!$isAdmin && !$isOfficer) {
+
+        // ต้องเป็นเจ้าของเอกสาร
+        if ($doc['owner_id'] != $userId) {
+            throw new Exception("No permission");
+        }
+
+        // User แก้ได้เฉพาะ draft / rejected
+        if (!in_array($doc['status'], ['draft', 'rejected'])) {
+            throw new Exception("Document locked");
+        }
+    }
+
 
     // 🔄 UPDATE documents
     $stmt = $pdo->prepare("
@@ -172,16 +200,13 @@ $documentId = isset($_POST['document_id']) ? (int)$_POST['document_id'] : 0;
 }
 
 
-
-
-
     $values = [
         1 => $docDate,
         2 => $fullname,
         3 => $position,
         4 => $joinType,
         5 => $eventTitle,
-        6 => ($dateOption === 'single') ? $singleDate : $rangeDate,
+        6 => $joinDates,
         7 => $isOnline ? 'เข้าร่วมรูปแบบออนไลน์' : $place,
         8 => number_format($amount, 2, '.', ''),
         9 => $carUsed ? $carPlate : '',

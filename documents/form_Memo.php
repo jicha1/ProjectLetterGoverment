@@ -35,8 +35,25 @@ if ($isEdit) {
     $doc = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$doc) exit("ไม่พบเอกสาร");
-    if ($doc['owner_id'] != $_SESSION['user_id']) exit("ไม่มีสิทธิ์แก้ไข");
-    if (!in_array($doc['status'], ['draft','rejected'])) exit("เอกสารแก้ไม่ได้");
+   $roleId = (int)($_SESSION['role_id'] ?? 0);
+    $isAdmin   = ($roleId === 1);
+    $isOfficer = ($roleId === 2);
+
+    // ✅ อนุญาต Admin / Officer แก้ไขได้
+    if (!$isAdmin && !$isOfficer) {
+        if ($doc['owner_id'] != $_SESSION['user_id']) {
+            header("Location: view_memo.php?id={$docId}&err=no_permission");
+            exit;
+
+        }
+
+        if (!in_array($doc['status'], ['draft','rejected'])) {
+           header("Location: view_memo.php?id={$docId}&err=no_permission");
+          exit;
+
+        }
+    }
+
 
     // โหลดค่า document_values
     $q = $pdo->prepare("
@@ -69,8 +86,8 @@ $department  = $formData[11] ?? '';
 // ===============================
 // FIX BUG ❌ ข้อ 5 : วันที่ (radio)
 // ===============================
-$isRangeDate = !empty($joinDates)
-    && (str_contains($joinDates, '-') || str_contains($joinDates, 'ถึง'));
+$isRangeDate = preg_match('/\d+\s*-\s*\d+/', $joinDates);
+
 
 // ===============================
 // FIX BUG ❌ ข้อ 6 : ออนไลน์ / ออนไซต์
@@ -537,8 +554,8 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
             <input type="text" id="rangeDisplay" class="border rounded-md p-2 shadow-sm w-64 bg-gray-50 text-gray-600"
               placeholder="10 - 11 กรกฎาคม 2568" readonly />
 
-            <input type="hidden" name="range_date" id="rangeDate" value="" />
-            <input type="hidden" name="join_date_range" id="joinDateValue" value="<?= h($formData[6] ?? '') ?>">
+            <input type="hidden" name="join_date" id="joinDate" value="<?= h($formData[6] ?? '') ?>">
+
 
           </div>
         </div>
@@ -631,9 +648,34 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
     const memoForm = document.getElementById("memoForm");
     const amountInput = document.getElementById("amountInput");
     if (memoForm) {
-      memoForm.addEventListener("submit", () => {
+      memoForm.addEventListener("submit", (event) => {
+
+
+        // แก้ comma เงิน
         amountInput.value = amountInput.value.replace(/,/g, "");
+
+        const joinDate = document.getElementById("joinDate");
+
+        if (optSingle.checked) {
+          if (!singleDate.value.trim()) {
+            alert("กรุณาเลือกวันที่");
+            event.preventDefault();
+            return;
+          }
+          joinDate.value = singleDate.value.trim();
+        }
+
+        if (optRange.checked) {
+          if (!rangeDisplay.value.trim()) {
+            alert("กรุณาเลือกช่วงวันที่");
+            event.preventDefault();
+            return;
+          }
+          joinDate.value = rangeDisplay.value.trim();
+        }
+
       });
+
     }
 
     /* ================= INIT ================= */
@@ -718,8 +760,8 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
     const startDate = document.getElementById("startDate");
     const endDate = document.getElementById("endDate");
     const rangeDisplay = document.getElementById("rangeDisplay");
-    const rangeDate = document.getElementById("rangeDate");
-    const joinDateValue = document.getElementById("joinDateValue");
+    const joinDate = document.getElementById("joinDate");
+
 
     const singlePicker = flatpickr("#singleDate", {
       disableMobile: true,
@@ -730,11 +772,51 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
     });
 
     const startPicker = flatpickr("#startDate", {
-      disableMobile: true
+      disableMobile: true,
+      onChange: updateRangeDisplay
     });
+
     const endPicker = flatpickr("#endDate", {
-      disableMobile: true
+      disableMobile: true,
+      onChange: updateRangeDisplay
     });
+
+    function updateRangeDisplay() {
+      if (!startPicker.selectedDates[0] || !endPicker.selectedDates[0]) return;
+
+      const d1 = startPicker.selectedDates[0];
+      const d2 = endPicker.selectedDates[0];
+
+      const y1 = d1.getFullYear() + 543;
+      const y2 = d2.getFullYear() + 543;
+      const m1 = monthsTH[d1.getMonth()];
+      const m2 = monthsTH[d2.getMonth()];
+
+      let text = "";
+
+      // ✅ เดือน + ปีเดียวกัน → 29 - 31 ธันวาคม 2568
+      if (m1 === m2 && y1 === y2) {
+        text = `${d1.getDate()} - ${d2.getDate()} ${m1} ${y1}`;
+      }
+      // เดือนเดียวกัน แต่ปีต่าง
+      else if (m1 === m2) {
+        text =
+          `${d1.getDate()} ${m1} ${y1}` +
+          " - " +
+          `${d2.getDate()} ${m2} ${y2}`;
+      }
+      // คนละเดือน
+      else {
+        text =
+          `${d1.getDate()} ${m1} ${y1}` +
+          " - " +
+          `${d2.getDate()} ${m2} ${y2}`;
+      }
+
+      rangeDisplay.value = text;
+      joinDate.value = text; // ส่งเข้า backend
+    }
+
 
     function toggleDatePickers() {
       const single = optSingle.checked;
@@ -746,47 +828,74 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
     optSingle.addEventListener("change", toggleDatePickers);
     optRange.addEventListener("change", toggleDatePickers);
 
-    function parseThaiDate(str) {
-      const map = Object.fromEntries(monthsTH.map((m, i) => [m, i]));
-      const p = str.trim().split(" ");
-      if (p.length < 3) return null;
-      return new Date(p[2] - 543, map[p[1]], parseInt(p[0], 10));
+    function parseThaiRange(raw) {
+      // รองรับ "10 - 11 กรกฎาคม 2568"
+      const match = raw.match(/(\d+)\s*-\s*(\d+)\s*(.+)\s*(\d{4})/);
+      if (!match) return null;
+
+      const d1 = parseInt(match[1], 10);
+      const d2 = parseInt(match[2], 10);
+      const monthName = match[3].trim();
+      const year = parseInt(match[4], 10) - 543;
+
+      const monthIndex = monthsTH.indexOf(monthName);
+      if (monthIndex === -1) return null;
+
+      return [
+        new Date(year, monthIndex, d1),
+        new Date(year, monthIndex, d2)
+      ];
     }
 
-    /* ================= RESTORE EDIT MODE (ตัวจริง) ================= */
-    if (joinDateValue && joinDateValue.value.trim()) {
-      const raw = joinDateValue.value.trim();
+    function parseThaiSingle(raw) {
+      // เช่น "16 ธันวาคม 2568"
+      const match = raw.match(/(\d+)\s+(.+)\s+(\d{4})/);
+      if (!match) return null;
 
-      // 🔥 หลายวัน ( - หรือ ถึง )
+      const day = parseInt(match[1], 10);
+      const monthName = match[2].trim();
+      const year = parseInt(match[3], 10) - 543;
+
+      const monthIndex = monthsTH.indexOf(monthName);
+      if (monthIndex === -1) return null;
+
+      return new Date(year, monthIndex, day);
+    }
+
+
+
+    /* ================= RESTORE EDIT MODE (ตัวจริง) ================= */
+    if (joinDate && joinDate.value.trim()) {
+      const raw = joinDate.value.trim();
+
+
+      // 🔥 หลายวัน
       if (raw.includes("-") || raw.includes("ถึง")) {
         optRange.checked = true;
         toggleDatePickers();
 
-        const parts = raw.includes("ถึง") ?
-          raw.split("ถึง") :
-          raw.split("-");
-
-        const d1 = parseThaiDate(parts[0]);
-        const d2 = parseThaiDate(parts[1]);
-
-        if (d1 && d2) {
-          startPicker.setDate(d1, false);
-          endPicker.setDate(d2, false);
+        const dates = parseThaiRange(raw);
+        if (dates) {
+          startPicker.setDate(dates[0], false);
+          endPicker.setDate(dates[1], false);
           rangeDisplay.value = raw;
-          rangeDate.value = raw;
+          joinDate.value = raw;
         }
       }
       // 🔥 วันเดียว
       else {
         optSingle.checked = true;
         toggleDatePickers();
-        const d = parseThaiDate(raw);
+
+        const d = parseThaiSingle(raw);
         if (d) {
           singlePicker.setDate(d, false);
           singleDate.value = raw;
+          joinDate.value = raw;
         }
       }
     }
+
 
     /* ================= INIT ALL ================= */
     syncPurposeUI();
