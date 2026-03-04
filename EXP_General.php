@@ -26,9 +26,9 @@ if ($docId > 0) {
 }
 
 // Helper
-function h($s){
-  return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
-}
+// function h($s){
+//   return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
+// }
 
 // Map fields
 $name = $valueMap[1] ?? '';

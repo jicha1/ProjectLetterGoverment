@@ -716,14 +716,11 @@ $len = max(20, $len);
 
 
 
-
             <!-- ย่อหน้า 3 -->
             <div style="margin-top:3cm; text-align:right; font-size:16pt;">
                 (Mr. Yanakorn Ruamsuk)<br>
                 University in Hagen, Germany
             </div>
-
-
 
 
             <!-- <div style="font-family:'TH SarabunPSK'; font-size:16pt; line-height:1.2;"> เรียน <?= h($hdr_to) ?> </div>
