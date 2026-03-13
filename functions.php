@@ -20,44 +20,58 @@ function getPDO() {
     return $pdo;
 }
 function login(string $username, string $password): array {
-    try {
-        $pdo = getPDO(); 
-        $sql = "
-            SELECT u.user_id, u.username, u.password, u.fullname, u.position, u.role_id, u.is_active,
-                   r.role_name
-            FROM users u
-            LEFT JOIN roles r ON r.role_id = u.role_id
-            WHERE u.username = :username
-            LIMIT 1
-        ";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([':username' => $username]);
-        $u = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$u) {
-            return ['ok' => false, 'error' => 'user'];
-        }
-        if ((int)$u['is_active'] !== 1) {
-            return ['ok' => false, 'error' => 'inactive'];
-        }
-        $dbPass = (string)$u['password'];
-        $isHash = str_starts_with($dbPass, '$2y$') || str_starts_with($dbPass, '$argon2');
-        $passOk = $isHash ? password_verify($password, $dbPass) : hash_equals($dbPass, $password);
+    $pdo = getPDO();
 
-        if (!$passOk) {
-            return ['ok' => false, 'error' => 'pass'];
-        }
-        return [
-            'ok'        => true,
-            'user_id'   => (int)$u['user_id'],
-            'username'  => $u['username'],
-            'role_id'   => (int)$u['role_id'],
-            'fullname'  => $u['fullname'],
-            'position'  => $u['position'],
-            'role_name' => $u['role_name'] ?? '',
-        ];
-    } catch (Throwable $e) {
-        return ['ok' => false, 'error' => 'db'];
+    $sql = "SELECT 
+                u.user_id, 
+                u.username, 
+                u.password, 
+                u.role_id, 
+                u.position, 
+                u.fullname, 
+                u.is_active,
+                r.role_name
+            FROM users u
+            LEFT JOIN roles r ON u.role_id = r.role_id
+            WHERE u.username = :u 
+            LIMIT 1";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['u' => $username]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$user) {
+        return ['ok' => false, 'error' => 'user_not_found'];
     }
+
+    if ((int)$user['is_active'] !== 1) {
+        return ['ok' => false, 'error' => 'inactive'];
+    }
+
+    $stored = (string)$user['password'];
+    $passOK = preg_match('/^\$2[aby]\$|^\$argon2/i', $stored)
+              ? password_verify($password, $stored)
+              : hash_equals($stored, $password);
+
+    if (!$passOK) {
+        return ['ok' => false, 'error' => 'invalid_password'];
+    }
+
+    // ✅ ดึงสิทธิ์ของผู้ใช้ทั้งหมด
+    $permStmt = $pdo->prepare("SELECT perm_id FROM user_permissions WHERE user_id = ?");
+    $permStmt->execute([$user['user_id']]);
+    $permissions = $permStmt->fetchAll(PDO::FETCH_COLUMN);
+
+    return [
+        'ok'          => true,
+        'user_id'     => $user['user_id'],
+        'username'    => $user['username'],
+        'role_id'     => $user['role_id'],
+        'position'    => $user['position'],
+        'fullname'    => $user['fullname'],
+        'role_name'   => $user['role_name'] ?? '',
+        'permissions' => $permissions
+    ];
 }
 function getAllUsers() {
     $pdo = getPDO();
