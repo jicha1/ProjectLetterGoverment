@@ -1,7 +1,7 @@
 <?php 
 // ต้องวางตรงนี้! บรรทัดแรกของไฟล์
-$CURRENT_MAIN = "academic";     
-$CURRENT_SUB  = "ประชุมวิชาการ/ศึกษาดูงาน/สัมมนาวิชาการ";           // ถ้าไม่มีหมวดย่อย ให้เว้นว่าง
+$CURRENT_MAIN = "external";     
+$CURRENT_SUB  = "ระบบขอความอนุเคราะห์หนังสือฝึกงาน (ของนักศึกษา)";           // ถ้าไม่มีหมวดย่อย ให้เว้นว่าง
 ?>
 <!--ระบบขอความอนุเคราะห์หนังสือฝึกงาน (ของนักศึกษา) -->
 <?php
@@ -177,7 +177,7 @@ if (!isset($_SESSION['user_id'])) {
             </div>
         </div>
         <div class="flex items-center space-x-4">
-            <a href="home.php">
+            <a href="/Pro_letter/user/home.php">
                 <div class="px-4 py-2 rounded-[11px] font-bold transition text-white">
                     หน้าหลัก
                 </div>
@@ -189,7 +189,7 @@ if (!isset($_SESSION['user_id'])) {
                 }
             ?>
 
-            <a href="form_Memo.php">
+            <a href="/Pro_letter/form_Memo/Request/infor_intership.php">
                 <div class="px-4 py-2 rounded-[11px] font-bold transition bg-white text-teal-500 shadow">
                     แบบฟอร์มบันทึกข้อความ
                 </div>
@@ -263,39 +263,8 @@ if (!isset($_SESSION['user_id'])) {
                     <label class="lbl text-gray-800 w-28 text-right">หมวดย่อย:</label>
                     <div class="relative w-full">
                         <select name="sub_category" class="custom-select w-full" id="subCategory"
-                            <?= ($CURRENT_MAIN!="internal"?"disabled":"") ?>>
+                            data-current="<?= h($CURRENT_SUB ?? '') ?>" disabled>
                             <option value="">-- เลือกหมวดย่อย --</option>
-
-                            <?php if ($CURRENT_MAIN == "internal"): ?>
-                            <option value="ขอใช้อาคารวันหยุดราชการ"
-                                <?= ($CURRENT_SUB=="ขอใช้อาคารวันหยุดราชการ"?"selected":"") ?>>
-                                ขอใช้อาคารวันหยุดราชการ
-                            </option>
-
-                            <option value="ขอห้องพักรับรอง" <?= ($CURRENT_SUB=="ขอห้องพักรับรอง"?"selected":"") ?>>
-                                ขอห้องพักรับรอง
-                            </option>
-
-                            <option value="ขออนุมัติตัวบุคคลเป็นวิทยากร"
-                                <?= ($CURRENT_SUB=="ขออนุมัติตัวบุคคลเป็นวิทยากร"?"selected":"") ?>>
-                                ขออนุมัติตัวบุคคลเป็นวิทยากร
-                            </option>
-
-                            <option value="ขออนุมัติไม่เข้าร่วมโครงการ"
-                                <?= ($CURRENT_SUB=="ขออนุมัติไม่เข้าร่วมโครงการ"?"selected":"") ?>>
-                                ขออนุมัติไม่เข้าร่วมโครงการ
-                            </option>
-
-                            <option value="การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์"
-                                <?= ($CURRENT_SUB=="การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์"?"selected":"") ?>>
-                                การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์
-                            </option>
-
-                            <option value="ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย"
-                                <?= ($CURRENT_SUB=="ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย"?"selected":"") ?>>
-                                ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย
-                            </option>
-                            <?php endif; ?>
                         </select>
 
                     </div>
@@ -438,8 +407,6 @@ if (!isset($_SESSION['user_id'])) {
             }
             </script>
 
-
-
             <script>
             const studentCountInput = document.getElementById("studentCount");
             const studentList = document.getElementById("studentList");
@@ -578,6 +545,133 @@ if (!isset($_SESSION['user_id'])) {
             </div>
         </div>
     </form>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const main = document.getElementById("mainCategory");
+        const sub = document.getElementById("subCategory");
+        if (!main || !sub) return;
+
+        // 1) รายการหมวดย่อย (ตามภาพของคุณ)
+        const SUB_OPTIONS = {
+            external: [
+                "ระบบขอความอนุเคราะห์หนังสือฝึกงาน (ของนักศึกษา)",
+                "ส่งตัวหนังสือขอออกฝึกงาน(ของนักศึกษา)",
+                "หนังสือเรียนเชิญวิทยากร (ของนักศึกษา)",
+                "หนังสือขอบคุณ (ของนักศึกษา)",
+                "หนังสือขอความอนุเคราะห์ข้อมูลจัดทำปริญญานิพนธ์ (ของนักศึกษา)",
+                "หนังสือเรียนเชิญปริญญา(ของนักศึกษา)",
+            ],
+            internal: [
+                "ขอเปลี่ยนแปลงตารางสอน (ของอาจารย์)",
+                "ขอเปลี่ยนแปลงตารางสอบ (ของอาจารย์)",
+                "ขอสอบนอกตาราง (ของอาจารย์)",
+                "ขอใช้อาคารวันหยุดราชการ (ของอาจารย์)",
+                "ขอสอนชดเชย (ของอาจารย์)",
+                "ขอห้องพักรับรอง (ของอาจารย์)",
+                "ขออนุมัติตัวบุคคลเป็นวิทยากร (ของอาจารย์)",
+                "ขออนุมัติไม่เข้าร่วมโครงการ (ของอาจารย์)",
+                "การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์ (ของอาจารย์)",
+                "ขออนุมัติจัดทำโครงการ (ของอาจารย์)",
+                "หนังสือยินยอมให้นำเสนอผลงานทางวิชาการ (ของอาจารย์)",
+                "ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย (ของอาจารย์)",
+            ],
+        };
+
+        // 2) ลิงก์ของ “หมวดหลัก”
+        // - train -> ไปหน้าฟอร์มหลักเลย
+        // - academic -> ยังไม่รู้ปลายทาง ใช้ # (ไม่ redirect)
+        const ROUTE_MAIN = {
+            train: "/Pro_letter/documents/form_Memo.php",
+            academic: "/Pro_letter/form_Memo/Request/infor_approve_pro.php",
+        };
+
+        // 3) ลิงก์ของ “หมวดย่อย”
+        // ยังไม่รู้หน้าไหน ใส่ # ไปก่อนตามที่คุณบอก
+        const ROUTE_SUB = {
+            // external
+            "ระบบขอความอนุเคราะห์หนังสือฝึกงาน (ของนักศึกษา)": "/Pro_letter/form_Memo/Request/infor_intership.php",
+            "หนังสือเรียนเชิญวิทยากร (ของนักศึกษา)": "/Pro_letter/form_Memo/Request/infor_invite.php",
+            "ส่งตัวหนังสือขอออกฝึกงาน(ของนักศึกษา)": "#",
+            "หนังสือขอบคุณ (ของนักศึกษา)": "/Pro_letter/form_Memo/Request/infor_thankyou.php",
+            "หนังสือขอความอนุเคราะห์ข้อมูลจัดทำปริญญานิพนธ์ (ของนักศึกษา)": "/Pro_letter/form_Memo/Request/infor_research_data.php",
+            "หนังสือเรียนเชิญปริญญา(ของนักศึกษา)": "#",
+
+            // internal (ยังไม่รู้ลิงก์จริง ใส่ # ไปก่อน)
+            "ขอเปลี่ยนแปลงตารางสอน (ของอาจารย์)": "#",
+            "ขอเปลี่ยนแปลงตารางสอบ (ของอาจารย์)": "/Pro_letter/form_Memo/Request/infor_change_exam.php",
+            "ขอสอบนอกตาราง (ของอาจารย์)": "/Pro_letter/form_Memo/Request/infor_extra_exam.php",
+            "ขอใช้อาคารวันหยุดราชการ (ของอาจารย์)": "/Pro_letter/user/Request_2.php",
+            "ขอสอนชดเชย (ของอาจารย์)": "#",
+            "ขอห้องพักรับรอง (ของอาจารย์)": "/Pro_letter/user/Request_3.php",
+            "ขออนุมัติตัวบุคคลเป็นวิทยากร (ของอาจารย์)": "/Pro_letter/user/Request_4.php",
+            "ขออนุมัติไม่เข้าร่วมโครงการ (ของอาจารย์)": "/Pro_letter/user/Request_5.php",
+            "การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์ (ของอาจารย์)": "#",
+            "ขออนุมัติจัดทำโครงการ (ของอาจารย์)": "#",
+            "หนังสือยินยอมให้นำเสนอผลงานทางวิชาการ (ของอาจารย์)": "#",
+            "ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย (ของอาจารย์)": "/Pro_letter/user/Request_7.php",
+        };
+
+        function renderSubOptions(list, selectedValue = "") {
+            sub.innerHTML = '<option value="">-- เลือกหมวดย่อย --</option>';
+            list.forEach(text => {
+                const opt = document.createElement("option");
+                opt.value = text;
+                opt.textContent = text;
+                if (text === selectedValue) opt.selected = true;
+                sub.appendChild(opt);
+            });
+        }
+
+        function syncUI() {
+            const mainVal = (main.value || "").trim();
+            const currentSub = (sub.dataset.current || "").trim();
+
+            // ถ้าเป็น train/academic -> ไม่ต้องมีหมวดย่อย
+            if (mainVal === "train" || mainVal === "academic" || mainVal === "") {
+                sub.disabled = true;
+                sub.innerHTML = '<option value="">-- เลือกหมวดย่อย --</option>';
+                return;
+            }
+
+            // ถ้าเป็น external/internal -> เปิดหมวดย่อย
+            sub.disabled = false;
+            renderSubOptions(SUB_OPTIONS[mainVal] || [], currentSub);
+        }
+
+        function goMain() {
+            const mainVal = (main.value || "").trim();
+            const target = ROUTE_MAIN[mainVal];
+
+            // train -> redirect, academic -> # (ไม่ทำอะไร)
+            if (target && target !== "#") {
+                if (window.location.pathname !== target) window.location.href = target;
+            }
+        }
+
+        function goSub() {
+            const subVal = (sub.value || "").trim();
+            const target = ROUTE_SUB[subVal];
+
+            if (!target || target === "#") return; // ยังไม่รู้หน้าปลายทางก็ไม่ต้องเด้ง
+            if (window.location.pathname !== target) window.location.href = target;
+        }
+
+        // events
+        main.addEventListener("change", () => {
+            sub.dataset.current = ""; // เปลี่ยนหมวดหลักแล้วเคลียร์ค่าเดิม
+            syncUI();
+            goMain();
+        });
+
+        sub.addEventListener("change", goSub);
+
+        // init: ใช้ค่า $CURRENT_MAIN / $CURRENT_SUB ที่ PHP set มา
+        syncUI();
+    });
+    </script>
+
+
 
     <script>
     /* ====== Helpers ====== */
@@ -917,92 +1011,7 @@ if (!isset($_SESSION['user_id'])) {
     // เรียกครั้งแรกให้ตรงตามค่า checked เริ่มต้น
     toggleDatePickers();
     </script>
-    <script>
-    // ✅ ระบบเปิด/ปิดเมนูโปรไฟล์
-    const profileBtn = document.getElementById("profileBtn");
-    const profileMenu = document.getElementById("profileMenu");
 
-    if (profileBtn && profileMenu) {
-        profileBtn.addEventListener("click", (e) => {
-            e.stopPropagation(); // ป้องกันการคลิกซ้ำซ้อน
-            profileMenu.classList.toggle("hidden");
-        });
-
-        // ปิดเมนูเมื่อคลิกนอกกรอบ
-        window.addEventListener("click", (e) => {
-            if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
-                profileMenu.classList.add("hidden");
-            }
-        });
-    }
-
-    // ✅ ปุ่ม "อยู่ต่อ" ให้ปิดเมนู dropdown
-    function closeMenu() {
-        profileMenu.classList.add("hidden");
-    }
-
-    const main = document.getElementById("mainCategory");
-    const sub = document.getElementById("subCategory");
-
-    // Mapping ไฟล์สำหรับ redirect
-    const redirectMain = {
-        train: "form_Memo.php",
-        academic: "Request_1.php",
-        external: null, // ยังไม่มีฟอร์ม
-        internal: null // ให้เลือกหมวดย่อยแทน
-    };
-
-    const redirectSub = {
-        "ขอใช้อาคารวันหยุดราชการ": "Request_2.php",
-        "ขอห้องพักรับรอง": "Request_3.php",
-        "ขออนุมัติตัวบุคคลเป็นวิทยากร": "Request_4.php",
-        "ขออนุมัติไม่เข้าร่วมโครงการ": "Request_5.php",
-        "การเผยแพร่งานวิจัยและเบิกค่าตอบแทนการตีพิมพ์": "Request_6.php",
-        "ขอแจ้งเรียนการเป็นผู้ร่วมวิจัย": "Request_7.php"
-    };
-
-    // หมวดย่อยของ "ภายใน"
-    const subInternal = Object.keys(redirectSub);
-
-    // เมื่อเลือก "หมวดหลัก"
-    main.addEventListener("change", () => {
-        const value = main.value;
-
-        // เคลียร์หมวดย่อยก่อน
-        sub.innerHTML = `<option value="">-- เลือกหมวดย่อย --</option>`;
-        sub.disabled = true;
-
-        // ถ้าเลือกหมวดที่มี redirect ทันที เช่น ฝึกอบรม, ประชุมฯ
-        if (redirectMain[value]) {
-            window.location.href = redirectMain[value];
-            return;
-        }
-
-        // ถ้าเลือก "ภายนอก" → ไม่ redirect, ไม่เปิดหมวดย่อย
-        if (value === "external") {
-            return;
-        }
-
-        // ถ้าเลือก "ภายใน" → เปิดหมวดย่อย
-        if (value === "internal") {
-            sub.disabled = false;
-            subInternal.forEach(text => {
-                const opt = document.createElement("option");
-                opt.value = text;
-                opt.textContent = text;
-                sub.appendChild(opt);
-            });
-        }
-    });
-
-    // เมื่อเลือกหมวดย่อยของภายใน → redirect
-    sub.addEventListener("change", () => {
-        const value = sub.value;
-        if (redirectSub[value]) {
-            window.location.href = redirectSub[value];
-        }
-    });
-    </script>
 
 </body>
 

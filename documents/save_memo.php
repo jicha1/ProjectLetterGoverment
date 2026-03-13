@@ -24,7 +24,7 @@ try {
     /** ===== รับค่า POST ===== */
     $templateId = (int) ($_POST['template_id'] ?? 1);
     $departmentId = (int) ($_POST['department_id'] ?? 1);
-
+    
     $docDate = trim($_POST['doc_date'] ?? '');   // YYYY-MM-DD
     $fullname = trim($_POST['fullname'] ?? '');
     $position = trim($_POST['position'] ?? '');
@@ -58,8 +58,11 @@ $documentId = isset($_POST['document_id']) ? (int)$_POST['document_id'] : 0;
     $errors['doc_date'] = 'required';
 }
 
-if ($purpose === '') {
-    $errors['purpose'] = 'required';
+if ($purpose === 'other') {
+    $other = trim($_POST['purpose_other_detail'] ?? '');
+    if ($other === '') {
+        $errors['purpose_other_detail'] = 'required';
+    }
 }
 
 if ($eventTitle === '') {
@@ -95,13 +98,21 @@ if ($carUsed && $carPlate === '') {
     $pdo = db();
     $pdo->beginTransaction();
 
+    
     // 1) map ฟิลด์
-    $joinType = match ($purpose) {
-        'academic' => 'นำเสนอผลงานทางวิชาการ',
-        'training' => 'เข้ารับการฝึกอบรมหลักสูตร',
-        'meeting' => 'เข้าร่วมประชุมวิชาการในงาน',
-        default => 'อื่นๆ',
-    };
+    if ($purpose === 'other') {
+        $joinType = trim($_POST['purpose_other_detail'] ?? '');
+        if ($joinType === '') {
+            $joinType = 'อื่นๆ';
+        }
+    } else {
+        $joinType = match ($purpose) {
+            'academic' => 'นำเสนอผลงานทางวิชาการ',
+            'training' => 'เข้ารับการฝึกอบรมหลักสูตร',
+            'meeting'  => 'เข้าร่วมประชุมวิชาการในงาน',
+            default    => 'อื่นๆ',
+        };
+    }
     $subject = trim($joinType . $eventTitle);
     $q = $pdo->prepare("SELECT d.department_name, d.phone, f.faculty_name
                     FROM departments d
@@ -234,6 +245,57 @@ if ($carUsed && $carPlate === '') {
             ':value_text' => $val
         ]);
     }
+
+    // =====================
+    // SAVE STEP2 -> budget_items
+    // =====================
+    $types   = $_POST['budget_type'] ?? [];
+    $descs   = $_POST['budget_desc'] ?? [];
+    $amounts = $_POST['budget_amount'] ?? [];
+
+    $totalAmount = isset($_POST['total_amount']) ? (float)$_POST['total_amount'] : null;
+
+    // ถ้ามี step2 และไม่ติ๊ก no_cost -> ให้ใช้ total เป็น amount หลักของเอกสาร
+    if (!$noCost && $totalAmount !== null && $totalAmount >= 0) {
+        $amount = $totalAmount;
+        // อัปเดต field_id 8 ด้วยยอดรวมจริงอีกที
+        $values[8] = number_format($amount, 2, '.', '');
+    }
+
+    // ลบรายการเก่าก่อน (กรณี update)
+    $pdo->prepare("DELETE FROM budget_items WHERE document_id = :id")
+        ->execute([':id' => $documentId]);
+
+    // insert ใหม่
+    if (is_array($types) && is_array($descs) && is_array($amounts)) {
+        $insB = $pdo->prepare("
+            INSERT INTO budget_items (document_id, item_type, description, amount)
+            VALUES (:doc, :type, :desc, :amt)
+        ");
+
+        $count = min(count($types), count($descs), count($amounts));
+        for ($i = 0; $i < $count; $i++) {
+            $t = $types[$i] ?? 'other';
+            $d = trim((string)($descs[$i] ?? ''));
+            $aRaw = str_replace(',', '', (string)($amounts[$i] ?? '0'));
+            $a = is_numeric($aRaw) ? (float)$aRaw : 0.0;
+
+            // กัน type หลุด enum
+            if (!in_array($t, ['registration','transport','accommodation','per_diem','other'], true)) {
+                $t = 'other';
+            }
+            // กันแถวว่าง
+            if ($d === '' && $a == 0.0) continue;
+
+            $insB->execute([
+                ':doc'  => $documentId,
+                ':type' => $t,
+                ':desc' => $d,
+                ':amt'  => number_format($a, 2, '.', '')
+            ]);
+        }
+    }
+    
 
     $pdo->commit();
 

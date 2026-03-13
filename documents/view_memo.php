@@ -5,9 +5,6 @@ require_once __DIR__ . '/../functions.php';
 $referer = $_SERVER['HTTP_REFERER'] ?? '';
 $referer = trim(str_replace(["\r","\n"],"", $referer));
 
-/* --------------------------------------------------
-   ตรวจ session
--------------------------------------------------- */
 if (empty($_SESSION['user_id'])) {
   http_response_code(401);
   exit("Unauthorized");
@@ -16,15 +13,10 @@ if (empty($_SESSION['user_id'])) {
 $userId = (int) $_SESSION['user_id'];
 $role = strtolower($_SESSION['role_name'] ?? 'user');
 
-/* --------------------------------------------------
-
-   ตั้ง homePath ตาม role
--------------------------------------------------- */
 $roleId = $_SESSION['role_id'] ?? 0;
 $roleId = (int) ($_SESSION['role_id'] ?? 0);
 $isAdmin = ($roleId === 1);
 $isOfficer = ($roleId === 2);
-
 
 if ($roleId == 1) {
   $homePath = "/Pro_letter/admin/home.php";
@@ -34,10 +26,6 @@ if ($roleId == 1) {
   $homePath = "/Pro_letter/user/home.php";
 }
 
-
-/* --------------------------------------------------
-   รับ document_id
--------------------------------------------------- */
 $pdo = db();
 $docId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
@@ -56,9 +44,6 @@ if ($docId <= 0) {
     exit("ยังไม่มีเอกสารของคุณ");
 }
 
-/* --------------------------------------------------
-   โหลดข้อมูลเอกสาร
--------------------------------------------------- */
 $stmt = $pdo->prepare("
     SELECT document_id, template_id, owner_id, department_id, 
            doc_no, doc_date, subject, header_text, status
@@ -70,18 +55,9 @@ $stmt->execute([':id' => $docId]);
 $document = $stmt->fetch(PDO::FETCH_ASSOC);
 $docStatus = $document['status'];
 
-
-
-
-
 if (!$document)
   exit("ไม่พบเอกสาร");
 
-/* --------------------------------------------------
-   สิทธิ์ดูเอกสาร
--------------------------------------------------- */
-// Officer: role_id = 2
-// Admin:   role_id = 1
 $roleId = (int) ($_SESSION['role_id'] ?? 0);
 
 // officer & admin ดูได้ทุกอัน
@@ -94,9 +70,7 @@ if ($roleId !== 1 && $roleId !== 2) {
 }
 
 
-/* --------------------------------------------------
-   สิทธิ์แก้ไขเอกสาร
--------------------------------------------------- */
+
 $sql = "
     SELECT COUNT(*) 
     FROM user_permissions up
@@ -110,25 +84,17 @@ $st->execute([':uid' => $userId]);
 $hasEditPermission = $st->fetchColumn() > 0;   // สิทธิ์จาก permission
 $allowEditByStatus = in_array($docStatus, ['draft', 'rejected']);
 
-// User
+
 if ($roleId === 3 || $roleId === 0) {
     $canEdit = $hasEditPermission && in_array($docStatus, ['draft', 'rejected']);
 }
 
-// Officer / Admin
 elseif ($roleId === 1 || $roleId === 2) {
     $canEdit = true;
 }
 
 $readonly = !$canEdit;
 
-
-
-
-
-/* --------------------------------------------------
-   ดึงค่า field จาก document_values
--------------------------------------------------- */
 $q = $pdo->prepare("SELECT field_id, value_text FROM document_values WHERE document_id = :id");
 $q->execute([':id' => $docId]);
 
@@ -136,11 +102,6 @@ $valueMap = [];
 foreach ($q->fetchAll(PDO::FETCH_ASSOC) as $row) {
   $valueMap[(int) $row['field_id']] = $row['value_text'];
 }
-
-/* --------------------------------------------------
-   ฟังก์ชัน helper
--------------------------------------------------- */
-
 
 function thai_date($ymd)
 {
@@ -164,9 +125,6 @@ function thai_date($ymd)
   return intval($d) . " " . $months[intval($m)] . " " . (intval($y) + 543);
 }
 
-/* --------------------------------------------------
-   Mapping ตัวแปรหลักจาก document_values
--------------------------------------------------- */
 $docDate = $valueMap[1] ?? $document['doc_date'];
 $ownerName = $valueMap[2] ?? "";
 $position = $valueMap[3] ?? "";
@@ -178,9 +136,18 @@ $amountStr = $valueMap[8] ?? "";
 $vehicle = $valueMap[9] ?? "";
 $faculty = $valueMap[10] ?? "";
 $department = $valueMap[11] ?? "";
-/* --------------------------------------------------
-   Mapping joinType → purposeCode (รหัส)
--------------------------------------------------- */
+
+
+$name = $valueMap[1] ?? '';
+$position = $valueMap[2] ?? '';
+$faculty = $valueMap[3] ?? '';
+$department = $valueMap[4] ?? '';
+$conference = $valueMap[5] ?? '';
+$country = $valueMap[6] ?? '';
+$paper_title = $valueMap[7] ?? '';
+$date_range = $valueMap[8] ?? '';
+$table_data = $valueMap[9] ?? ''; 
+
 $purposeCode = 'other';
 
 switch (trim($joinType)) {
@@ -195,23 +162,14 @@ switch (trim($joinType)) {
     break;
 }
 
-/* --------------------------------------------------
-   ⭐⭐⭐ สำคัญที่สุด — แก้ให้ส่วนหัวขึ้น ⭐⭐⭐
--------------------------------------------------- */
 
 $header_text = $document["header_text"] ?? "";
 $doc_no = $document["doc_no"] ?? "";
 $subject = $document["subject"] ?? "";
 
-/* --------------------------------------------------
-   คำนวณวันที่ไทย, งบประมาณ
--------------------------------------------------- */
 $thaiDocDate = thai_date($docDate);
 $prettyAmount = $amountStr !== "" ? number_format((float) $amountStr, 2) : "";
 
-/* --------------------------------------------------
-   สร้างข้อความส่วนหัวที่ใช้ในเนื้อหา
--------------------------------------------------- */
 $hdr_agency = trim(
   ($faculty ?: "คณะ..................................") . " " .
   ($department ? "ภาควิชา" . $department : "ภาควิชา........................")
@@ -220,24 +178,15 @@ $hdr_agency = trim(
 $hdr_subject = $joinType ?: "เข้ารับการฝึกอบรมหลักสูตร";
 $hdr_to = "คณบดี" . ($faculty ?: "คณะ..................................");
 
-/* --------------------------------------------------
-   ปีไทย
--------------------------------------------------- */
 $thaiYear = "";
 if ($docDate && preg_match('/^\d{4}/', $docDate)) {
   $thaiYear = ((int) substr($docDate, 0, 4) + 543);
 }
 
-/* --------------------------------------------------
-   ความกว้างของช่อง “เรื่อง”
--------------------------------------------------- */
 $len = mb_strlen($subject, "UTF-8");
 $len = max(20, $len);
 
 ?>
-
-
-
 <!DOCTYPE html>
 <html lang="th">
 
@@ -247,20 +196,13 @@ $len = max(20, $len);
   <title>บันทึกข้อความ #<?= h($document['document_id']) ?></title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
   <link rel="stylesheet" href="/Pro_letter/documents/memo-styles.css">
-
 </head>
 
 <body class="view-document">
-
-
   <?php if ($readonly && !($isAdmin || $isOfficer)): ?>
   <script>
   document.addEventListener("DOMContentLoaded", () => {
-
-
-
     // ซ่อนปุ่ม submit
     const submitBtn = document.querySelector("button[type=submit]");
     if (submitBtn) submitBtn.style.display = "none";
@@ -295,21 +237,15 @@ $len = max(20, $len);
   <?php endif; ?>
 
   <main class="page">
-
-
-    <!-- หัวบันทึก -->
     <div style="display:flex; align-items:flex-end; justify-content:flex-start; gap:20px; margin-bottom:0.5em;">
       <img src="https://i.pinimg.com/474x/bd/55/cc/bd55ccc4416012910a723da8f810658b.jpg"
         style="height:1.6cm; width:auto; margin-top:0;" />
-
       <h1 class="doc-title" style="font-size:30pt;font-weight:bold;font-family:'TH SarabunPSK';
       line-height:1.0;margin-bottom:-10px;text-align:center;flex:1;
       transform: translateX(-0.3cm);">
         บันทึกข้อความ
       </h1>
     </div>
-
-    <!-- ส่วนราชการ -->
     <div class="doc-row">
       <div class="doc-label" style="font-size:20pt;font-weight:bold;">ส่วนราชการ</div>
       <div class="dot-line">
@@ -318,28 +254,20 @@ $len = max(20, $len);
         </span>
       </div>
     </div>
-
     <div class="doc-row row-ty-date">
       <div class="doc-label" style="font-size:20pt;font-weight:bold;">ที่</div>
-
       <div class="dot-line ty-left">
         <span class="chip">
           <?= h($doc_no ?: 'ทส.486/2568') ?>
         </span>
       </div>
-
       <div class="doc-label" style="font-size:20pt;font-weight:bold;margin-left:1cm;">วันที่</div>
-
       <div class="dot-line ty-right">
         <span class="chip">
           <?= h($thaiDocDate ?: '') ?>
         </span>
       </div>
     </div>
-
-
-
-    <!-- เรื่อง -->
     <div class="doc-row">
       <div class="doc-label" style="font-size:20pt;font-weight:bold;">เรื่อง</div>
       <div class="dot-line">
@@ -348,14 +276,9 @@ $len = max(20, $len);
         </span>
       </div>
     </div>
-
-
-
-    <!-- เนื้อหา -->
     <div class="content-block single " style=" margin-left: 1.45cm;">
       เรียน คณบดีคณะเทคโนโลยีและการจัดการอุตสาหกรรม
     </div>
-
     <div class="content-block paragraph">
       ตามที่ สมาคมสหกิจศึกษาไทย กำหนดจัดอบรมหลักสูตร
       <span class="chip"><?= h($courseName ?: 'ชื่อหลักสูตร') ?></span>
@@ -364,7 +287,6 @@ $len = max(20, $len);
       ณ <span class="chip"><?= h($location ?: '...') ?></span> นั้น
       ซึ่งหลักสูตรดังกล่าวเป็นประโยชน์ต่อการพัฒนาทั้งกระบวนการจัดการเรียนการสอนในรูปแบบสหกิจศึกษา
     </div>
-
     <div class="content-block paragraph">
       การนี้ ข้าพเจ้า
       <span class="chip"><?= h($ownerName ?: 'ชื่อ-นามสกุล') ?></span>
@@ -376,42 +298,32 @@ $len = max(20, $len);
       <span class="chip keep"><?= h($courseName ?: 'ชื่อหลักสูตร') ?></span>
       ระหว่างวันที่ <span class="chip"><?= h($joinDates ?: '') ?></span>
       ณ <span class="chip"><?= h($location ?: '') ?></span>
-      <!-- วงเงินทั้งสิ้น <span class="chip"><?= h($prettyAmount ?: '') ?></span> บาท
+      <?= h($prettyAmount ?: '') ?></span> บาท
       โดยขอใช้แหล่งเงินจัดสรรให้หน่วยงาน ประจำปีงบประมาณ
       <span class="chip">
         <?= h($thaiYear ? 'พ.ศ. ' . $thaiYear : 'พ.ศ. ....') ?>
       </span>
       แผนงานจัดการศึกษาระดับอุดมศึกษา กองทุนพัฒนาบุคลากร หมวดค่าใช้สอย -->
       <span class="keep">(รายละเอียดตามเอกสารแนบ)</span>
-
     </div>
-
     <div class="content-block paragraph">
       จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ
     </div>
-
     <div class="signature-wrapper">
       <div class="signature-block" id="signatureBlock">
         <div class="sig-name">(<?= h($ownerName ?: '') ?>)</div>
         <div class="sig-position"><?= h($position ?: '') ?></div>
       </div>
     </div>
-
     <div style="font-family:'TH SarabunPSK'; font-size:16pt; line-height:1.2;"> เรียน <?= h($hdr_to) ?> </div>
     <div class="content-block single align-to-dean"> เพื่อโปรดพิจารณาอนุมัติ </div>
     <div class="content-block single align-to-dean" style="margin-top:50px;;"> (ผู้ช่วยศาสตราจารย์ ดร. ขนิษฐา
       นามี)<br /> หัวหน้าภาควิชาเทคโนโลยีสารสนเทศ </div>
-
     <div class="footer-actions">
-
-      <!-- พิมพ์ -->
       <button type="button" onclick="window.print()"
         class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md text-xl font-bold">
         พิมพ์/ดูตัวอย่าง
       </button>
-
-      <!-- ปุ่มแก้ไข (ทุก role เห็นเหมือนกัน) -->
-      <!-- ปุ่มแก้ไข -->
       <a href="/Pro_letter/documents/form_Memo.php?id=<?= $docId ?>" id="editBtn"
         data-can-edit="<?= $canEdit ? '1' : '0' ?>" class="px-6 py-2 rounded-md text-xl font-bold
    <?= $canEdit
@@ -419,36 +331,211 @@ $len = max(20, $len);
       : "bg-gray-300 text-gray-600 cursor-not-allowed" ?>">
         แก้ไข
       </a>
-
-
-
-      <!-- กลับ -->
       <a href="<?= $homePath ?>"
         class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md text-xl font-bold">
         กลับหน้าหลัก
       </a>
-
     </div>
-
-
   </main>
+  <div class="page">
+    <form action="save_expense.php" method="post" id="expenseForm">
+      <div class="mt-4 mb-10">
+        <h2 class="text-[16pt] font-bold text-center leading-[1.1] mb-6">
+          ประมาณการค่าใช้จ่าย<br>
+          การนำเสนอผลงานวิจัยในการประชุมวิชาการระดับนานาชาติ
+        </h2>
+        <div class="text-[16pt] leading-[1.15]">
+          <div class="flex mb-1">
+            <div class="w-[180px]">ชื่อ–สกุล</div>
+            <div class="flex-1">
+              <?= h($name ?: 'รองศาสตราจารย์ ดร.อนิราช มิ่งขวัญ') ?>
+            </div>
+          </div>
+          <div class="flex mb-1">
+            <div class="w-[180px]">มหาวิทยาลัยต้นสังกัด</div>
+            <div class="flex-1">
+              ภาควิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีและการจัดการอุตสาหกรรม<br>
+              มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ วิทยาเขตปราจีนบุรี
+            </div>
+          </div>
+          <div class="flex mb-1">
+            <div class="w-[180px]">ชื่อการประชุมวิชาการ</div>
+            <div class="flex-1">
+              2024 8th International Conference on Natural Language Processing and<br>
+              Information Retrieval (NLPIR 2024)
+            </div>
+          </div>
+          <div class="flex mb-1">
+            <div class="w-[180px]">วันที่</div>
+            <div class="flex-1">12 – 15 ธันวาคม 2567</div>
+          </div>
+          <div class="flex mb-1">
+            <div class="w-[180px]">สถานที่</div>
+            <div class="flex-1">Okayama, Japan</div>
+          </div>
+          <div class="flex mb-1">
+            <div class="w-[180px]">ชื่อผลงานวิจัย</div>
+            <div class="flex-1">
+              “Enhancing Retrieval-Augmented Generation Systems by<br>
+              Text-Representing Centroid”
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="text-[16pt] font-bold mt-4 mb-3 text-left">
+        ตารางสรุปค่าใช้จ่ายในการไปนำเสนอผลงานวิจัย
+      </h2>
+      <table id="expenseTable" style="width:100%; border-collapse:collapse; font-family:'TH SarabunPSK';
+              font-size:16pt; line-height:1.25; table-layout:fixed;">
+        <tr style="height:28px;">
+          <th style="
+            width:55px;
+            border:1px solid #000; 
+            padding:3px 4px; 
+            text-align:center; 
+            font-weight:bold;">
+            ลำดับ<br>ที่
+          </th>
+          <th style="
+    width:65%; 
+    border:1px solid #000; 
+    padding:3px 6px; 
+    text-align:center; 
+    font-weight:bold;
+    vertical-align: top;
+">
+            รายการ
+          </th>
+          <th style="
+    width:120px; 
+    border:1px solid #000; 
+    padding:3px 4px; 
+    text-align:center; 
+    font-weight:bold;
+    vertical-align: top;
+">
+            จำนวนเงิน (บาท)
+          </th>
+        </tr>
+        <tr>
+          <td style="border:1px solid #000; padding:3px 4px; text-align:center; vertical-align: top;">1</td>
+          <td style="border:1px solid #000; padding:3px 8px; text-align:left;" contenteditable="true">
+            ค่าลงทะเบียน (1 คน × 540 USD) (ตามที่จ่ายจริง)<br>
+            - (1 USD = 35.00 บาท)
+          </td>
+          <td style="border:1px solid #000; padding:3px 4px; text-align:right; vertical-align: top;"
+            contenteditable="true">
+            18,900.00
+          </td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #000; padding:3px 4px; text-align:center; vertical-align: top;">2</td>
+          <td style="border:1px solid #000; padding:3px 8px; text-align:left;" contenteditable="true">
+            ค่าเดินทางระหว่างประเทศ (ตามที่จ่ายจริง)<br>
+            - ตั๋วเครื่องบิน ไป–กลับ ชั้นประหยัด กรุงเทพฯ → ญี่ปุ่น<br>
+            &nbsp;&nbsp;&nbsp;(25,000.00 บาท × 1 คน)
+          </td>
+          <td style="border:1px solid #000; padding:3px 4px; text-align:right; vertical-align: top;"
+            contenteditable="true">
+            25,000.00
+          </td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #000; padding:3px 4px; text-align:center; vertical-align: top;">3</td>
+          <td style="border:1px solid #000; padding:3px 8px; text-align:left;" contenteditable="true">
+            ค่าที่พัก ตามที่จ่ายจริง (ไม่เกิน 2 คืน)<br>
+            - ค่าที่พัก 13–14 ธันวาคม 2567 (7,000.00 บาท × 2 คืน)
+          </td>
+          <td style="border:1px solid #000; padding:3px 4px; text-align:right; vertical-align: top;"
+            contenteditable="true">
+            14,000.00
+          </td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #000; padding:3px 4px; text-align:center; vertical-align: top;">4</td>
+          <td style="border:1px solid #000; padding:3px 8px; text-align:left;" contenteditable="true">
+            ค่าพาหนะ<br>
+            - วันที่ 13 ธ.ค. 67 ค่าโดยสารรถแท็กซี่ ไป–กลับที่พัก–งาน NLPIR 2024<br>
+            &nbsp;&nbsp;&nbsp;(2,500.00 × 2 เที่ยว)<br>
+
+            - วันที่ 14 ธ.ค. 67 ค่าโดยสารรถแท็กซี่ ไป–กลับที่พัก–งาน NLPIR 2024<br>
+            &nbsp;&nbsp;&nbsp;(2,500.00 × 2 เที่ยว)<br>
+
+            - วันที่ 15 ธ.ค. 67 ค่าโดยสารรถแท็กซี่ ไป–กลับที่พัก–งาน NLPIR 2024<br>
+            &nbsp;&nbsp;&nbsp;(2,500.00 × 2 เที่ยว)
+          </td>
+          <td style="border:1px solid #000; padding:3px 4px; text-align:right; vertical-align: top;"
+            contenteditable="true">
+            15,000.00
+          </td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #000; padding:3px 4px; text-align:center; vertical-align: top;">5</td>
+          <td style="border:1px solid #000; padding:3px 8px; text-align:left;" contenteditable="true">
+            ค่าเบี้ยเลี้ยง วันละ 3,100.00 บาท รวม 3 วัน (ไม่เกิน 3 วัน)<br>
+            - ค่าเบี้ย 13–14–15 ธันวาคม 2567 (3,100.00 × 3 วัน)
+          </td>
+          <td style="border:1px solid #000; padding:3px 4px; text-align:right; vertical-align: top;"
+            contenteditable="true">
+            9,300.00
+          </td>
+        </tr>
+        <tr>
+          <th style="
+        width:55px;
+        border:1px solid #000;
+        padding:3px 4px;
+        background:#ffffff;
+    "></th>
+          <th colspan="1" style="
+        border:1px solid #000;
+        padding:3px 6px;
+        text-align:right;
+        font-weight:bold;
+        background:#f8f8f8;
+    ">
+            รวมเป็นเงิน * (เบิกได้ไม่เกิน 80,000.00 บาท)
+          </th>
+          <th style="
+        width:150px;
+        border:1px solid #000;
+        padding:3px 4px;
+        text-align:right;
+        font-weight:bold;
+        background:#ffffff;
+    ">
+            82,200.00
+          </th>
+        </tr>
+      </table>
+      <input type="hidden" name="doc_id" value="<?= $docId ?>">
+      <input type="hidden" name="table_data" id="table_data">
+      <div class="footer-actions">
+        <button type="button" onclick="window.print()"
+          class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md text-xl font-bold">
+          พิมพ์/ดูตัวอย่าง
+        </button>
+
+        <a href="/Pro_letter/documents/form_Memo.php?id=<?= $docId ?>" id="editBtn"
+          data-can-edit="<?= $canEdit ? '1' : '0' ?>" class="px-6 py-2 rounded-md text-xl font-bold
+   <?= $canEdit
+      ? "bg-teal-500 hover:bg-teal-600 text-white"
+      : "bg-gray-300 text-gray-600 cursor-not-allowed" ?>">
+          แก้ไข
+        </a>
+        <a href="<?= $homePath ?>"
+          class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md text-xl font-bold">
+          กลับหน้าหลัก
+        </a>
+      </div>
+    </form>
+  </div>
   <script>
-  /* ===============================
-    GLOBAL HELPERS
-    =============================== */
   function getQuery(name) {
     const url = new URL(window.location.href);
     return url.searchParams.get(name);
   }
-
-  /* ===============================
-  DOM READY
-  =============================== */
   document.addEventListener("DOMContentLoaded", () => {
-
-    /* ---------------------------------
-    1) LOCK VIEW DOCUMENT (chip)
-    --------------------------------- */
     document.querySelectorAll(".view-document .chip").forEach(el => {
       el.removeAttribute("contenteditable");
       el.removeAttribute("tabindex");
@@ -458,16 +545,11 @@ $len = max(20, $len);
       el.blur();
     });
 
-    /* ---------------------------------
-    2) READONLY MODE (PHP inject)
-    ใช้ได้เฉพาะตอน $readonly = true
-    --------------------------------- */
     <?php if ($readonly && !($isAdmin || $isOfficer)): ?>
     document.querySelectorAll("input, textarea, select").forEach(el => {
       el.disabled = true;
       el.style.background = "#f0f0f0";
     });
-
     const submitBtn = document.querySelector("button[type=submit]");
     if (submitBtn) submitBtn.style.display = "none";
 
@@ -478,10 +560,6 @@ $len = max(20, $len);
       confirmButtonText: "ตกลง"
     });
     <?php endif; ?>
-
-    /* ---------------------------------
-    3) ALERT BOX AUTO HIDE
-    --------------------------------- */
     const alertBox = document.getElementById("alertBox");
     if (alertBox) {
       setTimeout(() => {
@@ -491,9 +569,6 @@ $len = max(20, $len);
       }, 3000);
     }
 
-    /* ---------------------------------
-    4) NO PERMISSION ALERT (?err=no_permission)
-    --------------------------------- */
     const errType = getQuery("err");
     if (errType === "no_permission") {
       Swal.fire({
@@ -516,10 +591,6 @@ $len = max(20, $len);
         }
       });
     }
-
-    /* ---------------------------------
-    5) EDIT BUTTON PERMISSION CHECK
-    --------------------------------- */
     const editBtn = document.getElementById("editBtn");
     if (editBtn) {
       editBtn.addEventListener("click", function(e) {
@@ -536,9 +607,6 @@ $len = max(20, $len);
       });
     }
 
-    /* ---------------------------------
-    6) SAVED FROM UPDATE ALERT
-    --------------------------------- */
     if (getQuery("saved") === "1" && getQuery("from") === "update") {
       Swal.fire({
         title: "บันทึกสำเร็จ",
@@ -555,14 +623,8 @@ $len = max(20, $len);
         }
       });
     }
-
   });
   </script>
-
-
-
-
 </body>
-
 
 </html>

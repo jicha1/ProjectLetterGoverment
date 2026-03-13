@@ -1,5 +1,5 @@
 <?php
-// pro_letter/documents/form_Memo.php
+// pro_letter/documents/form_Calcu.php
 
 $CURRENT_MAIN = "train";
 $CURRENT_SUB  = "ฝึกอบรม";
@@ -627,8 +627,12 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
 
     function calc() {
       // 1 compensation
-      const compSum = state.compensation.reduce((s, it) => s + num(it.amount), 0);
 
+      const compSum = state.compensation.reduce((s, it) => s + num(it.amount), 0);
+      const amountInput = document.getElementById("amountInput"); // อยู่ step1 แต่เข้าถึงได้
+
+      // ใน calc() หลังคำนวณ total เสร็จ
+      if (amountInput) amountInput.value = String(total.toFixed(2));
       // 2 allowance
       let reg = 0,
         lod = 0,
