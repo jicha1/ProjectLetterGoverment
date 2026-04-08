@@ -202,6 +202,146 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
     animation: shake 0.2s linear 0s 2;
   }
 
+  /* input error */
+  .spell-error {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+    background-color: #fffafa;
+  }
+
+  /* กล่องผลลัพธ์ */
+  .spell-box {
+    margin-top: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: #fff7ed;
+    border: 1px solid #fdba74;
+    color: #9a3412;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ซ่อน */
+  .spell-box.hidden {
+    display: none !important;
+  }
+
+  /* กล่องผลลัพธ์ภายใน */
+  .spell-result-box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* ข้อความแจ้งเตือน */
+  .spell-warning {
+    font-weight: 600;
+    color: #991b1b;
+  }
+
+  /* ข้อความช่วย */
+  .spell-help-text {
+    font-size: 13px;
+    color: #9a3412;
+    font-weight: 500;
+  }
+
+  /* container ของคำแนะนำ */
+  .spell-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  /* ปุ่มคำแนะนำ */
+  .spell-suggestion-btn {
+    border: 1px solid #fdba74;
+    background: #ffffff;
+    color: #9a3412;
+    padding: 4px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+  }
+
+  /* hover */
+  .spell-suggestion-btn:hover {
+    background: #ffedd5;
+    border-color: #fb923c;
+  }
+
+  /* กด */
+  .spell-suggestion-btn:active {
+    transform: scale(0.96);
+  }
+
+  /* focus */
+  .spell-suggestion-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.2);
+  }
+
+  .spell-ok {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+    background-color: #f0fdf4;
+  }
+
+  .spell-loading {
+    margin-top: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: #eff6ff;
+    border: 1px solid #93c5fd;
+    color: #1d4ed8;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .spell-loading.hidden {
+    display: none !important;
+  }
+
+  .spell-loading-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .spell-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #bfdbfe;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  .spell-ignore-btn {
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #334155;
+    padding: 4px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+  }
+
+  .spell-ignore-btn:hover {
+    background: #e2e8f0;
+  }
+
+  ;
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   @keyframes shake {
 
     0%,
@@ -387,9 +527,17 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
                 อื่น ๆ
                 (ระบุ)
                 <input type="text" name="purpose_other_detail" id="purposeOtherInput"
+                  data-spell-field="purpose_other_detail"
                   class="border rounded-md p-2 w-[260px] ml-3 <?= ($purpose === 'other') ? '' : 'bg-gray-100 text-gray-400' ?>"
                   placeholder="โปรดระบุ" value="<?= h($purposeOther) ?>"
                   <?= ($purpose === 'other') ? '' : 'disabled' ?> />
+                <div id="purposeOtherSpellBox" class="spell-box hidden"></div>
+                <div id="purposeOtherSpellLoading" class="spell-loading hidden">
+                  <div class="spell-loading-row">
+                    <div class="spell-spinner"></div>
+                    <span>กำลังตรวจคำผิด...</span>
+                  </div>
+                </div>
               </label>
             </div>
           </div>
@@ -399,8 +547,15 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
             4.ชื่อของงานประชุมวิชาการ /<br />ชื่อหลักสูตรอบรม :
           </label>
           <div class="w-full">
-            <textarea name="event_title" rows="2" class="w-full border rounded-md p-2 shadow-sm"
-              id="eventTitle"><?= h($formData[5] ?? '') ?></textarea>
+            <textarea name="event_title" data-spell-field="event_title" rows="2"
+              class="w-full border rounded-md p-2 shadow-sm" id="eventTitle"><?= h($formData[5] ?? '') ?></textarea>
+            <div id="eventTitleSpellBox" class="spell-box hidden"></div>
+            <div id="eventTitleSpellLoading" class="spell-loading hidden">
+              <div class="spell-loading-row">
+                <div class="spell-spinner"></div>
+                <span>กำลังตรวจคำผิด...</span>
+              </div>
+            </div>
           </div>
         </div>
         <div class="mb-6">
@@ -464,9 +619,16 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
               <?= !$isOnline ? 'checked' : '' ?>>
             <label for="onsiteCheckbox">เข้าร่วมในรูปแบบออนไซต์</label>
             <label class="lbl text-gray-800 ml-4 mr-2" for="placeOnsite">ระบุสถานที่ไป :</label>
-            <input type="text" name="place" id="placeOnsite" class="border rounded-md p-2 w-[400px]
+            <input type="text" name="place" id="placeOnsite" data-spell-field="place" class="border rounded-md p-2 w-[400px]
   <?= !$isOnline ? '' : 'bg-gray-100 text-gray-400' ?>" value="<?= !$isOnline ? h($location) : '' ?>"
               <?= !$isOnline ? '' : 'disabled' ?>>
+            <div id="placeOnsiteSpellBox" class="spell-box hidden"></div>
+            <div id="placeOnsiteSpellLoading" class="spell-loading hidden">
+              <div class="spell-loading-row">
+                <div class="spell-spinner"></div>
+                <span>กำลังตรวจคำผิด...</span>
+              </div>
+            </div>
           </div>
         </div>
         <div class="mb-6">
@@ -678,6 +840,30 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
     </div>
   </form>
   <script>
+  const spellState = {
+    purpose_other_detail: {
+      checked: false,
+      hasError: false,
+      ignored: false,
+      suggestions: [],
+      errors: []
+    },
+    event_title: {
+      checked: false,
+      hasError: false,
+      ignored: false,
+      suggestions: [],
+      errors: []
+    },
+    place: {
+      checked: false,
+      hasError: false,
+      ignored: false,
+      suggestions: [],
+      errors: []
+    }
+  };
+
   document.addEventListener("DOMContentLoaded", () => {
     if (typeof flatpickr === "undefined") {
       console.error("flatpickr not loaded");
@@ -693,6 +879,9 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
     const mainCategory = document.getElementById("mainCategory");
     const subCategory = document.getElementById("subCategory");
 
+    const purposeOtherInput = document.getElementById("purposeOtherInput");
+    const eventTitle = document.getElementById("eventTitle");
+    const placeOnsite = document.getElementById("placeOnsite");
 
     const docDateDisplay = document.getElementById("docDateDisplay"); // ไทย พ.ศ.
     const docDateHidden = document.getElementById("docDate"); // YYYY-MM-DD (ส่ง DB)
@@ -700,11 +889,14 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
     const fullname = document.getElementById("fullname");
     const position = document.getElementById("position");
 
-    const purposeRadios = document.querySelectorAll('input[name="purpose"]');
-    const purposeOtherRadio = document.getElementById("purposeOtherRadio");
-    const purposeOtherInput = document.getElementById("purposeOtherInput");
+    const purposeOtherSpellBox = document.getElementById("purposeOtherSpellBox");
+    const eventTitleSpellBox = document.getElementById("eventTitleSpellBox");
+    const placeOnsiteSpellBox = document.getElementById("placeOnsiteSpellBox");
 
-    const eventTitle = document.getElementById("eventTitle");
+
+
+    const purposeOtherRadio = document.getElementById("purposeOtherRadio");
+    const purposeRadios = document.querySelectorAll('input[name="purpose"]');
 
     const optSingle = document.getElementById("optSingle");
     const optRange = document.getElementById("optRange");
@@ -716,13 +908,31 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
 
     const onlineCheckbox = document.getElementById("onlineCheckbox");
     const onsiteCheckbox = document.getElementById("onsiteCheckbox");
-    const placeOnsite = document.getElementById("placeOnsite");
 
     const amountInput = document.getElementById("amountInput");
     const noCostCheckbox = document.getElementById("noCostCheckbox");
 
     const carCheckbox = document.getElementById("carCheckbox");
     const carPlateInput = document.getElementById("carPlateInput");
+
+
+    function getSpellLoadingByField(el) {
+      if (!el) return null;
+      if (el.id === "purposeOtherInput") return document.getElementById("purposeOtherSpellLoading");
+      if (el.id === "eventTitle") return document.getElementById("eventTitleSpellLoading");
+      if (el.id === "placeOnsite") return document.getElementById("placeOnsiteSpellLoading");
+      return null;
+    }
+
+    function showSpellLoading(el) {
+      const box = getSpellLoadingByField(el);
+      if (box) box.classList.remove("hidden");
+    }
+
+    function hideSpellLoading(el) {
+      const box = getSpellLoadingByField(el);
+      if (box) box.classList.add("hidden");
+    }
 
     function clearError(el) {
       if (!el) return;
@@ -775,19 +985,17 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
     }
 
     function parseThaiSingle(raw) {
-
-      const match = (raw || "").match(/(\d+)\s*-\s*(\d+)\s*(.+)\s*(\d{4})/);
+      const match = (raw || "").match(/(\d+)\s+([^\s]+)\s+(\d{4})/);
       if (!match) return null;
 
-      const d1 = parseInt(match[1], 10);
-      const d2 = parseInt(match[2], 10);
-      const monthName = match[3].trim();
-      const year = parseInt(match[4], 10) - 543;
+      const d = parseInt(match[1], 10);
+      const monthName = match[2].trim();
+      const year = parseInt(match[3], 10) - 543;
 
       const monthIndex = monthsTH.indexOf(monthName);
       if (monthIndex === -1) return null;
 
-      return [new Date(year, monthIndex, d1), new Date(year, monthIndex, d2)];
+      return new Date(year, monthIndex, d);
     }
 
     function syncPurposeUI() {
@@ -798,6 +1006,15 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
         purposeOtherInput.value = "";
         purposeOtherInput.disabled = true;
         purposeOtherInput.classList.add("bg-gray-100", "text-gray-400");
+        clearError(purposeOtherInput);
+        clearSpellResult(purposeOtherInput);
+        spellState.purpose_other_detail = {
+          checked: false,
+          hasError: false,
+          ignored: false,
+          suggestions: [],
+          errors: []
+        };
       }
     }
     purposeRadios.forEach(r => r.addEventListener("change", syncPurposeUI));
@@ -817,7 +1034,8 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
       }
     }
     onlineCheckbox?.addEventListener("change", syncPlaceUI);
-    onsiteCheckbox?.addEventListener("change", syncPlaceUI);
+    onsiteCheckbox?.addEventListener("change",
+      syncPlaceUI);
 
     function syncCostUI() {
       if (noCostCheckbox?.checked) {
@@ -950,116 +1168,24 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
       }
     }
 
-    memoForm?.addEventListener("submit", (event) => {
-      // บังคับ sync ค่า display -> hidden ก่อน submit
-      if (docDateDisplay?.value && !docDateHidden?.value) {
-        const d = docPicker.selectedDates[0];
-        if (d) {
-          docDateHidden.value = docPicker.formatDate(d, "Y-m-d");
-        }
-      }
-      [
-        mainCategory, subCategory,
-        docDateDisplay, fullname, position,
-        purposeOtherInput, eventTitle,
-        singleDate, startDate, endDate, rangeDisplay,
-        placeOnsite, amountInput, carPlateInput
-      ].forEach(clearError);
 
-      let firstError = null;
 
-      if (!mainCategory?.value?.trim()) {
-        firstError = firstError || mainCategory;
-        setError(mainCategory, "กรุณาเลือกหมวดหลัก");
-      }
+    function parseThaiRange(raw) {
+      const match = (raw || "").match(/(\d+)\s+([^\s]+)\s+(\d{4})\s*-\s*(\d+)\s+([^\s]+)\s+(\d{4})/);
+      if (!match) return null;
 
-      if (!docDateHidden?.value?.trim()) {
-        firstError = firstError || docDateDisplay;
-        setError(docDateDisplay, "กรุณาเลือกวัน เดือน ปี");
-      }
+      const d1 = parseInt(match[1], 10);
+      const m1 = monthsTH.indexOf(match[2]);
+      const y1 = parseInt(match[3], 10) - 543;
 
-      if (!fullname?.value?.trim()) {
-        firstError = firstError || fullname;
-        setError(fullname, "กรุณาเลือกชื่อ - นามสกุล");
-      }
+      const d2 = parseInt(match[4], 10);
+      const m2 = monthsTH.indexOf(match[5]);
+      const y2 = parseInt(match[6], 10) - 543;
 
-      if (!position?.value?.trim()) {
-        firstError = firstError || position;
-        setError(position, "กรุณากรอกตำแหน่ง");
-      }
+      if (m1 === -1 || m2 === -1) return null;
 
-      const chosenPurpose = document.querySelector('input[name="purpose"]:checked');
-      if (!chosenPurpose) {
-        firstError = firstError || (purposeOtherRadio || purposeRadios[0]);
-        setError((purposeOtherRadio || purposeRadios[0]), "กรุณาเลือกข้อ 3");
-      } else if (chosenPurpose.value === "other") {
-        if (!purposeOtherInput?.value?.trim()) {
-          firstError = firstError || purposeOtherInput;
-          setError(purposeOtherInput, "กรุณาระบุรายละเอียด (อื่น ๆ)");
-        }
-      }
-
-      if (!eventTitle?.value?.trim()) {
-        firstError = firstError || eventTitle;
-        setError(eventTitle, "กรุณากรอกชื่อของงาน/หลักสูตรอบรม");
-      }
-
-      if (optSingle?.checked) {
-        if (!singleDate?.value?.trim()) {
-          firstError = firstError || singleDate;
-          setError(singleDate, "กรุณาเลือกวันที่ (วันเดียว)");
-        } else {
-          joinDate.value = singleDate.value.trim();
-        }
-      }
-
-      if (optRange?.checked) {
-        if (!rangeDisplay?.value?.trim()) {
-          firstError = firstError || rangeDisplay;
-          setError(rangeDisplay, "กรุณาเลือกช่วงวันที่ (หลายวัน)");
-        } else {
-          joinDate.value = rangeDisplay.value.trim();
-        }
-      }
-
-      if (onlineCheckbox?.checked) {
-        placeOnsite.value = "เข้าร่วมรูปแบบออนไลน์";
-      } else if (onsiteCheckbox?.checked) {
-        if (!placeOnsite?.value?.trim()) {
-          firstError = firstError || placeOnsite;
-          setError(placeOnsite, "กรุณาระบุสถานที่ไป (ออนไซต์)");
-        }
-      } else {
-        firstError = firstError || (onlineCheckbox || onsiteCheckbox);
-        setError((onlineCheckbox || onsiteCheckbox), "กรุณาเลือก ออนไลน์ หรือ ออนไซต์");
-      }
-
-      amountInput.value = (amountInput.value || "").replace(/,/g, "").trim();
-      if (!noCostCheckbox?.checked) {
-        if (!amountInput.value) {
-          firstError = firstError || amountInput;
-          setError(amountInput, "กรุณากรอกยอดค่าใช้จ่าย");
-        } else if (isNaN(Number(amountInput.value)) || Number(amountInput.value) < 0) {
-          firstError = firstError || amountInput;
-          setError(amountInput, "ยอดค่าใช้จ่ายต้องเป็นตัวเลขที่ถูกต้อง");
-        }
-      } else {
-        amountInput.value = "0.00";
-      }
-
-      if (carCheckbox?.checked) {
-        if (!carPlateInput?.value?.trim()) {
-          firstError = firstError || carPlateInput;
-          setError(carPlateInput, "กรุณากรอกทะเบียนรถ");
-        }
-      }
-
-      if (firstError) {
-        event.preventDefault();
-        scrollToFirstError(firstError);
-        return;
-      }
-    });
+      return [new Date(y1, m1, d1), new Date(y2, m2, d2)];
+    }
 
     const step1 = document.getElementById("step1");
     const step2 = document.getElementById("step2");
@@ -1114,8 +1240,19 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
         docDateDisplay, fullname, position, eventTitle,
         singleDate, startDate, endDate, rangeDisplay, placeOnsite, amountInput
       ].forEach(clearError);
-
       let firstError = null;
+      const chosenPurpose = document.querySelector('input[name="purpose"]:checked');
+
+      if (!chosenPurpose) {
+        firstError = firstError || (purposeOtherRadio || purposeRadios[0]);
+        setError((purposeOtherRadio || purposeRadios[0]), "กรุณาเลือกข้อ 3");
+      } else if (chosenPurpose.value === "other") {
+        if (!purposeOtherInput?.value?.trim()) {
+          firstError = firstError || purposeOtherInput;
+          setError(purposeOtherInput, "กรุณาระบุรายละเอียด (อื่น ๆ)");
+        }
+      }
+
 
       if (!docDateHidden?.value?.trim()) {
         firstError = firstError || docDateDisplay;
@@ -1181,7 +1318,7 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
       return true;
     }
 
-    nextBtn?.addEventListener("click", () => {
+    nextBtn?.addEventListener("click", async () => {
       if (noCostCheckbox?.checked) return;
       if (optSingle?.checked && singleDate?.value?.trim()) {
         joinDate.value = singleDate.value.trim();
@@ -1189,14 +1326,160 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
       if (optRange?.checked && rangeDisplay?.value?.trim()) {
         joinDate.value = rangeDisplay.value.trim();
       }
-      if (noCostCheckbox?.checked) return;
+      await checkSpellField(purposeOtherInput);
+      await checkSpellField(eventTitle);
+      await checkSpellField(placeOnsite);
+      for (const key in spellState) {
+        const state = spellState[key];
+        if (state.checked && state.hasError && !state.ignored) {
+          alert("กรุณาเลือกคำแนะนำ หรือกดใช้ข้อความเดิมก่อนดำเนินการ");
+          return;
+        }
+      }
       if (!validateStep1Minimal()) return;
       showStep2();
-      if (!validateStep1Minimal()) return;
-      showStep2();
+
     });
     backBtn?.addEventListener("click", () => {
       showStep1();
+    });
+
+    memoForm?.addEventListener("submit", async (event) => {
+      event.preventDefault(); // กันส่งฟอร์มก่อนเสมอ
+
+      // กันกดรัว
+      const submitter = event.submitter || finalSubmitBtn || submitBtnStep1;
+      if (submitter) submitter.disabled = true;
+
+      try {
+        // บังคับ sync ค่า display -> hidden ก่อน submit
+        if (docDateDisplay?.value && !docDateHidden?.value) {
+          const d = docPicker.selectedDates[0];
+          if (d) {
+            docDateHidden.value = docPicker.formatDate(d, "Y-m-d");
+          }
+        }
+
+        [
+          mainCategory, subCategory,
+          docDateDisplay, fullname, position,
+          purposeOtherInput, eventTitle,
+          singleDate, startDate, endDate, rangeDisplay,
+          placeOnsite, amountInput, carPlateInput
+        ].forEach(clearError);
+
+        let firstError = null;
+
+        if (!mainCategory?.value?.trim()) {
+          firstError = firstError || mainCategory;
+          setError(mainCategory, "กรุณาเลือกหมวดหลัก");
+        }
+
+        if (!docDateHidden?.value?.trim()) {
+          firstError = firstError || docDateDisplay;
+          setError(docDateDisplay, "กรุณาเลือกวัน เดือน ปี");
+        }
+
+        if (!fullname?.value?.trim()) {
+          firstError = firstError || fullname;
+          setError(fullname, "กรุณาเลือกชื่อ - นามสกุล");
+        }
+
+        if (!position?.value?.trim()) {
+          firstError = firstError || position;
+          setError(position, "กรุณากรอกตำแหน่ง");
+        }
+
+        const chosenPurpose = document.querySelector('input[name="purpose"]:checked');
+        if (!chosenPurpose) {
+          firstError = firstError || (purposeOtherRadio || purposeRadios[0]);
+          setError((purposeOtherRadio || purposeRadios[0]), "กรุณาเลือกข้อ 3");
+        } else if (chosenPurpose.value === "other") {
+          if (!purposeOtherInput?.value?.trim()) {
+            firstError = firstError || purposeOtherInput;
+            setError(purposeOtherInput, "กรุณาระบุรายละเอียด (อื่น ๆ)");
+          }
+        }
+
+        if (!eventTitle?.value?.trim()) {
+          firstError = firstError || eventTitle;
+          setError(eventTitle, "กรุณากรอกชื่อของงาน/หลักสูตรอบรม");
+        }
+
+        if (optSingle?.checked) {
+          if (!singleDate?.value?.trim()) {
+            firstError = firstError || singleDate;
+            setError(singleDate, "กรุณาเลือกวันที่ (วันเดียว)");
+          } else {
+            joinDate.value = singleDate.value.trim();
+          }
+        } else if (optRange?.checked) {
+          if (!rangeDisplay?.value?.trim()) {
+            firstError = firstError || rangeDisplay;
+            setError(rangeDisplay, "กรุณาเลือกช่วงวันที่ (หลายวัน)");
+          } else {
+            joinDate.value = rangeDisplay.value.trim();
+          }
+        } else {
+          firstError = firstError || optSingle;
+          setError(optSingle, "กรุณาเลือก วันเดียว หรือ หลายวัน");
+        }
+
+        if (onlineCheckbox?.checked) {
+          placeOnsite.value = "เข้าร่วมรูปแบบออนไลน์";
+        } else if (onsiteCheckbox?.checked) {
+          if (!placeOnsite?.value?.trim()) {
+            firstError = firstError || placeOnsite;
+            setError(placeOnsite, "กรุณาระบุสถานที่ไป (ออนไซต์)");
+          }
+        } else {
+          firstError = firstError || (onlineCheckbox || onsiteCheckbox);
+          setError((onlineCheckbox || onsiteCheckbox), "กรุณาเลือก ออนไลน์ หรือ ออนไซต์");
+        }
+
+        amountInput.value = (amountInput.value || "").replace(/,/g, "").trim();
+        if (!noCostCheckbox?.checked) {
+          if (!amountInput.value) {
+            firstError = firstError || amountInput;
+            setError(amountInput, "กรุณากรอกยอดค่าใช้จ่าย");
+          } else if (isNaN(Number(amountInput.value)) || Number(amountInput.value) < 0) {
+            firstError = firstError || amountInput;
+            setError(amountInput, "ยอดค่าใช้จ่ายต้องเป็นตัวเลขที่ถูกต้อง");
+          }
+        } else {
+          amountInput.value = "0.00";
+        }
+
+        if (carCheckbox?.checked) {
+          if (!carPlateInput?.value?.trim()) {
+            firstError = firstError || carPlateInput;
+            setError(carPlateInput, "กรุณากรอกทะเบียนรถ");
+          }
+        }
+
+        if (firstError) {
+          scrollToFirstError(firstError);
+          return;
+        }
+
+        await checkSpellField(purposeOtherInput);
+        await checkSpellField(eventTitle);
+        await checkSpellField(placeOnsite);
+
+        for (const key in spellState) {
+          const state = spellState[key];
+          if (state.checked && state.hasError && !state.ignored) {
+            alert("กรุณาเลือกคำแนะนำ หรือกดใช้ข้อความเดิมก่อนดำเนินการ");
+            return;
+          }
+        }
+
+        // ผ่านทุกอย่างแล้วค่อย submit จริง
+        memoForm.submit();
+
+      } finally {
+        if (submitter) submitter.disabled = false;
+      }
     });
 
     syncPurposeUI();
@@ -1239,6 +1522,62 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
     const trList = document.getElementById("trList");
     const trEmpty = document.getElementById("trEmpty");
     const trTotal = document.getElementById("trTotal");
+
+
+    document.addEventListener("click", (e) => {
+      const ignoreBtn = e.target.closest(".spell-ignore-btn");
+      if (!ignoreBtn) return;
+
+      const targetId = ignoreBtn.dataset.target;
+      const target = document.getElementById(targetId);
+      if (!target) return;
+
+      const fieldName = target.dataset.spellField || "";
+      const currentText = (target.value || "").trim();
+
+      spellState[fieldName] = {
+        checked: true,
+        hasError: false,
+        ignored: true,
+        suggestions: [],
+        errors: [],
+        lastText: currentText
+      };
+
+      clearSpellResult(target);
+      target.classList.remove("spell-error");
+      target.classList.add("spell-ok");
+    });
+
+
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest(".spell-suggestion-btn");
+      if (!btn) return;
+
+      const targetId = btn.dataset.target;
+      const word = btn.dataset.word;
+      const wrongWord = btn.dataset.wrongWord;
+      const target = document.getElementById(targetId);
+
+      if (!target || !word || !wrongWord) return;
+
+      const currentValue = target.value || "";
+      const updatedValue = replaceWholeWordOnce(currentValue, wrongWord, word);
+
+      target.value = updatedValue;
+
+      const fieldName = target.dataset.spellField || "";
+      spellState[fieldName] = {
+        checked: false,
+        hasError: false,
+        ignored: false,
+        suggestions: [],
+        errors: [],
+        lastText: ""
+      };
+
+      checkSpellField(target);
+    });
 
     function n(v) {
       const x = Number(String(v ?? "").replace(/,/g, ""));
@@ -1457,7 +1796,328 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
 
     finalSubmitBtn?.addEventListener("click", () => {
       calcAll();
+
     });
+
+    function getSpellBoxByField(el) {
+      if (!el) return null;
+      if (el.id === "purposeOtherInput") return purposeOtherSpellBox;
+      if (el.id === "eventTitle") return eventTitleSpellBox;
+      if (el.id === "placeOnsite") return placeOnsiteSpellBox;
+      return null;
+    }
+
+    function clearSpellResult(el) {
+      if (!el) return;
+      el.classList.remove("spell-error", "spell-ok");
+
+      const box = getSpellBoxByField(el);
+      if (box) {
+        box.innerHTML = "";
+        box.classList.add("hidden");
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function showSpellError(el, errors = []) {
+      if (!el) return;
+      clearSpellResult(el);
+      el.classList.add("spell-error");
+
+      const box = getSpellBoxByField(el);
+      if (!box) return;
+
+      errors = normalizeErrors(errors, el.value || "");
+
+      if (!Array.isArray(errors) || errors.length === 0) {
+        showSpellOk(el);
+        return;
+      }
+
+      let html = `<div class="spell-result-box">`;
+      html += `<div class="spell-warning">พบคำแนะนำ ${errors.length} จุด</div>`;
+
+      errors.forEach((item, index) => {
+        const wrongWord = item?.wrongWord || "";
+        const suggestions = Array.isArray(item?.suggestions) ? item.suggestions.slice(0, 5) : [];
+
+        html += `<div class="mt-2">`;
+        html += `<div class="spell-help-text">คำที่ ${index + 1}: <b>${escapeHtml(wrongWord)}</b></div>`;
+
+        if (suggestions.length > 0) {
+          html += `<div class="spell-suggestions">`;
+          suggestions.forEach(word => {
+            html += `
+          <button
+            type="button"
+            class="spell-suggestion-btn"
+            data-target="${el.id}"
+            data-word="${escapeHtml(word)}"
+            data-wrong-word="${escapeHtml(wrongWord)}"
+          >${escapeHtml(word)}</button>
+        `;
+          });
+          html += `</div>`;
+        }
+        html += `</div>`;
+      });
+
+      html += `
+    <div class="spell-suggestions">
+      <button type="button" class="spell-ignore-btn" data-target="${el.id}">
+        ใช้ข้อความเดิม
+      </button>
+    </div>
+  `;
+
+      html += `</div>`;
+
+      box.innerHTML = html;
+      box.classList.remove("hidden");
+    }
+
+    function showSpellOk(el) {
+      if (!el) return;
+      clearSpellResult(el);
+      if ((el.value || "").trim() !== "") {
+        el.classList.add("spell-ok");
+      }
+    }
+
+    function shouldCheckSpell(el) {
+      if (!el) return false;
+      if (el.disabled || el.readOnly) return false;
+
+      if (el.id === "purposeOtherInput") {
+        return !!purposeOtherRadio?.checked;
+      }
+
+      if (el.id === "placeOnsite") {
+        return !!onsiteCheckbox?.checked;
+      }
+
+      return true;
+    }
+
+
+
+    function escapeRegExp(str) {
+      return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    function replaceWholeWordOnce(text, wrongWord, newWord) {
+      if (!text || !wrongWord || !newWord) return text;
+
+      const escaped = escapeRegExp(wrongWord);
+
+      // พยายามแทนทั้งคำก่อน
+      const wordBoundaryRegex = new RegExp(`(^|\\s|[,(\\[{"'“”‘’])(${escaped})(?=$|\\s|[),.\\]}",'“”‘’!?])`);
+      if (wordBoundaryRegex.test(text)) {
+        return text.replace(wordBoundaryRegex, (match, p1) => `${p1}${newWord}`);
+      }
+
+      // ถ้าไม่เจอจริง ๆ ค่อยแทนครั้งเดียวแบบตรงตัว
+      const plainRegex = new RegExp(escaped);
+      return text.replace(plainRegex, newWord);
+    }
+
+    function normalizeErrors(errors = [], originalText = "") {
+      if (!Array.isArray(errors)) return [];
+
+      const seen = new Set();
+      const normalized = [];
+
+      for (const item of errors) {
+        const wrongWord = String(item?.wrongWord || "").trim();
+        if (!wrongWord) continue;
+
+        // เอาเฉพาะคำที่มีอยู่จริงในข้อความปัจจุบัน
+        if (originalText && !originalText.includes(wrongWord)) continue;
+
+        // ตัดคำซ้ำ
+        if (seen.has(wrongWord)) continue;
+        seen.add(wrongWord);
+
+        // ตัด suggestion ที่ซ้ำกับคำเดิม
+        const suggestions = Array.isArray(item?.suggestions) ?
+          item.suggestions
+          .map(s => String(s || "").trim())
+          .filter(Boolean)
+          .filter(s => s !== wrongWord)
+          .filter((s, i, arr) => arr.indexOf(s) === i)
+          .slice(0, 5) : [];
+
+        normalized.push({
+          wrongWord,
+          suggestions
+        });
+      }
+
+      return normalized;
+    }
+
+    function isIgnoredForSameText(fieldName, text) {
+      const state = spellState[fieldName];
+      return !!(state && state.ignored && state.lastText === text);
+    }
+    const spellCache = {};
+
+    async function checkSpellField(el) {
+      if (!el) return;
+
+      clearSpellResult(el);
+
+      if (!shouldCheckSpell(el)) {
+        return;
+      }
+
+      const text = (el.value || "").trim();
+      if (!text) {
+        return;
+      }
+
+      const fieldName = el.dataset.spellField || "";
+      const cacheKey = `${fieldName}::${text}`;
+      if (isIgnoredForSameText(fieldName, text)) {
+        showSpellOk(el);
+        return;
+      }
+
+      if (spellCache[cacheKey]) {
+        const cached = spellCache[cacheKey];
+
+        if (cached.hasError) {
+          const normalizedErrors = normalizeErrors(cached.errors || [], text);
+
+          if (normalizedErrors.length === 0) {
+            spellState[fieldName] = {
+              checked: true,
+              hasError: false,
+              ignored: false,
+              suggestions: [],
+              errors: [],
+              lastText: text
+            };
+            showSpellOk(el);
+            return;
+          }
+
+          spellState[fieldName] = {
+            checked: true,
+            hasError: true,
+            ignored: false,
+            suggestions: [],
+            errors: normalizedErrors,
+            lastText: text
+          };
+          showSpellError(el, normalizedErrors);
+        } else {
+          spellState[fieldName] = {
+            checked: true,
+            hasError: false,
+            ignored: false,
+            suggestions: [],
+            errors: [],
+            lastText: text
+          };
+          showSpellOk(el);
+        }
+        return;
+      }
+
+      el.classList.add("opacity-50");
+      showSpellLoading(el);
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+      try {
+        const response = await fetch("http://127.0.0.1:8001/api/spell-check", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            field: fieldName,
+            text: text
+          }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const result = await response.json();
+        spellCache[cacheKey] = result;
+
+        if (result.hasError) {
+          const normalizedErrors = normalizeErrors(result.errors || [], text);
+
+          if (normalizedErrors.length === 0) {
+            spellState[fieldName] = {
+              checked: true,
+              hasError: false,
+              ignored: false,
+              suggestions: [],
+              errors: [],
+              lastText: text
+            };
+            showSpellOk(el);
+            return;
+          }
+
+          spellState[fieldName] = {
+            checked: true,
+            hasError: true,
+            ignored: false,
+            suggestions: [],
+            errors: normalizedErrors,
+            lastText: text
+          };
+
+          showSpellError(el, normalizedErrors);
+        } else {
+          spellState[fieldName] = {
+            checked: true,
+            hasError: false,
+            ignored: false,
+            suggestions: [],
+            errors: [],
+            lastText: text
+          };
+
+          showSpellOk(el);
+        }
+      } catch (error) {
+        clearTimeout(timeoutId);
+        console.error("Spell check API error:", error);
+
+        spellState[fieldName] = {
+          checked: false,
+          hasError: false,
+          ignored: false,
+          suggestions: [],
+          errors: [],
+          lastText: ""
+        };
+      } finally {
+        el.classList.remove("opacity-50");
+        hideSpellLoading(el);
+      }
+    }
+
+
   });
   </script>
   <script>
@@ -1553,6 +2213,9 @@ $purposeOther = ($purpose === 'other') ? $joinType : '';
     });
     sub.addEventListener("change", goSub);
     syncUI();
+
+
+
   });
   </script>
   <script>
